@@ -3,20 +3,7 @@
 
 #include <vector>
 
-int PascalValue(int i, int n)
-{
-    if(i == 0 || i == n)
-        return 1;
-    else
-        return PascalValue(i, n-1) + PascalValue(i-1, n-1);
-}
-
-std::vector<unsigned int> Range(unsigned int n)
-{
-    std::vector<unsigned int> rangeVector;
-    for(unsigned int i; i < n; ++i)
-        rangeVector.push_back(i);
-    return rangeVector;
-}
+int PascalValue(int i, int n);
+std::vector<unsigned int> Range(unsigned int n);
 
 #endif // UTILS_HPP
