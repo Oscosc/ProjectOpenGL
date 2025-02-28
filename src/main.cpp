@@ -34,6 +34,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+bool mouseActive = false;
 
 // curve
 //int nb_curve_points = 10;
@@ -244,6 +245,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
+    if(mouseActive) {
+        return;
+    }
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -279,5 +283,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
         nb_curve_points--;
+    }
+
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if(mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if(!mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        mouseActive = !mouseActive;
     }
 }
