@@ -36,8 +36,8 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // curve
-int nb_curve_points = 10;
-
+//int nb_curve_points = 10;
+float nb_curve_points = 0.1f;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -107,7 +107,7 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     BezierCurve curve(controlPolygon);
-    ptsTab verticesBezier = curve.discretize(nb_curve_points);
+    ptsTab verticesBezier = curve.discretizeEqualy(nb_curve_points);
     verticesBezier.reserve(MAX_DISCRETE_POINTS);
 
     // Create drawable objects
@@ -162,7 +162,7 @@ int main()
         // update bezier curve
         // -------------------
         if(verticesBezier.size() != nb_curve_points) {
-            verticesBezier = curve.discretize(nb_curve_points);
+            verticesBezier = curve.discretizeEqualy(nb_curve_points);
             bezier.updateVertices(verticesBezier);
         }
         // active shader

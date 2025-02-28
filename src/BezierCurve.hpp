@@ -2,7 +2,7 @@
 #define BEZIER_CURVE_HPP
 
 #define MAX_DISCRETE_POINTS 100
-#define DISCRETIZATION_STEP 0.05
+#define DISCRETIZATION_STEP 0.01
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -28,7 +28,7 @@ public:
     void debugControlPoints();
     glm::vec3 curveValue(float u);
     ptsTab discretize(int nb_points);
-    ptsTab discretizeEqualy(int segment_size);
+    ptsTab discretizeEqualy(float segment_size);
 
 private:
 
@@ -37,4 +37,4 @@ private:
     float bersteinValue(float u, int i, int n);
 };
 
-#endif // BEZIER_CURVE_HPP
+#endif //BEZIER_CURVE_HPP

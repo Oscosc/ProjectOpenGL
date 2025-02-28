@@ -48,7 +48,7 @@ ptsTab BezierCurve::discretize(int nb_points)
 }
 
 
-ptsTab BezierCurve::discretizeEqualy(int segment_size)
+ptsTab BezierCurve::discretizeEqualy(float segment_size)
 {
     ptsTab vertices = {control_points[0]};
 
@@ -56,7 +56,6 @@ ptsTab BezierCurve::discretizeEqualy(int segment_size)
     for(float i = 0; i <= 1; i += DISCRETIZATION_STEP) {
         glm::vec3 new_point = curveValue(i);
         if (glm::length(vertices[current] - new_point) >= segment_size) {
-            std::cout << "New point added !" << std::endl;
             vertices.push_back(new_point);
             ++current;
         }
