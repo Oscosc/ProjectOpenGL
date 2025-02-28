@@ -277,7 +277,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 // key callback function
 // ---------------------
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+{   
+    // Update number of curve points in BezierCurve
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
         nb_curve_points++;
     }
