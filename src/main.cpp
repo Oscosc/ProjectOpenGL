@@ -172,10 +172,7 @@ int main()
 
         // draw lines
         // ----------
-        bezierShader.setVec3("color", 1.0f, 1.0f, 1.0f);
-        curve.draw();
-
-        bezierShader.setVec3("color", 1.0f, 0.0f, 0.0f);
+        curve.draw(bezierShader);
 
 
         // draw crosshair

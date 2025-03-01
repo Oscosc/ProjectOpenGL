@@ -33,15 +33,26 @@ glm::vec3 BezierCurve::curveValue(float u)
 }
 
 
-void BezierCurve::updateCurvePoints()
+ptsTab BezierCurve::normalDiscretization()
 {
     ptsTab discretizedValues;
     for(float i=0; i < m_nbCurvePoints; ++i) {
         discretizedValues.push_back(curveValue(i/(m_nbCurvePoints-1)));
     }
+    return discretizedValues;
+}
 
-    m_curvePoints = discretizedValues;
-    updateVertices(m_curvePoints);
+
+ptsTab BezierCurve::equalDiscretization()
+{
+    return ptsTab();
+}
+
+
+void BezierCurve::updateCurvePoints()
+{
+    m_curvePoints = normalDiscretization();
+    updateVertices(combine(m_controlPoints, m_curvePoints));
 }
 
 
@@ -65,16 +76,17 @@ ptsTab BezierCurve::discretizeEqualy(float segment_size)
 }
 
 
-void BezierCurve::draw()
+void BezierCurve::draw(Shader shader)
 {
-    std::cout << "DEBUG POINTS UPDATE" << std::endl;
-    for(glm::vec3 point : m_curvePoints) {
-        std::cout << glm::to_string(point) << std::endl;
-    }
-    std::cout << "-------------------" << std::endl;
-
     glBindVertexArray(VAO);
-    glDrawArrays(GL_LINE_STRIP, 0, m_curvePoints.size());
+
+    // Dessine le polygone de controle
+    shader.setVec3("color", 1.0f, 0.0f, 0.0f);
+    glDrawArrays(GL_LINE_STRIP, 0, m_controlPoints.size());
+
+    // Dessine la courbe de Bezier
+    shader.setVec3("color", 1.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_LINE_STRIP, m_controlPoints.size(), m_curvePoints.size());
 
     // Optionnel : "déconnecte" le VAO
     glBindVertexArray(0);

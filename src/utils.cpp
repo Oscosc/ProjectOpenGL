@@ -17,3 +17,13 @@ std::vector<unsigned int> Range(unsigned int n)
         rangeVector.push_back(i);
     return rangeVector;
 }
+
+
+std::vector<glm::vec3> combine(std::vector<glm::vec3> vecA, std::vector<glm::vec3> vecB)
+{
+    std::vector<glm::vec3> tmp;
+    tmp.reserve(vecA.size() + vecB.size());
+    tmp.insert(tmp.end(), vecA.begin(), vecA.end());
+    tmp.insert(tmp.end(), vecB.begin(), vecB.end());
+    return tmp;
+}

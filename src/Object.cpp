@@ -10,7 +10,7 @@ Object::Object()
     // "Connexion" au VAO et au VBO
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
+    
     glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
@@ -39,7 +39,6 @@ void Object::updateVertices(ptsTab points)
         points.data(),
         GL_DYNAMIC_DRAW
     );
-    std::cout << "Vertices updated with " << points.size() << " points" << std::endl;
 
     // Lier les données aux attributs de vertex
     glEnableVertexAttribArray(0);

@@ -8,6 +8,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+#include "../includes/shader.hpp"
+
 
 using ptsTab = std::vector<glm::vec3>;
 
@@ -22,7 +24,7 @@ public:
 
     Object();
     virtual ~Object();
-    virtual void draw() = 0; // A redéfinir pour chaque objet
+    virtual void draw(Shader shader) = 0; // A redéfinir pour chaque objet
 
 protected:
 

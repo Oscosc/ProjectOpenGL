@@ -29,7 +29,7 @@ public:
     ptsTab discretizeEqualy(float segment_size);
     
     // Fonctions héritées de Object
-    void draw() override;
+    void draw(Shader shader) override;
 
     // Fonctions héritées de ScalableElement
     void next() override;
@@ -41,6 +41,10 @@ private:
     ptsTab m_curvePoints;
     unsigned int m_nbCurvePoints;
 
+    GLuint controlVAO, controlVBO;
+
+    ptsTab normalDiscretization();
+    ptsTab equalDiscretization();
     void updateCurvePoints();
     float bersteinValue(float u, int i, int n);
 };
