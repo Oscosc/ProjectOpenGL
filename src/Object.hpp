@@ -9,21 +9,26 @@
 #include <glm/glm.hpp>
 
 
+using ptsTab = std::vector<glm::vec3>;
+
+
+/**
+ * @class Object
+ * @brief Classe abstraite pour les objets qui doivent être rendus en OpenGL.
+ */
 class Object
 {
 public:
 
-    Object(std::vector<glm::vec3> points);
-    Object(std::vector<glm::vec3> points, unsigned int forced_buffer_size);
+    Object();
+    virtual ~Object();
+    virtual void draw() = 0; // A redéfinir pour chaque objet
 
-    void updateVertices(std::vector<glm::vec3> new_points);
-    void drawLine();
-    void deleteBuffers();
+protected:
 
-private:
+    GLuint VAO, VBO;
 
-    unsigned int VAO, VBO;
-    std::vector<glm::vec3> points;
+    void updateVertices(ptsTab points);
 };
 
 #endif // OBJECT_HPP

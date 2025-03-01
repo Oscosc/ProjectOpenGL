@@ -1,15 +1,17 @@
 #include "BezierCurve.hpp"
 
 
-BezierCurve::BezierCurve(ptsTab control_points)
+BezierCurve::BezierCurve(ptsTab controlPoints) :
+    m_controlPoints(controlPoints),
+    m_nbCurvePoints(MIN_DISCRETE_POINTS)
 {
-    this->control_points = control_points;
+    updateCurvePoints();
 }
 
 
 void BezierCurve::debugControlPoints()
 {
-    for(glm::vec3 point : this->control_points) {
+    for(glm::vec3 point : this->m_controlPoints) {
         std::cout << glm::to_string(point) << std::endl;
     }
 }
@@ -23,34 +25,30 @@ glm::vec3 BezierCurve::curveValue(float u)
     }
 
     glm::vec3 result(0.0f);
-    for(int i=0; i < this->control_points.size(); ++i) {
-        result += bersteinValue(u, i, this->control_points.size()-1) * control_points[i];
+    for(int i=0; i < this->m_controlPoints.size(); ++i) {
+        result += bersteinValue(u, i, this->m_controlPoints.size()-1) * m_controlPoints[i];
     }
 
     return result;
 }
 
 
-ptsTab BezierCurve::discretize(int nb_points)
+void BezierCurve::updateCurvePoints()
 {
-    // LIMIT for VBO
-    if (nb_points > MAX_DISCRETE_POINTS)
-        nb_points = MAX_DISCRETE_POINTS;
-    // LIMIT for rendering
-    if (nb_points < 2)
-        nb_points = 2;
-
-    ptsTab discretized_values;
-    for(float i=0; i < nb_points; ++i) {
-        discretized_values.push_back(curveValue(i/(nb_points-1)));
+    ptsTab discretizedValues;
+    for(float i=0; i < m_nbCurvePoints; ++i) {
+        discretizedValues.push_back(curveValue(i/(m_nbCurvePoints-1)));
     }
-    return discretized_values;
+
+    m_curvePoints = discretizedValues;
+    updateVertices(m_curvePoints);
 }
 
 
+// Obsolète temporairement
 ptsTab BezierCurve::discretizeEqualy(float segment_size)
 {
-    ptsTab vertices = {control_points[0]};
+    ptsTab vertices = {m_controlPoints[0]};
 
     unsigned int current = 0;
     for(float i = 0; i <= 1; i += DISCRETIZATION_STEP) {
@@ -61,19 +59,45 @@ ptsTab BezierCurve::discretizeEqualy(float segment_size)
         }
     }
 
-    vertices.push_back(control_points[control_points.size() - 1]);
+    vertices.push_back(m_controlPoints[m_controlPoints.size() - 1]);
 
     return vertices;
 }
 
 
+void BezierCurve::draw()
+{
+    std::cout << "DEBUG POINTS UPDATE" << std::endl;
+    for(glm::vec3 point : m_curvePoints) {
+        std::cout << glm::to_string(point) << std::endl;
+    }
+    std::cout << "-------------------" << std::endl;
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINE_STRIP, 0, m_curvePoints.size());
+
+    // Optionnel : "déconnecte" le VAO
+    glBindVertexArray(0);
+}
+
+
+void BezierCurve::next()
+{
+    m_nbCurvePoints++;
+    updateCurvePoints();
+}
+
+
+void BezierCurve::previous()
+{
+    if(m_nbCurvePoints > MIN_DISCRETE_POINTS) {
+        m_nbCurvePoints--;
+        updateCurvePoints();
+    }
+}
+
 float BezierCurve::bersteinValue(float u, int i, int n)
 {
     int p = PascalValue(i, n);
-    /*
-    std::cout << "Bernstein : " << p << " * " << u << "^"
-        << i <<" * (1 - " << u << ")^" << n-i
-        << std::endl;
-    */
     return p * pow(u, i) * pow((1.0f - u), n-i);
 }

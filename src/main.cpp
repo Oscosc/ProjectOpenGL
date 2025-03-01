@@ -16,7 +16,7 @@
 
 // Custom classes imports
 #include "BezierCurve.hpp"
-#include "Object.hpp"
+#include "AppContext.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -35,10 +35,6 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mouseActive = false;
-
-// curve
-//int nb_curve_points = 10;
-float nb_curve_points = 0.1f;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -73,6 +69,11 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
+    // glfw custom user pointer
+    // ------------------------
+    AppContext meshes;
+    glfwSetWindowUserPointer(window, &meshes);
+
     // Mouse capture config
     // --------------------
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -95,8 +96,8 @@ int main()
     Shader bezierShader("shaders/bezier.vs", "shaders/bezier.fs");
 
 
-    // Creating and calculating Bezier Curve
-    // -------------------------------------
+    // Creating Bezier Curve
+    // ---------------------
     ptsTab controlPolygon = {
         {-0.5f, -0.5f, -0.5f},
         {-0.5f, 0.5f, -0.5f},
@@ -108,13 +109,7 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     BezierCurve curve(controlPolygon);
-    ptsTab verticesBezier = curve.discretizeEqualy(nb_curve_points);
-    verticesBezier.reserve(MAX_DISCRETE_POINTS);
-
-    // Create drawable objects
-    // -----------------------
-    Object bezier(verticesBezier, MAX_DISCRETE_POINTS);
-    Object control(controlPolygon);
+    meshes.addObject(&curve);
 
 
     // crosshair setup
@@ -160,12 +155,6 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // update bezier curve
-        // -------------------
-        if(verticesBezier.size() != nb_curve_points) {
-            verticesBezier = curve.discretizeEqualy(nb_curve_points);
-            bezier.updateVertices(verticesBezier);
-        }
         // active shader
         bezierShader.use();
 
@@ -184,10 +173,9 @@ int main()
         // draw lines
         // ----------
         bezierShader.setVec3("color", 1.0f, 1.0f, 1.0f);
-        bezier.drawLine();
+        curve.draw();
 
         bezierShader.setVec3("color", 1.0f, 0.0f, 0.0f);
-        control.drawLine();
 
 
         // draw crosshair
@@ -203,11 +191,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    bezier.deleteBuffers();
-    control.deleteBuffers();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -277,13 +260,19 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 // key callback function
 // ---------------------
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{   
+{
+    // Récupération du contexte
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    ScalableElement* activeElement = context->getActiveObject();
+
     // Update number of curve points in BezierCurve
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-        nb_curve_points++;
+        activeElement->next();
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        nb_curve_points--;
+        activeElement->previous();
     }
 
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {

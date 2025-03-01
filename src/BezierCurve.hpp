@@ -1,7 +1,7 @@
 #ifndef BEZIER_CURVE_HPP
 #define BEZIER_CURVE_HPP
 
-#define MAX_DISCRETE_POINTS 100
+#define MIN_DISCRETE_POINTS 2
 #define DISCRETIZATION_STEP 0.01
 
 #include <glm/glm.hpp>
@@ -10,16 +10,15 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "utils.hpp"
+#include "Object.hpp"
+#include "ScalableElement.hpp"
 
 #include <math.h>
 #include <iostream>
 #include <vector>
 
 
-using ptsTab = std::vector<glm::vec3>;
-
-
-class BezierCurve
+class BezierCurve : public Object, public ScalableElement
 {
 public:
 
@@ -27,13 +26,22 @@ public:
 
     void debugControlPoints();
     glm::vec3 curveValue(float u);
-    ptsTab discretize(int nb_points);
     ptsTab discretizeEqualy(float segment_size);
+    
+    // Fonctions héritées de Object
+    void draw() override;
+
+    // Fonctions héritées de ScalableElement
+    void next() override;
+    void previous() override;
 
 private:
 
-    ptsTab control_points;
+    ptsTab m_controlPoints;
+    ptsTab m_curvePoints;
+    unsigned int m_nbCurvePoints;
 
+    void updateCurvePoints();
     float bersteinValue(float u, int i, int n);
 };
 

@@ -2,18 +2,19 @@
 #define APP_CONTEXT_HPP
 
 #include <vector>
-#include "Object.hpp"
+#include <iostream>
+#include "ScalableElement.hpp"
 
 class AppContext
 {
 public:
     AppContext();
-    void addObject(Object* new_object);
-    Object* getActiveObject();
+    void addObject(ScalableElement* new_object);
+    ScalableElement* getActiveObject();
 
 
 private:
-    std::vector<Object*> m_objects;
+    std::vector<ScalableElement*> m_objects;
     size_t m_activeObjectIndex;
 };
 

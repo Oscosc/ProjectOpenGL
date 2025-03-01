@@ -1,6 +1,6 @@
 CXX = g++
 CC = gcc
-LDFLAGS = -lglfw -ldl
+LDFLAGS = -lglfw -ldl -g
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -15,7 +15,7 @@ TARGET = igai_exe
 all: $(TARGET)
 
 $(TARGET): $(OBJ_FILES)
-	$(CXX) -g $^ -o $@ $(LDFLAGS)
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) -c $< -o $@
