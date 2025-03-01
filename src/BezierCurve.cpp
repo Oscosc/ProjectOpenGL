@@ -45,34 +45,27 @@ ptsTab BezierCurve::normalDiscretization()
 
 ptsTab BezierCurve::equalDiscretization()
 {
-    return ptsTab();
-}
-
-
-void BezierCurve::updateCurvePoints()
-{
-    m_curvePoints = normalDiscretization();
-    updateVertices(combine(m_controlPoints, m_curvePoints));
-}
-
-
-// Obsolète temporairement
-ptsTab BezierCurve::discretizeEqualy(float segment_size)
-{
     ptsTab vertices = {m_controlPoints[0]};
 
     unsigned int current = 0;
     for(float i = 0; i <= 1; i += DISCRETIZATION_STEP) {
         glm::vec3 new_point = curveValue(i);
-        if (glm::length(vertices[current] - new_point) >= segment_size) {
+        if (glm::length(vertices[current] - new_point) >= (EQUALY_BASE_SEGMENT / m_nbCurvePoints)) {
             vertices.push_back(new_point);
             ++current;
         }
     }
-
     vertices.push_back(m_controlPoints[m_controlPoints.size() - 1]);
 
+    std::cout << "New segment size : " << (EQUALY_BASE_SEGMENT / m_nbCurvePoints) << std::endl;
     return vertices;
+}
+
+
+void BezierCurve::updateCurvePoints()
+{
+    (isAltMode()) ? m_curvePoints = equalDiscretization() : m_curvePoints = normalDiscretization();
+    updateVertices(combine(m_controlPoints, m_curvePoints));
 }
 
 
@@ -107,6 +100,14 @@ void BezierCurve::previous()
         updateCurvePoints();
     }
 }
+
+
+void BezierCurve::switchMode()
+{
+    altModeOn = !altModeOn;
+    updateCurvePoints();
+}
+
 
 float BezierCurve::bersteinValue(float u, int i, int n)
 {

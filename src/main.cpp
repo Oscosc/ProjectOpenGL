@@ -263,6 +263,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if(!context) return;
 
     ScalableElement* activeElement = context->getActiveObject();
+    if(!activeElement) return;
 
     // Update number of curve points in BezierCurve
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
@@ -270,6 +271,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
         activeElement->previous();
+    }
+    // Update type of curve points in BezierCurve
+    if (key == GLFW_KEY_SEMICOLON && action == GLFW_PRESS) {
+        std::cout << "Switching Mode !" << std::endl;
+        activeElement->switchMode();
     }
 
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {

@@ -3,6 +3,7 @@
 
 #define MIN_DISCRETE_POINTS 2
 #define DISCRETIZATION_STEP 0.01
+#define EQUALY_BASE_SEGMENT 3.0 // Valeur qui semble correspondre après tests
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -26,7 +27,6 @@ public:
 
     void debugControlPoints();
     glm::vec3 curveValue(float u);
-    ptsTab discretizeEqualy(float segment_size);
     
     // Fonctions héritées de Object
     void draw(Shader shader) override;
@@ -34,6 +34,7 @@ public:
     // Fonctions héritées de ScalableElement
     void next() override;
     void previous() override;
+    void switchMode() override;
 
 private:
 
