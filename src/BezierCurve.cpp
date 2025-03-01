@@ -64,7 +64,7 @@ ptsTab BezierCurve::equalDiscretization()
 
 void BezierCurve::updateCurvePoints()
 {
-    (isAltMode()) ? m_curvePoints = equalDiscretization() : m_curvePoints = normalDiscretization();
+    (isAltModeOn()) ? m_curvePoints = equalDiscretization() : m_curvePoints = normalDiscretization();
     updateVertices(combine(m_controlPoints, m_curvePoints));
 }
 
