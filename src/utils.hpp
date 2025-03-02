@@ -1,3 +1,6 @@
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
 /**
  * @file utils.hpp
  * @brief Fonctions utilitaires usuelles.
@@ -7,9 +10,6 @@
  * @author Oscar G.
  * @date 2025-03-01
  */
-
-#ifndef UTILS_HPP
-#define UTILS_HPP
 
 #include <vector>
 #include <glm/glm.hpp>

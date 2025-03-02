@@ -1,3 +1,6 @@
+#ifndef BEZIER_CURVE_HPP
+#define BEZIER_CURVE_HPP
+
 /**
  * @file BezierCurve.hpp
  * @brief Définition de la classe BezierCurve.
@@ -8,9 +11,6 @@
  * @author Oscar G.
  * @date 2025-03-01
  */
-
-#ifndef BEZIER_CURVE_HPP
-#define BEZIER_CURVE_HPP
 
 #define MIN_DISCRETE_POINTS 2
 #define DISCRETIZATION_STEP 0.01

@@ -1,3 +1,6 @@
+#ifndef APP_CONTEXT_HPP
+#define APP_CONTEXT_HPP
+
 /**
  * @file AppContext.hpp
  * @brief Définition de la classe AppContext.
@@ -8,9 +11,6 @@
  * @author Oscar G.
  * @date 2025-03-01
  */
-
-#ifndef APP_CONTEXT_HPP
-#define APP_CONTEXT_HPP
 
 #include <vector>
 #include <iostream>

@@ -1,3 +1,6 @@
+#ifndef OBJECT_HPP
+#define OBJECT_HPP
+
 /**
  * @file Object.hpp
  * @brief Définition de la classe abstraite Object.
@@ -7,10 +10,6 @@
  * @author Oscar G.
  * @date 2025-03-01
  */
-
-#ifndef OBJECT_HPP
-#define OBJECT_HPP
-
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

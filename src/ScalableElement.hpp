@@ -1,3 +1,6 @@
+#ifndef SCALABLE_ELEMENT_HPP
+#define SCALABLE_ELEMENT_HPP
+
 /**
  * @file ScalableElement.hpp
  * @brief Définition de la classe abstraite/interface ScalableElement.
@@ -9,9 +12,7 @@
  * @date 2025-03-01
  */
 
-#ifndef SCALABLE_ELEMENT_HPP
-#define SCALABLE_ELEMENT_HPP
-
+ 
 /**
  * @class ScalableElement
  * @brief Classe abstraite/interface pour les éléments qui doivent être modifiables dynamiquement
