@@ -28,6 +28,7 @@
 #include "BezierCurve.hpp"
 #include "AppContext.hpp"
 #include "Ray.hpp"
+#include "Sphere.hpp"
 
 /**
  * @brief Frame-buffer size callback.
@@ -177,7 +178,9 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     meshes.addObject(std::make_unique<BezierCurve>(controlPolygon));
-
+    
+    // Creating sphere
+    meshes.addObject(std::make_unique<Sphere>(1.0f));
 
     // crosshair setup
     // ---------------

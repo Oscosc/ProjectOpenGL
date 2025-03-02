@@ -1,6 +1,6 @@
 CXX = g++
 CC = gcc
-LDFLAGS = -lglfw -ldl -g
+LDFLAGS = -lglfw -ldl -g -lm
 
 SRC_DIR = src
 OBJ_DIR = obj
