@@ -1,0 +1,8 @@
+# Répertoire temporaire de build
+obj/*
+
+# Répertoire de documentation
+doc/*
+
+# Répertoire de configuration
+.vscode/*
