@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>
 #include "ScalableElement.hpp"
 #include "Object.hpp"
 
@@ -28,6 +29,8 @@
 class AppContext
 {
 public:
+    using uniqueObjectsList = std::vector<std::unique_ptr<Object>>;
+    using uniqueObject = std::unique_ptr<Object>;
 
     /**
      * @brief Constructeur par défaut.
@@ -40,7 +43,7 @@ public:
      * 
      * @param new_object Objet héritant de l'interface ScalableElement.
      */
-    void addObject(Object* new_object);
+    void addObject(uniqueObject new_object);
 
     /**
      * @brief Retourne la référence à l'objet actif dans le contexte. (Cette fonction effectue un
@@ -48,15 +51,14 @@ public:
      * objets) 
      */
     ScalableElement* getActiveObject();
-
     /**
      * @brief Fonction begin() pour permettre d'itérer sur AppContext.
      * 
      * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
      * cette boucle pour l'affichage OpenGL).
      */
-    std::vector<Object*>::iterator begin();
-    std::vector<Object*>::const_iterator begin() const;
+    uniqueObjectsList::iterator begin();
+    uniqueObjectsList::const_iterator begin() const;
 
     /**
      * @brief Fonction end() pour permettre d'itérer sur AppContext.
@@ -64,11 +66,13 @@ public:
      * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
      * cette boucle pour l'affichage OpenGL)
      */
-    std::vector<Object*>::iterator end();
-    std::vector<Object*>::const_iterator end() const;
+    uniqueObjectsList::iterator end();
+    uniqueObjectsList::const_iterator end() const;
+
+    unsigned int size() const;
 
 private:
-    std::vector<Object*> m_objects;
+    uniqueObjectsList m_objects;
     size_t m_activeObjectIndex;
 };
 

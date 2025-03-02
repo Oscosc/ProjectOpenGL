@@ -7,37 +7,43 @@ AppContext::AppContext() : m_activeObjectIndex(-1) {}
 ScalableElement* AppContext::getActiveObject()
 {
     if(m_objects.empty()) return nullptr;
-    return dynamic_cast<ScalableElement*>(m_objects[m_activeObjectIndex]);
+    return dynamic_cast<ScalableElement*>(m_objects[m_activeObjectIndex].get());
 }
 
 
-void AppContext::addObject(Object* new_object)
+void AppContext::addObject(AppContext::uniqueObject new_object)
 {
-    m_objects.push_back(new_object);
+    m_objects.push_back(std::move(new_object));
     if(m_activeObjectIndex == -1) m_activeObjectIndex++;
     return;
 }
 
 
-std::vector<Object*>::iterator AppContext::begin()
+AppContext::uniqueObjectsList::iterator AppContext::begin()
 {
     return m_objects.begin();
 }
 
 
-std::vector<Object*>::const_iterator AppContext::begin() const
+AppContext::uniqueObjectsList::const_iterator AppContext::begin() const
 {
     return m_objects.cbegin();
 }
 
 
-std::vector<Object*>::iterator AppContext::end()
+AppContext::uniqueObjectsList::iterator AppContext::end()
 {
     return m_objects.end();
 }
 
 
-std::vector<Object*>::const_iterator AppContext::end() const
+AppContext::uniqueObjectsList::const_iterator AppContext::end() const
 {
     return m_objects.cend();
+}
+
+
+unsigned int AppContext::size() const
+{
+    return m_objects.size();
 }

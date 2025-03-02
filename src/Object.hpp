@@ -16,6 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "../includes/shader.hpp"
 

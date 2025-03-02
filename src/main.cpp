@@ -27,6 +27,7 @@
 // Custom classes imports
 #include "BezierCurve.hpp"
 #include "AppContext.hpp"
+#include "Ray.hpp"
 
 /**
  * @brief Frame-buffer size callback.
@@ -75,6 +76,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
  * @param mods Eventuels modifications sur la touche (si ALT est maintenu avec par exemple)
  */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 /**
  * @brief Traite les inputs "longs" du clavier.
@@ -96,6 +98,10 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mouseActive = false;
+
+// 3D space
+glm::mat4 projection;
+glm::mat4 view;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -129,6 +135,7 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // glfw custom user pointer
     // ------------------------
@@ -169,8 +176,7 @@ int main()
         {-0.5f, 0.5f, 0.5f},
         {-0.5f, -0.5f, 0.5f}
     };
-    BezierCurve curve(controlPolygon);
-    meshes.addObject(&curve);
+    meshes.addObject(std::make_unique<BezierCurve>(controlPolygon));
 
 
     // crosshair setup
@@ -220,11 +226,11 @@ int main()
         bezierShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         bezierShader.setMat4("projection", projection);
 
         // camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
+        view = camera.GetViewMatrix();
         bezierShader.setMat4("view", view);
 
         // model transformation
@@ -233,7 +239,8 @@ int main()
 
         // draw context elements
         // ---------------------
-        for(auto element : meshes) {
+        // std::cout << "Elements dans le contexte : " << meshes.size() << std::endl;
+        for(const auto& element : meshes) {
             element->draw(bezierShader);
         }
 
@@ -340,5 +347,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         if(mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         if(!mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         mouseActive = !mouseActive;
+    }
+}
+
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        // Récupération du contexte
+        AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+        if(!context) return;
+
+        // Récupération du point cliqué
+        double mouseX, mouseY;
+        if(mouseActive) {glfwGetCursorPos(window, &mouseX, &mouseY);}
+        else {mouseX = SCR_WIDTH/2.0f; mouseY = SCR_HEIGHT/2.0f;}
+
+        // Calcul des valeurs du rayon lancé
+        float x = (2.0f * mouseX) / SCR_WIDTH - 1.0f;
+        float y = 1.0f - (2.0f * mouseY) / SCR_HEIGHT;
+        glm::vec4 rayClip(x, y, -1.0f, 1.0f);
+
+        glm::vec4 rayEye = glm::inverse(projection) * rayClip;
+        rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+        glm::vec4 rayWorld = glm::inverse(view) * rayEye;
+        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
+
+        glm::vec3 nearPoint = camera.Position + rayDir * 1.0f;
+        glm::vec3 farPoint = camera.Position + rayDir * 100.0f;
+
+        // Ajout du rayon à l'affichage
+        context->addObject(std::make_unique<Ray>(nearPoint, farPoint));
     }
 }
