@@ -19,25 +19,25 @@ void AppContext::addObject(Object* new_object)
 }
 
 
-auto AppContext::begin()
+std::vector<Object*>::iterator AppContext::begin()
 {
     return m_objects.begin();
 }
 
 
-auto AppContext::begin() const
+std::vector<Object*>::const_iterator AppContext::begin() const
 {
     return m_objects.cbegin();
 }
 
 
-auto AppContext::end()
+std::vector<Object*>::iterator AppContext::end()
 {
     return m_objects.end();
 }
 
 
-auto AppContext::end() const
+std::vector<Object*>::const_iterator AppContext::end() const
 {
     return m_objects.cend();
 }

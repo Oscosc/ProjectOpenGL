@@ -55,8 +55,8 @@ public:
      * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
      * cette boucle pour l'affichage OpenGL).
      */
-    auto begin();
-    auto begin() const;
+    std::vector<Object*>::iterator begin();
+    std::vector<Object*>::const_iterator begin() const;
 
     /**
      * @brief Fonction end() pour permettre d'itérer sur AppContext.
@@ -64,8 +64,8 @@ public:
      * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
      * cette boucle pour l'affichage OpenGL)
      */
-    auto end();
-    auto end() const;
+    std::vector<Object*>::iterator end();
+    std::vector<Object*>::const_iterator end() const;
 
 private:
     std::vector<Object*> m_objects;
