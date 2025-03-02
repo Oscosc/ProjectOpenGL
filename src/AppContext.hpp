@@ -15,8 +15,10 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <algorithm>
 #include "ScalableElement.hpp"
 #include "Object.hpp"
+#include "Ray.hpp"
 
 /**
  * @class AppContext
@@ -70,6 +72,8 @@ public:
     uniqueObjectsList::const_iterator end() const;
 
     unsigned int size() const;
+
+    void removeRays();
 
 private:
     uniqueObjectsList m_objects;

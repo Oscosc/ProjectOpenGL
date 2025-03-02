@@ -47,3 +47,11 @@ unsigned int AppContext::size() const
 {
     return m_objects.size();
 }
+
+
+void AppContext::removeRays()
+{
+    m_objects.erase(std::remove_if(m_objects.begin(), m_objects.end(), [](const std::unique_ptr<Object>& obj) {
+        return dynamic_cast<Ray*>(obj.get()) != nullptr;
+    }), m_objects.end());
+}

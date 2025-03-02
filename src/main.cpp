@@ -343,10 +343,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         activeElement->switchMode();
     }
 
+    // Switch cursor visiblity and mode for ray casting
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
         if(mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         if(!mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         mouseActive = !mouseActive;
+    }
+
+    // Remove all casted rays
+    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+        context->removeRays();
     }
 }
 
