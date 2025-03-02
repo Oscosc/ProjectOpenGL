@@ -15,6 +15,7 @@
 #include <vector>
 #include <iostream>
 #include "ScalableElement.hpp"
+#include "Object.hpp"
 
 /**
  * @class AppContext
@@ -39,15 +40,35 @@ public:
      * 
      * @param new_object Objet héritant de l'interface ScalableElement.
      */
-    void addObject(ScalableElement* new_object);
+    void addObject(Object* new_object);
 
     /**
-     * @brief Retourne la référence à l'objet actif dans le contexte.
+     * @brief Retourne la référence à l'objet actif dans le contexte. (Cette fonction effectue un
+     * dynamic_cast vers le type ScalableElement car les données initiales sont stockées comme des
+     * objets) 
      */
     ScalableElement* getActiveObject();
 
+    /**
+     * @brief Fonction begin() pour permettre d'itérer sur AppContext.
+     * 
+     * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
+     * cette boucle pour l'affichage OpenGL).
+     */
+    auto begin();
+    auto begin() const;
+
+    /**
+     * @brief Fonction end() pour permettre d'itérer sur AppContext.
+     * 
+     * En particulier ici, on itère sur les éléments du contexte de type Object (car on utilise
+     * cette boucle pour l'affichage OpenGL)
+     */
+    auto end();
+    auto end() const;
+
 private:
-    std::vector<ScalableElement*> m_objects;
+    std::vector<Object*> m_objects;
     size_t m_activeObjectIndex;
 };
 

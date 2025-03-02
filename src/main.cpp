@@ -229,11 +229,13 @@ int main()
 
         // model transformation
         glm::mat4 model = glm::mat4(1.0f);
-        bezierShader.setMat4("model", model);      
+        bezierShader.setMat4("model", model);
 
-        // draw lines
-        // ----------
-        curve.draw(bezierShader);
+        // draw context elements
+        // ---------------------
+        for(auto element : meshes) {
+            element->draw(bezierShader);
+        }
 
 
         // draw crosshair
