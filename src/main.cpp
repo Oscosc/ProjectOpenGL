@@ -94,15 +94,10 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mouseActive = false;
-
-// 3D space
-glm::mat4 projection;
-glm::mat4 view;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -140,8 +135,8 @@ int main()
 
     // glfw custom user pointer
     // ------------------------
-    AppContext meshes;
-    glfwSetWindowUserPointer(window, &meshes);
+    AppContext contextIGAI;
+    glfwSetWindowUserPointer(window, &contextIGAI);
 
     // Mouse capture config
     // --------------------
@@ -177,10 +172,10 @@ int main()
         {-0.5f, 0.5f, 0.5f},
         {-0.5f, -0.5f, 0.5f}
     };
-    meshes.addObject(std::make_unique<BezierCurve>(controlPolygon));
+    contextIGAI.addObject(std::make_unique<BezierCurve>(controlPolygon));
     
     // Creating sphere
-    meshes.addObject(std::make_unique<Sphere>(1.0f));
+    contextIGAI.addObject(std::make_unique<Sphere>(1.0f));
 
     // crosshair setup
     // ---------------
@@ -229,21 +224,20 @@ int main()
         bezierShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        bezierShader.setMat4("projection", projection);
+        contextIGAI.setProjection(glm::perspective(glm::radians(contextIGAI.getCamera()->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f));
+        bezierShader.setMat4("projection", contextIGAI.getProjection());
 
         // camera/view transformation
-        view = camera.GetViewMatrix();
-        bezierShader.setMat4("view", view);
-
-        // model transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        bezierShader.setMat4("model", model);
+        contextIGAI.setView(contextIGAI.getCamera()->GetViewMatrix());
+        bezierShader.setMat4("view", contextIGAI.getView());
 
         // draw context elements
         // ---------------------
         // std::cout << "Elements dans le contexte : " << meshes.size() << std::endl;
-        for(const auto& element : meshes) {
+        for(const auto& element : contextIGAI) {
+            glm::mat4 model = glm::mat4(1.0f);
+            bezierShader.setMat4("model", model);
+
             element->draw(bezierShader);
         }
 
@@ -271,17 +265,20 @@ int main()
 
 void processInput(GLFWwindow *window)
 {
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        context->getCamera()->ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        context->getCamera()->ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        context->getCamera()->ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        context->getCamera()->ProcessKeyboard(RIGHT, deltaTime);
 }
 
 
@@ -295,6 +292,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
     if(mouseActive) {
         return;
     }
@@ -314,13 +314,16 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    context->getCamera()->ProcessMouseMovement(xoffset, yoffset);
 }
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    context->getCamera()->ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
 
@@ -377,14 +380,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         float y = 1.0f - (2.0f * mouseY) / SCR_HEIGHT;
         glm::vec4 rayClip(x, y, -1.0f, 1.0f);
 
-        glm::vec4 rayEye = glm::inverse(projection) * rayClip;
+        glm::vec4 rayEye = glm::inverse(context->getProjection()) * rayClip;
         rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
-        glm::vec4 rayWorld = glm::inverse(view) * rayEye;
+        glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
         glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
 
-        glm::vec3 nearPoint = camera.Position + rayDir * 1.0f;
-        glm::vec3 farPoint = camera.Position + rayDir * 100.0f;
+        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f;
+        glm::vec3 farPoint = context->getCamera()->Position + rayDir * 100.0f;
 
         // Ajout du rayon à l'affichage
         context->addObject(std::make_unique<Ray>(nearPoint, farPoint));

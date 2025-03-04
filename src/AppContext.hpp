@@ -19,6 +19,7 @@
 #include "ScalableElement.hpp"
 #include "Object.hpp"
 #include "Ray.hpp"
+#include "../includes/camera.hpp"
 
 /**
  * @class AppContext
@@ -72,12 +73,20 @@ public:
     uniqueObjectsList::const_iterator end() const;
 
     unsigned int size() const;
-
     void removeRays();
+    glm::mat4 getView();
+    void setView(glm::mat4 view);
+    glm::mat4 getProjection();
+    void setProjection(glm::mat4 projection);
+    Camera* getCamera();
 
 private:
     uniqueObjectsList m_objects;
     size_t m_activeObjectIndex;
+    
+    glm::mat4 m_projection;
+    glm::mat4 m_view;
+    Camera m_camera;
 };
 
 #endif //APP_CONTEXT_HPP

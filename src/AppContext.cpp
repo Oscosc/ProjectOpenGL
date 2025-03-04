@@ -1,7 +1,12 @@
 #include "AppContext.hpp"
 
 
-AppContext::AppContext() : m_activeObjectIndex(-1) {}
+AppContext::AppContext() :
+    m_activeObjectIndex(-1),
+    m_camera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))),
+    m_projection(glm::mat4(1.0f)),
+    m_view(glm::mat4(1.0f))
+{}
 
 
 ScalableElement* AppContext::getActiveObject()
@@ -55,3 +60,13 @@ void AppContext::removeRays()
         return dynamic_cast<Ray*>(obj.get()) != nullptr;
     }), m_objects.end());
 }
+
+glm::mat4 AppContext::getView(){return m_view;}
+
+void AppContext::setView(glm::mat4 view) {m_view = view;}
+
+glm::mat4 AppContext::getProjection() {return m_projection;}
+
+void AppContext::setProjection(glm::mat4 projection) {m_projection = projection;}
+
+Camera* AppContext::getCamera() {return &m_camera;}

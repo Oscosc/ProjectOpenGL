@@ -4,12 +4,8 @@
 Sphere::Sphere(float radius)
 {
     ptsTab vertices = generateVertices(DEFAULT_STACKS, DEFAULT_SECTORS, radius);
-    //std::cout << vertices.size() << std::endl;
-    //for(auto v: vertices) {std::cout << glm::to_string(v) << std::endl;}
     std::vector<unsigned int> indexes = generateIndexes(DEFAULT_STACKS, DEFAULT_SECTORS);
-    for(auto i: indexes) {std::cout << i << std::endl;}
     m_nbVertices = indexes.size();
-    //std::cout << m_nbVertices << std::endl;
 
     // Completing Object constructor with EBO init
     glGenBuffers(1, &EBO);
@@ -25,6 +21,10 @@ void Sphere::draw(Shader shader)
 {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+    // Temporaire : décale la sphère
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0f));
+    shader.setMat4("model", model);
 
     shader.setVec3("color", 0.8f, 0.8f, 0.8f);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, 0);
