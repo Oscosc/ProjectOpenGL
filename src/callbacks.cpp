@@ -1,0 +1,77 @@
+#include "callbacks.hpp"
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    context->getCamera()->ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    // Récupération du contexte
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    ScalableElement* activeElement = context->getActiveObject();
+    if(!activeElement) return;
+
+    // Update number of curve points in BezierCurve
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        activeElement->next();
+    }
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        activeElement->previous();
+    }
+    // Update type of curve points in BezierCurve
+    if (key == GLFW_KEY_SEMICOLON && action == GLFW_PRESS) {
+        std::cout << "Switching Mode !" << std::endl;
+        activeElement->switchMode();
+    }
+
+    // Switch cursor visiblity and mode for ray casting
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if(context->isMouseActive()) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        context->switchMouseActive();
+    }
+
+    // Remove all casted rays
+    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+        context->removeRays();
+    }
+}
+
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        // Récupération du contexte
+        AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+        if(!context) return;
+
+        // Récupération du point cliqué
+        double mouseX, mouseY;
+        if(context->isMouseActive()) {glfwGetCursorPos(window, &mouseX, &mouseY);}
+        else {mouseX = context->SCR_WIDTH/2.0f; mouseY = context->SCR_HEIGHT/2.0f;}
+
+        // Calcul des valeurs du rayon lancé
+        float x = (2.0f * mouseX) / context->SCR_WIDTH - 1.0f;
+        float y = 1.0f - (2.0f * mouseY) / context->SCR_HEIGHT;
+        glm::vec4 rayClip(x, y, -1.0f, 1.0f);
+
+        glm::vec4 rayEye = glm::inverse(context->getProjection()) * rayClip;
+        rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+        glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
+        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
+
+        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f;
+        glm::vec3 farPoint = context->getCamera()->Position + rayDir * 100.0f;
+
+        // Ajout du rayon à l'affichage
+        context->addObject(std::make_unique<Ray>(nearPoint, farPoint));
+    }
+}

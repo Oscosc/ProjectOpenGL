@@ -1,7 +1,9 @@
 #include "AppContext.hpp"
 
 
-AppContext::AppContext() :
+AppContext::AppContext(unsigned int screen_width, unsigned int screen_height) :
+    SCR_WIDTH(screen_width),
+    SCR_HEIGHT(screen_height),
     m_activeObjectIndex(-1),
     m_camera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))),
     m_projection(glm::mat4(1.0f)),
@@ -70,3 +72,7 @@ glm::mat4 AppContext::getProjection() {return m_projection;}
 void AppContext::setProjection(glm::mat4 projection) {m_projection = projection;}
 
 Camera* AppContext::getCamera() {return &m_camera;}
+
+bool AppContext::isMouseActive() {return m_mouseActive;}
+
+void AppContext::switchMouseActive() {m_mouseActive = !m_mouseActive;}

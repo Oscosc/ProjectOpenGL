@@ -35,10 +35,13 @@ public:
     using uniqueObjectsList = std::vector<std::unique_ptr<Object>>;
     using uniqueObject = std::unique_ptr<Object>;
 
+    const unsigned int SCR_WIDTH;
+    const unsigned int SCR_HEIGHT;
+
     /**
      * @brief Constructeur par défaut.
      */
-    AppContext();
+    AppContext(unsigned int screen_width, unsigned int screen_height);
 
     /**
      * @brief Ajoute un objet à la liste des objets du contexte.
@@ -79,14 +82,22 @@ public:
     glm::mat4 getProjection();
     void setProjection(glm::mat4 projection);
     Camera* getCamera();
+    bool isMouseActive();
+    void switchMouseActive();
 
 private:
+
     uniqueObjectsList m_objects;
     size_t m_activeObjectIndex;
     
     glm::mat4 m_projection;
     glm::mat4 m_view;
     Camera m_camera;
+
+    float m_cursorX;
+    float m_cursorY;
+
+    bool m_mouseActive;
 };
 
 #endif //APP_CONTEXT_HPP

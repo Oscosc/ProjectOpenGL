@@ -10,9 +10,8 @@
  * @date 2025-03-02
  */
 
-// Standard imports
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+#include "callbacks.hpp" // Contient GLFW et glad : à appeler en premier
 #include <iostream>
 
 // Transformation imports
@@ -26,9 +25,11 @@
 
 // Custom classes imports
 #include "BezierCurve.hpp"
-#include "AppContext.hpp"
 #include "Ray.hpp"
 #include "Sphere.hpp"
+
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 /**
  * @brief Frame-buffer size callback.
@@ -52,34 +53,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 /**
- * @brief Scroll callback.
- * 
- * Fonction de callback pour traiter le scroll de l'utilisateur et zoomer/dezoomer la camera.
- * @param window Fenêtre à laquelle on veut assigner le callback.
- * @param xoffset Mouvement en X du scroll.
- * @param yoffset Mouvement en Y du scroll.
- */
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
-/**
- * @brief Key callback.
- * 
- * Fonction de callback pour les touches du clavier. Les touches du clavier actuellement traitées
- * sont :
- * - Flèche haut (comportement spécifique aux courbes de Bézier)
- * - Flèche bas (comportement spécifique aux courbes de Bézier)
- * - Tab (bascule du mode "curseur" au mode "souris")
- * - M (comportement spécifique aux courbes de Bézier)
- * @param window Fenêtre à laquelle on veut assigner le callback.
- * @param key Identifiant de la touche qui déclenche le callback.
- * @param scancode Scancode de la touche qui déclenche le callback.
- * @param action Type d'action effectuée sur la touche (pressée, relachée, etc).
- * @param mods Eventuels modifications sur la touche (si ALT est maintenu avec par exemple)
- */
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-
-/**
  * @brief Traite les inputs "longs" du clavier.
  * 
  * Traite les entrées claviers de type ZQSD qui doivent ête effectuées à chaque frame pour donner
@@ -89,15 +62,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void processInput(GLFWwindow *window);
 
 
-// frame settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
 // camera
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+float lastX = SCREEN_WIDTH / 2.0f;
+float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
-bool mouseActive = false;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -119,7 +87,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Projet IGAI", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Projet IGAI", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -135,7 +103,7 @@ int main()
 
     // glfw custom user pointer
     // ------------------------
-    AppContext contextIGAI;
+    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT);
     glfwSetWindowUserPointer(window, &contextIGAI);
 
     // Mouse capture config
@@ -224,7 +192,8 @@ int main()
         bezierShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        contextIGAI.setProjection(glm::perspective(glm::radians(contextIGAI.getCamera()->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f));
+        contextIGAI.setProjection(glm::perspective(glm::radians(contextIGAI.getCamera()->Zoom),
+            (float)contextIGAI.SCR_WIDTH / (float)contextIGAI.SCR_HEIGHT, 0.1f, 100.0f));
         bezierShader.setMat4("projection", contextIGAI.getProjection());
 
         // camera/view transformation
@@ -245,7 +214,7 @@ int main()
         // draw crosshair
         // --------------
         crosshairShader.use();
-        crosshairShader.setVec2("screenSize", SCR_WIDTH, SCR_HEIGHT);
+        crosshairShader.setVec2("screenSize", contextIGAI.SCR_WIDTH, contextIGAI.SCR_HEIGHT);
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -295,9 +264,8 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
     if(!context) return;
 
-    if(mouseActive) {
-        return;
-    }
+    if(context->isMouseActive()) return;
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -315,81 +283,4 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastY = ypos;
 
     context->getCamera()->ProcessMouseMovement(xoffset, yoffset);
-}
-
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
-
-    context->getCamera()->ProcessMouseScroll(static_cast<float>(yoffset));
-}
-
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    // Récupération du contexte
-    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
-
-    ScalableElement* activeElement = context->getActiveObject();
-    if(!activeElement) return;
-
-    // Update number of curve points in BezierCurve
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-        activeElement->next();
-    }
-    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        activeElement->previous();
-    }
-    // Update type of curve points in BezierCurve
-    if (key == GLFW_KEY_SEMICOLON && action == GLFW_PRESS) {
-        std::cout << "Switching Mode !" << std::endl;
-        activeElement->switchMode();
-    }
-
-    // Switch cursor visiblity and mode for ray casting
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        if(mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        if(!mouseActive) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        mouseActive = !mouseActive;
-    }
-
-    // Remove all casted rays
-    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
-        context->removeRays();
-    }
-}
-
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        // Récupération du contexte
-        AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-        if(!context) return;
-
-        // Récupération du point cliqué
-        double mouseX, mouseY;
-        if(mouseActive) {glfwGetCursorPos(window, &mouseX, &mouseY);}
-        else {mouseX = SCR_WIDTH/2.0f; mouseY = SCR_HEIGHT/2.0f;}
-
-        // Calcul des valeurs du rayon lancé
-        float x = (2.0f * mouseX) / SCR_WIDTH - 1.0f;
-        float y = 1.0f - (2.0f * mouseY) / SCR_HEIGHT;
-        glm::vec4 rayClip(x, y, -1.0f, 1.0f);
-
-        glm::vec4 rayEye = glm::inverse(context->getProjection()) * rayClip;
-        rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-
-        glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
-        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
-
-        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f;
-        glm::vec3 farPoint = context->getCamera()->Position + rayDir * 100.0f;
-
-        // Ajout du rayon à l'affichage
-        context->addObject(std::make_unique<Ray>(nearPoint, farPoint));
-    }
 }
