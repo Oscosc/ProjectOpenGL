@@ -82,8 +82,18 @@ public:
     glm::mat4 getProjection();
     void setProjection(glm::mat4 projection);
     Camera* getCamera();
+    float getCursorX();
+    void setCursorX(float value);
+    float getCursorY();
+    void setCursorY(float value);
     bool isMouseActive();
     void switchMouseActive();
+    bool isFirstMouse();
+    void firstMouseDone();
+    float getDeltaTime();
+    void setDeltaTime(float value);
+    float getLastFrame();
+    void setLastFrame(float value);
 
 private:
 
@@ -98,6 +108,10 @@ private:
     float m_cursorY;
 
     bool m_mouseActive;
+    bool m_firstMouse = true; // To remove in future, used only once
+
+    float m_deltaTime = 0.0f;
+    float m_lastFrame = 0.0f;
 };
 
 #endif //APP_CONTEXT_HPP

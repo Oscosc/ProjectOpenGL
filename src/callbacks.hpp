@@ -53,6 +53,16 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
  * @param mods Eventuels modifications sur la touche (si ALT est maintenu avec par exemple)
  */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+
+/**
+ * @brief Traite les inputs "longs" du clavier.
+ * 
+ * Traite les entrées claviers de type ZQSD qui doivent ête effectuées à chaque frame pour donner
+ * un effet "lisse" dans les déplacements par exemple.
+ * @param window Fenêtre à laquelle on veut assigner le traitement des saisies clavier.
+ */
+void processInput(GLFWwindow *window);
 
 #endif // CALLBACKS_HPP

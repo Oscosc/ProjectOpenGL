@@ -1,5 +1,41 @@
 #include "callbacks.hpp"
 
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    if(context->isMouseActive()) return;
+
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (context->isFirstMouse())
+    {
+        context->setCursorX(xpos);
+        context->setCursorY(ypos);
+        context->firstMouseDone();
+    }
+
+    float xoffset = xpos - context->getCursorX();
+    float yoffset = context->getCursorY() - ypos; // reversed since y-coordinates go from bottom to top
+
+    context->setCursorX(xpos);
+    context->setCursorY(ypos);
+
+    context->getCamera()->ProcessMouseMovement(xoffset, yoffset);
+}
+
+
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
@@ -74,4 +110,22 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         // Ajout du rayon à l'affichage
         context->addObject(std::make_unique<Ray>(nearPoint, farPoint));
     }
+}
+
+void processInput(GLFWwindow *window)
+{
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) return;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        context->getCamera()->ProcessKeyboard(FORWARD, context->getDeltaTime());
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        context->getCamera()->ProcessKeyboard(BACKWARD, context->getDeltaTime());
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        context->getCamera()->ProcessKeyboard(LEFT, context->getDeltaTime());
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        context->getCamera()->ProcessKeyboard(RIGHT, context->getDeltaTime());
 }

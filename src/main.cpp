@@ -31,46 +31,6 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-/**
- * @brief Frame-buffer size callback.
- * 
- * Fonction de callback pour que l'utilisateur puisse redimensionner dynamiquement la fenêtre.
- * @param window Fenêtre à laquelle on veut assigner le callback.
- * @param width Nouvelle largeur de la fenêtre.
- * @param height Nouvelle hauteur de la fenêtre.
- */
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-/**
- * @brief Mouse callback.
- * 
- * Fonction de callback pour traiter les mouvements du curseur et déplacer la vue dans la scène 3D
- * en fonction de ce mouvement.
- * @param window Fenêtre à laquelle on veut assigner le callback.
- * @param xpos Nouvelle position X du curseur.
- * @param ypos Nouvelle position Y du curseur.
- */
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
-/**
- * @brief Traite les inputs "longs" du clavier.
- * 
- * Traite les entrées claviers de type ZQSD qui doivent ête effectuées à chaque frame pour donner
- * un effet "lisse" dans les déplacements par exemple.
- * @param window Fenêtre à laquelle on veut assigner le traitement des saisies clavier.
- */
-void processInput(GLFWwindow *window);
-
-
-// camera
-float lastX = SCREEN_WIDTH / 2.0f;
-float lastY = SCREEN_HEIGHT / 2.0f;
-bool firstMouse = true;
-
-// timing
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
-
 
 int main()
 {
@@ -176,8 +136,8 @@ int main()
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        contextIGAI.setDeltaTime(currentFrame - contextIGAI.getLastFrame());
+        contextIGAI.setLastFrame(currentFrame);
 
         // input
         // -----
@@ -229,58 +189,4 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-
-void processInput(GLFWwindow *window)
-{
-    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        context->getCamera()->ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        context->getCamera()->ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        context->getCamera()->ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        context->getCamera()->ProcessKeyboard(RIGHT, deltaTime);
-}
-
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
-}
-
-
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
-
-    if(context->isMouseActive()) return;
-
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    context->getCamera()->ProcessMouseMovement(xoffset, yoffset);
 }

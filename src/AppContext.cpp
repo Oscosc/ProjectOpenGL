@@ -7,7 +7,9 @@ AppContext::AppContext(unsigned int screen_width, unsigned int screen_height) :
     m_activeObjectIndex(-1),
     m_camera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))),
     m_projection(glm::mat4(1.0f)),
-    m_view(glm::mat4(1.0f))
+    m_view(glm::mat4(1.0f)),
+    m_cursorX(SCR_WIDTH / 2.0f),
+    m_cursorY(SCR_HEIGHT / 2.0f)
 {}
 
 
@@ -73,6 +75,26 @@ void AppContext::setProjection(glm::mat4 projection) {m_projection = projection;
 
 Camera* AppContext::getCamera() {return &m_camera;}
 
+float AppContext::getCursorX() {return m_cursorX;}
+
+void AppContext::setCursorX(float value) {m_cursorX = value;}
+
+float AppContext::getCursorY() {return m_cursorY;}
+
+void AppContext::setCursorY(float value) {m_cursorY = value;}
+
 bool AppContext::isMouseActive() {return m_mouseActive;}
 
 void AppContext::switchMouseActive() {m_mouseActive = !m_mouseActive;}
+
+bool AppContext::isFirstMouse() {return m_firstMouse;}
+
+void AppContext::firstMouseDone() {m_firstMouse = false;}
+
+float AppContext::getDeltaTime() {return m_deltaTime;}
+
+void AppContext::setDeltaTime(float value) {m_deltaTime = value;}
+
+float AppContext::getLastFrame() {return m_lastFrame;}
+
+void AppContext::setLastFrame(float value) {m_lastFrame = value;}
