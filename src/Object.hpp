@@ -55,9 +55,14 @@ public:
      */
     virtual void draw(Shader shader) = 0;
 
+    glm::vec3 getPosition();
+
+    void setPosition(glm::vec3 value);
+
 protected:
 
     GLuint VAO, VBO;
+    glm::vec3 m_position;
 
     /**
      * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.

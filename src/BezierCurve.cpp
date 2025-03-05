@@ -20,7 +20,6 @@ void BezierCurve::debugControlPoints()
 glm::vec3 BezierCurve::curveValue(float u)
 {
     if(0.0f > u || u > 1.0f) {
-        std::cout << "u value out of range [0;1]" << std::endl;
         return glm::vec3(0.0f);
     }
 
@@ -57,7 +56,6 @@ ptsTab BezierCurve::equalDiscretization()
     }
     vertices.push_back(m_controlPoints[m_controlPoints.size() - 1]);
 
-    std::cout << "New segment size : " << (EQUALY_BASE_SEGMENT / m_nbCurvePoints) << std::endl;
     return vertices;
 }
 

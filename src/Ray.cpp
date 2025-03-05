@@ -1,10 +1,8 @@
 #include "Ray.hpp"
 
-Ray::Ray(glm::vec3 start, glm::vec3 end)
+Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_origin(origin), m_direction(direction)
 {
-    m_points.push_back(start);
-    m_points.push_back(end);
-    updateVertices(m_points);
+    updateVertices(getVertices());
 }
 
 void Ray::draw(Shader shader)
@@ -12,8 +10,13 @@ void Ray::draw(Shader shader)
     glBindVertexArray(VAO);
 
     shader.setVec3("color", 0.0f, 1.0f, 0.0f);
-    glDrawArrays(GL_LINE_STRIP, 0, m_points.size());
+    glDrawArrays(GL_LINE_STRIP, 0, 2);
 
     // Optionnel : "déconnecte" le VAO
     glBindVertexArray(0);
+}
+
+ptsTab Ray::getVertices()
+{
+    return {m_origin, m_origin + m_direction * RAY_LENGTH};
 }

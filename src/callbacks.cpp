@@ -102,13 +102,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
         glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
-        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
 
-        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f;
-        glm::vec3 farPoint = context->getCamera()->Position + rayDir * 100.0f;
+        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
+        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f; // 1.0 pour être un peu éloigné de l'écran
 
         // Ajout du rayon à l'affichage
-        context->addObject(std::make_unique<Ray>(nearPoint, farPoint));
+        context->addObject(std::make_unique<Ray>(nearPoint, rayDir));
     }
 }
 

@@ -88,6 +88,9 @@ int main()
     Shader bezierShader("shaders/bezier.vs", "shaders/bezier.fs");
 
 
+    // Creating sphere
+    contextIGAI.addObject(std::make_unique<Sphere>(1.0f));
+
     // Creating Bezier Curve
     // ---------------------
     ptsTab controlPolygon = {
@@ -101,9 +104,6 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     contextIGAI.addObject(std::make_unique<BezierCurve>(controlPolygon));
-    
-    // Creating sphere
-    contextIGAI.addObject(std::make_unique<Sphere>(1.0f));
 
     // crosshair setup
     // ---------------

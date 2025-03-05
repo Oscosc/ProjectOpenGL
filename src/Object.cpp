@@ -1,7 +1,7 @@
 #include "Object.hpp"
 
 
-Object::Object()
+Object::Object() : m_position(glm::vec3(0.0f))
 {
     // Création du VAO et du VBO
     glGenVertexArrays(1, &VAO);
@@ -47,3 +47,7 @@ void Object::updateVertices(ptsTab points)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
+
+glm::vec3 Object::getPosition() {return m_position;}
+
+void Object::setPosition(glm::vec3 value) {m_position = value;}

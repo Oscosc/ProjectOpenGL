@@ -57,6 +57,7 @@ public:
      * objets) 
      */
     ScalableElement* getActiveObject();
+
     /**
      * @brief Fonction begin() pour permettre d'itérer sur AppContext.
      * 
