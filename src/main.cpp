@@ -10,8 +10,9 @@
  * @date 2025-03-02
  */
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-#include "callbacks.hpp" // Contient GLFW et glad : à appeler en premier
 #include <iostream>
 
 // Transformation imports
@@ -24,6 +25,7 @@
 #include "../includes/camera.hpp"
 
 // Custom classes imports
+#include "callbacks.hpp"
 #include "BezierCurve.hpp"
 #include "Ray.hpp"
 #include "Sphere.hpp"
@@ -55,20 +57,23 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    
+    // glfw custom user pointer
+    // ------------------------
+    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glfwSetWindowUserPointer(window, &contextIGAI);
+    
+    // glfw callbacks setup
+    // --------------------
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-    // glfw custom user pointer
-    // ------------------------
-    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT);
-    glfwSetWindowUserPointer(window, &contextIGAI);
-
     // Mouse capture config
     // --------------------
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------

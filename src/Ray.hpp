@@ -15,7 +15,7 @@ public:
     Ray(glm::vec3 origin, glm::vec3 direction);
     void draw(Shader shader) override;
 
-    bool intersect(const Sphere &sphere, float &point) const;
+    bool intersect(const Sphere &sphere, float &point, glm::vec3 &new_direction) const;
     glm::vec3 getPoint(float t) const;
 
 private:

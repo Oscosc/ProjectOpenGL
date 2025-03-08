@@ -20,10 +20,10 @@ void Ray::draw(Shader shader)
 }
 
 
-bool Ray::intersect(const Sphere &sphere, float &point) const
+bool Ray::intersect(const Sphere &sphere, float &point, glm::vec3 &new_direction) const
 {
+    // CALCUL DU POINT D'INTERSECTION
     float t0, t1; // Solutions for t if the ray intersects the sphere
-    // Analytic solution
     glm::vec3 L = this->getOrigin() - sphere.getOrigin();
     float a = glm::dot(this->getDirection(), this->getDirection());
     float b = 2 * glm::dot(this->getDirection(), L);
@@ -37,6 +37,11 @@ bool Ray::intersect(const Sphere &sphere, float &point) const
     }
 
     point = t0;
+
+    // CALCUL DE LA NOUVELLE DIRECTION
+    glm::vec3 norm = glm::normalize(getPoint(point) - sphere.getOrigin());
+    glm::vec3 dir = getDirection();
+    new_direction = dir - 2 * glm::dot(dir, norm) * norm;
 
     return true;
 }

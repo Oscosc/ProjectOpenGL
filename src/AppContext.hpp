@@ -112,7 +112,7 @@ private:
     float m_cursorX;
     float m_cursorY;
 
-    bool m_mouseActive;
+    bool m_mouseActive = true;
     bool m_firstMouse = true; // To remove in future, used only once
 
     float m_deltaTime = 0.0f;

@@ -12,7 +12,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
+    if(!context) {
+        std::cout << "Erreur d'initialisation context dans mouse_callack()" << std::endl;
+        return;
+    }
 
     if(context->isMouseActive()) return;
 
@@ -39,7 +42,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
+    if(!context) {
+        std::cout << "Erreur d'initialisation context dans scroll_callack()" << std::endl;
+        return;
+    }
 
     context->getCamera()->ProcessMouseScroll(static_cast<float>(yoffset));
 }
@@ -49,7 +55,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     // Récupération du contexte
     AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
+    if(!context) {
+        std::cout << "Erreur d'initialisation context dans key_callack()" << std::endl;
+        return;
+    }
+
+    // Switch cursor visiblity and mode for ray casting
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if(context->isMouseActive()) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        context->switchMouseActive();
+    }
+
+    // Remove all casted rays
+    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+        context->removeRays();
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
 
     ScalableElement* activeElement = context->getActiveObject();
     if(!activeElement) return;
@@ -66,18 +91,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         std::cout << "Switching Mode !" << std::endl;
         activeElement->switchMode();
     }
-
-    // Switch cursor visiblity and mode for ray casting
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        if(context->isMouseActive()) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        context->switchMouseActive();
-    }
-
-    // Remove all casted rays
-    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
-        context->removeRays();
-    }
 }
 
 
@@ -86,7 +99,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         // Récupération du contexte
         AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-        if(!context) return;
+        if(!context) {
+            std::cout << "Erreur d'initialisation context dans mouse_button_callack()" << std::endl;
+            return;
+        }
 
         // Récupération du point cliqué
         double mouseX, mouseY;
@@ -112,20 +128,26 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         // Temporaire : calcul d'intersection
         Ray tmp(nearPoint, rayDir);
         float a = 0.0f;
+        glm::vec3 new_dir;
+
         Sphere* mySphere = dynamic_cast<Sphere*>(context->getObject(0));
-        if(tmp.intersect(*mySphere, a)) {
+        if(tmp.intersect(*mySphere, a, new_dir)) {
             std::cout << "INTERSECTION en " << glm::to_string(tmp.getPoint(a)) << std::endl;
+            std::cout << "-> REFLEXION en " << glm::to_string(new_dir) << std::endl;
         }
     }
 }
 
 void processInput(GLFWwindow *window)
 {
-    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
-    if(!context) return;
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    AppContext* context = static_cast<AppContext*>(glfwGetWindowUserPointer(window));
+    if(!context) {
+        std::cout << "Erreur d'initialisation context dans processInput()" << std::endl;
+        return;
+    }
+
+    if(context->isMouseActive()) return;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         context->getCamera()->ProcessKeyboard(FORWARD, context->getDeltaTime());
