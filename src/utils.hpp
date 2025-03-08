@@ -30,5 +30,18 @@ std::vector<unsigned int> Range(unsigned int n);
  * renvoyé par la fonction. Cette fonction garantit donc de ne pas modifier A et B.
  */
 std::vector<glm::vec3> combine(std::vector<glm::vec3> vecA, std::vector<glm::vec3> vecB);
+std::vector<unsigned int> combine(std::vector<unsigned int> vecA, std::vector<unsigned int> vecB);
+
+/**
+ * @brief Fonction récupérée ici :
+ * https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+ * 
+ * Calcule les racines d'un polynome du second debré si elles existent et les stocke dans x0 et x1 (x1 > x0).
+ * @param a, b, c coefficient du polynome
+ * @param x0, x1 entiers où écire les racines du polynome
+ * @return true si des racines ont été trouvées, false sinon
+ */
+bool solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1);
+
 
 #endif // UTILS_HPP

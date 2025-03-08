@@ -65,6 +65,13 @@ void AppContext::removeRays()
     }), m_objects.end());
 }
 
+
+Object* AppContext::getObject(size_t index) {
+    if (index >= m_objects.size()) throw std::out_of_range("Index out of range");
+    return m_objects[index].get();
+}
+
+
 glm::mat4 AppContext::getView(){return m_view;}
 
 void AppContext::setView(glm::mat4 view) {m_view = view;}

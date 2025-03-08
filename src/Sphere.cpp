@@ -1,32 +1,52 @@
 #include "Sphere.hpp"
 
 
-Sphere::Sphere(float radius)
+Sphere::Sphere(float radius) : m_radius(radius)
 {
-    ptsTab vertices = generateVertices(DEFAULT_STACKS, DEFAULT_SECTORS, radius);
-    std::vector<unsigned int> indexes = generateIndexes(DEFAULT_STACKS, DEFAULT_SECTORS);
-    m_nbVertices = indexes.size();
+    std::vector<unsigned int> lineIndexes;
 
-    // Completing Object constructor with EBO init
-    glGenBuffers(1, &EBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVertices * sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
+    ptsTab vertices = generateVertices(DEFAULT_STACKS, DEFAULT_SECTORS, m_radius);
+    std::vector<unsigned int> triangleIndexes = generateIndexes(DEFAULT_STACKS, DEFAULT_SECTORS, &lineIndexes);
+
+    m_nbVertices = triangleIndexes.size();
+    m_nbVerticesLines = lineIndexes.size();
 
     updateVertices(vertices);
+
+    // Completing Object constructor with EBO init
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glGenBuffers(1, &EBOTriangles);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVertices * sizeof(unsigned int), triangleIndexes.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, &EBOLines);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVerticesLines * sizeof(unsigned int), lineIndexes.data(), GL_STATIC_DRAW);
 }
 
 
 void Sphere::draw(Shader shader)
 {
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), m_position);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);
     shader.setMat4("model", model);
 
-    shader.setVec3("color", 0.8f, 0.8f, 0.8f);
-    glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(VAO);
+
+    shader.setVec3("color", 0.9f, 0.9f, 0.9f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
+    glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
+
+    shader.setVec3("color", 0.0f, 0.0f, 0.0f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
+    glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
+}
+
+
+float Sphere::getRadius() const
+{
+    return m_radius;
 }
 
 
@@ -63,10 +83,13 @@ ptsTab Sphere::generateVertices(unsigned int stackCount, unsigned int sectorCoun
 }
 
 
-std::vector<unsigned int> Sphere::generateIndexes(unsigned int stackCount, unsigned int sectorCount)
+std::vector<unsigned int> Sphere::generateIndexes(unsigned int stackCount, unsigned int sectorCount,
+    std::vector<unsigned int>* lineIndices)
 {
     std::vector<unsigned int> indices;
+
     int k1, k2;
+
     for(int i = 0; i < stackCount; ++i)
     {
         k1 = i * (sectorCount + 1);     // beginning of current stack
@@ -90,7 +113,17 @@ std::vector<unsigned int> Sphere::generateIndexes(unsigned int stackCount, unsig
                 indices.push_back(k2);
                 indices.push_back(k2 + 1);
             }
+
+            // Pour afficher les lignes
+            lineIndices->push_back(k1);
+            lineIndices->push_back(k2);
+            if(i != 0)  // horizontal lines except 1st stack, k1 => k+1
+            {
+                lineIndices->push_back(k1);
+                lineIndices->push_back(k1 + 1);
+            }
         }
     }
+
     return indices;
 }

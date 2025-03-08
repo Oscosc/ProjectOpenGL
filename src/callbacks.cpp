@@ -108,6 +108,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
         // Ajout du rayon à l'affichage
         context->addObject(std::make_unique<Ray>(nearPoint, rayDir));
+
+        // Temporaire : calcul d'intersection
+        Ray tmp(nearPoint, rayDir);
+        float a = 0.0f;
+        Sphere* mySphere = dynamic_cast<Sphere*>(context->getObject(0));
+        if(tmp.intersect(*mySphere, a)) {
+            std::cout << "INTERSECTION en " << glm::to_string(tmp.getPoint(a)) << std::endl;
+        }
     }
 }
 

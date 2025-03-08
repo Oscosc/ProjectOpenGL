@@ -78,6 +78,10 @@ public:
 
     unsigned int size() const;
     void removeRays();
+
+    // Surcharge de l'opérateur [] pour l'accès en lecture seule (const)
+    Object* getObject(size_t index);
+
     glm::mat4 getView();
     void setView(glm::mat4 view);
     glm::mat4 getProjection();

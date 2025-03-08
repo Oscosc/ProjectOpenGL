@@ -2,6 +2,9 @@
 #define RAY_HPP
 
 #include "Object.hpp"
+#include "Sphere.hpp"
+
+#include "AppContext.hpp"
 
 #define RAY_LENGTH 100.0f
 
@@ -12,9 +15,13 @@ public:
     Ray(glm::vec3 origin, glm::vec3 direction);
     void draw(Shader shader) override;
 
+    bool intersect(const Sphere &sphere, float &point) const;
+    glm::vec3 getPoint(float t) const;
+
 private:
-    glm::vec3 m_origin;
     glm::vec3 m_direction;
+
+    glm::vec3 getDirection() const;
 
     ptsTab getVertices();
 };

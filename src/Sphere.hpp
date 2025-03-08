@@ -2,16 +2,19 @@
 #define SPHERE_HPP
 
 #include "Object.hpp"
+#include "utils.hpp"
 #include <math.h>
 
-#define DEFAULT_STACKS 16
-#define DEFAULT_SECTORS 16
+#define DEFAULT_STACKS 64
+#define DEFAULT_SECTORS 64
 
 class Sphere : public Object
 {
 public:
     Sphere(float radius);
     void draw(Shader shader) override;
+
+    float getRadius() const;
 
 private:
 
@@ -23,10 +26,14 @@ private:
     /**
      * @brief Code also from : https://www.songho.ca/opengl/gl_sphere.html#sphere
      */
-    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount);
+    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount,
+        std::vector<unsigned int>* lineIndices);
 
-    unsigned int EBO;
-    unsigned int m_nbVertices;
+    unsigned int EBOTriangles;
+    unsigned int EBOLines, VAOLines;
+    
+    float m_radius;
+    unsigned int m_nbVertices, m_nbVerticesLines;
 };
 
 #endif // SPHERE_HPP
