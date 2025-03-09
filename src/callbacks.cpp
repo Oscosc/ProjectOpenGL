@@ -120,21 +120,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
 
         glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
-        glm::vec3 nearPoint = context->getCamera()->Position + rayDir * 1.0f; // 1.0 pour être un peu éloigné de l'écran
-
-        // Ajout du rayon à l'affichage
-        context->addObject(std::make_unique<Ray>(nearPoint, rayDir));
-
-        // Temporaire : calcul d'intersection
-        Ray tmp(nearPoint, rayDir);
-        float a = 0.0f;
-        glm::vec3 new_dir;
-
-        Sphere* mySphere = dynamic_cast<Sphere*>(context->getObject(0));
-        if(tmp.intersect(*mySphere, a, new_dir)) {
-            std::cout << "INTERSECTION en " << glm::to_string(tmp.getPoint(a)) << std::endl;
-            std::cout << "-> REFLEXION en " << glm::to_string(new_dir) << std::endl;
-        }
+        glm::vec3 nearPoint = context->getCamera()->Position;
+        
+        // Calcul d'intersections
+        Ray original(nearPoint, rayDir);
+        ptsTab intersections;
+        glm::vec3 reflexion;
+        Intersection::rayContextPath(*context, original, intersections, reflexion);
+        context->addObject(std::make_unique<Ray>(nearPoint, rayDir, intersections, reflexion));
     }
 }
 

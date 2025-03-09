@@ -27,6 +27,7 @@ Object::~Object()
 }
 
 
+
 void Object::updateVertices(ptsTab points)
 {
     // "Connexion" au VAO

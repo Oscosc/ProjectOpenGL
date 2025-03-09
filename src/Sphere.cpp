@@ -5,8 +5,11 @@ Sphere::Sphere(float radius) : m_radius(radius)
 {
     std::vector<unsigned int> lineIndexes;
 
-    ptsTab vertices = generateVertices(DEFAULT_STACKS, DEFAULT_SECTORS, m_radius);
-    std::vector<unsigned int> triangleIndexes = generateIndexes(DEFAULT_STACKS, DEFAULT_SECTORS, &lineIndexes);
+    unsigned int stacks = (radius > 1.0f) ? DEFAULT_STACKS : round(DEFAULT_STACKS * radius);
+    unsigned int sectors = (radius > 1.0f) ? DEFAULT_SECTORS : round(DEFAULT_SECTORS * radius);
+
+    ptsTab vertices = generateVertices(stacks, sectors, m_radius);
+    std::vector<unsigned int> triangleIndexes = generateIndexes(stacks, sectors, &lineIndexes);
 
     m_nbVertices = triangleIndexes.size();
     m_nbVerticesLines = lineIndexes.size();
@@ -26,6 +29,10 @@ Sphere::Sphere(float radius) : m_radius(radius)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVerticesLines * sizeof(unsigned int), lineIndexes.data(), GL_STATIC_DRAW);
 }
 
+Sphere::Sphere(float radius, glm::vec3 position) : Sphere(radius)
+{
+    setOrigin(position);
+}
 
 void Sphere::draw(Shader shader)
 {

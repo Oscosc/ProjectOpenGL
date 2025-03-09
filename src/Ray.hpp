@@ -13,15 +13,17 @@ class Ray : public Object
 {
 public:
     Ray(glm::vec3 origin, glm::vec3 direction);
+    Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 reflexion);
+
     void draw(Shader shader) override;
 
-    bool intersect(const Sphere &sphere, float &point, glm::vec3 &new_direction) const;
     glm::vec3 getPoint(float t) const;
+    glm::vec3 getDirection() const;
+    void setDirection(glm::vec3 value);
 
 private:
     glm::vec3 m_direction;
-
-    glm::vec3 getDirection() const;
+    unsigned int m_bounces;
 
     ptsTab getVertices();
 };

@@ -33,6 +33,8 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+#define DISPERSION_RATE 1.5
+
 
 int main()
 {
@@ -94,7 +96,14 @@ int main()
 
 
     // Creating sphere
-    contextIGAI.addObject(std::make_unique<Sphere>(1.0f));
+    srand(time(0));
+    for(int i=0; i < 10; ++i) {
+        glm::vec3 randVec3 = glm::vec3((float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
+                                       (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
+                                       (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE);
+        float randRadius = (float)(std::rand()) / (float)(RAND_MAX);
+        contextIGAI.addObject(std::make_unique<Sphere>(randRadius, randVec3));
+    }
 
     // Creating Bezier Curve
     // ---------------------

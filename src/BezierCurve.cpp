@@ -72,7 +72,7 @@ void BezierCurve::draw(Shader shader)
     glBindVertexArray(VAO);
 
     // Dessine le polygone de controle
-    shader.setVec3("color", 1.0f, 0.0f, 0.0f);
+    shader.setVec3("color", 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_LINE_STRIP, 0, m_controlPoints.size());
 
     // Dessine la courbe de Bezier

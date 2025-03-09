@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "AppContext.hpp"
+#include "Intersections.hpp"
 
 /**
  * @brief Frame-buffer size callback.

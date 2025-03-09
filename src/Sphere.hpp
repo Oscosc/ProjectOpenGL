@@ -12,6 +12,8 @@ class Sphere : public Object
 {
 public:
     Sphere(float radius);
+    Sphere(float radius, glm::vec3 position);
+
     void draw(Shader shader) override;
 
     float getRadius() const;
