@@ -56,13 +56,15 @@ public:
     virtual void draw(Shader shader) = 0;
 
     glm::vec3 getOrigin() const;
-
     void setOrigin(glm::vec3 value);
+    glm::vec3 getColor() const;
+    void setColor(glm::vec3 value);
 
 protected:
 
     GLuint VAO, VBO;
     glm::vec3 m_origin;
+    glm::vec3 m_color;
 
     /**
      * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.

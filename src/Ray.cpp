@@ -1,6 +1,12 @@
 #include "Ray.hpp"
 
 
+Ray::Ray() : m_direction(glm::vec3(0.0f)), m_bounces(0)
+{
+    setOrigin(glm::vec3(0.0f));
+}
+
+
 Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_bounces(0)
 {
     setOrigin(origin);

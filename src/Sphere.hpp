@@ -12,7 +12,7 @@ class Sphere : public Object
 {
 public:
     Sphere(float radius);
-    Sphere(float radius, glm::vec3 position);
+    Sphere(float radius, glm::vec3 position, glm::vec3 color);
 
     void draw(Shader shader) override;
 

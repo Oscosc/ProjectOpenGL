@@ -72,12 +72,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         context->removeRays();
     }
 
+    // Exit app
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
+    // Capture screen with ray tracing
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+        std::string captureName = "screen_capture.png";
+        Intersection::raySavePNG(*context, captureName);
+    }
+
+
+    // ONLY SCALABLE ELEMENTS PART ----------------------------------------------------------------
     ScalableElement* activeElement = context->getActiveObject();
     if(!activeElement) return;
+    // --------------------------------------------------------------------------------------------
 
     // Update number of curve points in BezierCurve
     if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
@@ -109,25 +119,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         if(context->isMouseActive()) {glfwGetCursorPos(window, &mouseX, &mouseY);}
         else {mouseX = context->SCR_WIDTH/2.0f; mouseY = context->SCR_HEIGHT/2.0f;}
 
-        // Calcul des valeurs du rayon lancé
-        float x = (2.0f * mouseX) / context->SCR_WIDTH - 1.0f;
-        float y = 1.0f - (2.0f * mouseY) / context->SCR_HEIGHT;
-        glm::vec4 rayClip(x, y, -1.0f, 1.0f);
-
-        glm::vec4 rayEye = glm::inverse(context->getProjection()) * rayClip;
-        rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-
-        glm::vec4 rayWorld = glm::inverse(context->getView()) * rayEye;
-
-        glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
-        glm::vec3 nearPoint = context->getCamera()->Position;
+        // Calcul du rayon initial
+        Ray original;
+        Intersection::cameraRay(*context, mouseX, mouseY, original);
         
         // Calcul d'intersections
-        Ray original(nearPoint, rayDir);
         ptsTab intersections;
         glm::vec3 reflexion;
         Intersection::rayContextPath(*context, original, intersections, reflexion);
-        context->addObject(std::make_unique<Ray>(nearPoint, rayDir, intersections, reflexion));
+        context->addObject(std::make_unique<Ray>(original.getOrigin(), original.getDirection(), intersections, reflexion));
     }
 }
 

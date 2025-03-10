@@ -29,9 +29,10 @@ Sphere::Sphere(float radius) : m_radius(radius)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVerticesLines * sizeof(unsigned int), lineIndexes.data(), GL_STATIC_DRAW);
 }
 
-Sphere::Sphere(float radius, glm::vec3 position) : Sphere(radius)
+Sphere::Sphere(float radius, glm::vec3 position, glm::vec3 color) : Sphere(radius)
 {
     setOrigin(position);
+    setColor(color);
 }
 
 void Sphere::draw(Shader shader)
@@ -41,11 +42,11 @@ void Sphere::draw(Shader shader)
 
     glBindVertexArray(VAO);
 
-    shader.setVec3("color", 0.9f, 0.9f, 0.9f);
+    shader.setVec3("color", m_color);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
 
-    shader.setVec3("color", 0.0f, 0.0f, 0.0f);
+    shader.setVec3("color", 0.f, 0.f, 0.f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
     glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
 }

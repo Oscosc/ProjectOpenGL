@@ -33,7 +33,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define DISPERSION_RATE 1.5
+#define DISPERSION_RATE 5
 
 
 int main()
@@ -62,7 +62,7 @@ int main()
     
     // glfw custom user pointer
     // ------------------------
-    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT);
+    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.2f, 0.3f, 0.3f));
     glfwSetWindowUserPointer(window, &contextIGAI);
     
     // glfw callbacks setup
@@ -102,7 +102,10 @@ int main()
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE);
         float randRadius = (float)(std::rand()) / (float)(RAND_MAX);
-        contextIGAI.addObject(std::make_unique<Sphere>(randRadius, randVec3));
+        /* glm::vec3 randColor = glm::vec3((float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE,
+                                       (float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE,
+                                       (float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE); */
+        contextIGAI.addObject(std::make_unique<Sphere>(randRadius, randVec3, glm::vec3(0.9f)));
     }
 
     // Creating Bezier Curve
@@ -159,7 +162,8 @@ int main()
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glm::vec3 clColor = contextIGAI.getBackgroundColor();
+        glClearColor(clColor.x, clColor.y, clColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // active shader

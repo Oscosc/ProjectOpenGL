@@ -30,6 +30,26 @@ bool Intersection::Ray_Sphere(const Ray &ray, const Sphere &sphere, Ray &reflexi
 }
 
 
+void Intersection::cameraRay(AppContext &context, double xPos, double yPos, Ray &ray)
+{
+    // Calcul des valeurs du rayon lancé
+    float x = (2.0f * xPos) / context.SCR_WIDTH - 1.0f;
+    float y = 1.0f - (2.0f * yPos) / context.SCR_HEIGHT;
+    glm::vec4 rayClip(x, y, -1.0f, 1.0f);
+
+    glm::vec4 rayEye = glm::inverse(context.getProjection()) * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+    glm::vec4 rayWorld = glm::inverse(context.getView()) * rayEye;
+
+    glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
+    glm::vec3 nearPoint = context.getCamera()->Position;
+
+    ray.setDirection(rayDir);
+    ray.setOrigin(nearPoint);
+}
+
+
 void Intersection::rayContextPath(AppContext &context, const Ray &ray, ptsTab &intersections,
     glm::vec3 &reflexion)
 {
@@ -79,4 +99,52 @@ void Intersection::rayContextPath(AppContext &context, const Ray &ray, ptsTab &i
         objectIdBounceFrom = closestIndex;
         bouncesCount++;
     }
+}
+
+
+glm::vec3 Intersection::rayColorPoint(AppContext &context, const Ray &ray)
+{
+    float minDistance = -1.f;
+    glm::vec3 minColor = context.getBackgroundColor();
+
+    for(int i = 0; i < context.size(); ++i) {
+        // SPHERE ---------------------------------------------------------------------------------
+        Sphere* item = dynamic_cast<Sphere*>(context.getObject(i));
+        if(item != nullptr) {
+            Ray dumb;
+            if(Ray_Sphere(ray, *item, dumb) &&
+                (minDistance < 0 || glm::length(dumb.getOrigin() - ray.getOrigin()) < minDistance))
+            {
+                minColor = item->getColor();
+                minDistance = glm::length(dumb.getOrigin() - ray.getOrigin());
+            }
+        }
+    }
+
+    return minColor;
+}
+
+
+void Intersection::raySavePNG(AppContext &context, std::string filename)
+{
+    std::vector<unsigned char> image;
+    image.resize(context.SCR_WIDTH * context.SCR_HEIGHT * 4);
+
+    for(unsigned int y = 0; y < context.SCR_HEIGHT; ++y)
+    {
+        for(unsigned int x = 0; x < context.SCR_WIDTH; ++x)
+        {
+            Ray tmp;
+            cameraRay(context, x, y, tmp);
+            glm::vec3 color = rayColorPoint(context, tmp);
+
+            image[4 * context.SCR_WIDTH * y + 4 * x + 0] = 255 * color.x;
+            image[4 * context.SCR_WIDTH * y + 4 * x + 1] = 255 * color.y;
+            image[4 * context.SCR_WIDTH * y + 4 * x + 2] = 255 * color.z;
+            image[4 * context.SCR_WIDTH * y + 4 * x + 3] = 255;
+        }
+    }
+
+    unsigned error = lodepng::encode(filename, image, context.SCR_WIDTH, context.SCR_HEIGHT);
+    if(!error) std::cout << "Image saved as '" << filename << "'" << std::endl;
 }

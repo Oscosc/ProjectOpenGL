@@ -1,7 +1,7 @@
 #include "Object.hpp"
 
 
-Object::Object() : m_origin(glm::vec3(0.0f))
+Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f))
 {
     // Création du VAO et du VBO
     glGenVertexArrays(1, &VAO);
@@ -52,3 +52,7 @@ void Object::updateVertices(ptsTab points)
 glm::vec3 Object::getOrigin() const {return m_origin;}
 
 void Object::setOrigin(glm::vec3 value) {m_origin = value;}
+
+glm::vec3 Object::getColor() const {return m_color;}
+
+void Object::setColor(glm::vec3 value) {m_color = value;}

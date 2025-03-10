@@ -12,6 +12,7 @@
 class Ray : public Object
 {
 public:
+    Ray();
     Ray(glm::vec3 origin, glm::vec3 direction);
     Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 reflexion);
 
