@@ -18,7 +18,6 @@ Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_boun
 Ray::Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 reflexion) :
     m_direction(direction), m_bounces(intersections.size())
 {
-    std::cout << intersections.size() << std::endl;
     setOrigin(origin);
     
     float remainingLength = RAY_LENGTH;

@@ -56,3 +56,5 @@ void Object::setOrigin(glm::vec3 value) {m_origin = value;}
 glm::vec3 Object::getColor() const {return m_color;}
 
 void Object::setColor(glm::vec3 value) {m_color = value;}
+
+const std::vector<Triangle>* Object::getTriangles() {return &m_triangles;}

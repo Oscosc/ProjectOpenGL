@@ -97,7 +97,7 @@ int main()
 
     // Creating sphere
     srand(time(0));
-    for(int i=0; i < 10; ++i) {
+    for(int i=0; i < 1000; ++i) {
         glm::vec3 randVec3 = glm::vec3((float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE);
@@ -180,7 +180,6 @@ int main()
 
         // draw context elements
         // ---------------------
-        // std::cout << "Elements dans le contexte : " << meshes.size() << std::endl;
         for(const auto& element : contextIGAI) {
             glm::mat4 model = glm::mat4(1.0f);
             bezierShader.setMat4("model", model);

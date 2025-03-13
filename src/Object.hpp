@@ -21,6 +21,13 @@
 #include "../includes/shader.hpp"
 
 
+typedef struct s_Triangle {
+    glm::vec3 a;
+    glm::vec3 b;
+    glm::vec3 c;
+} Triangle;
+
+
 using ptsTab = std::vector<glm::vec3>;
 
 
@@ -60,11 +67,15 @@ public:
     glm::vec3 getColor() const;
     void setColor(glm::vec3 value);
 
+    const std::vector<Triangle>* getTriangles();
+    // virtual void setTriangles() = 0;
+
 protected:
 
     GLuint VAO, VBO;
     glm::vec3 m_origin;
     glm::vec3 m_color;
+    std::vector<Triangle> m_triangles;
 
     /**
      * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.

@@ -30,16 +30,57 @@ bool Intersection::Ray_Sphere(const Ray &ray, const Sphere &sphere, Ray &reflexi
 }
 
 
+bool Intersection::Ray_Triangle(const Ray &ray, const Triangle &triangle, Ray &reflexion)
+{
+    glm::vec3 e1 = triangle.b - triangle.a;
+    glm::vec3 e2 = triangle.c - triangle.a;
+    
+    glm::vec3 N = e1 * e2;
+    glm::vec3 P = ray.getDirection() * e2;
+
+    float det = glm::dot(e1, P);
+    // Le rayon est parallèle au plan 
+    if(det <= ZERO_THRESHOLD && det >= -ZERO_THRESHOLD) return false;
+
+    float invDet = 1 / det;
+
+    glm::vec3 T = ray.getOrigin() - triangle.a;
+    float u = glm::dot(T, P) * invDet;
+    // Si u n'est pas compris dans [0;1] alors le point d'intersection est hors du triangle
+    if(u < 0 || u > 1) return false;
+
+    glm::vec3 Q = T * e1;
+    float v = glm::dot(ray.getDirection(), Q) * invDet;
+    // Si v n'est pas compris dans [0;1] alors le point d'intersection est hors du triangle
+    if(v < 0 || u > 1) return false;
+
+    float t = glm::dot(e2, Q) * invDet;
+    // Si t est inférieur à 0 alors l'intersection est derrière le rayon
+    if(t < 0) return false;
+
+    // Sinon, rayon ok donc on met a jour et on renvoie true
+    reflexion.setOrigin(ray.getPoint(t));
+    glm::vec3 new_dir = ray.getDirection() - 2 * glm::dot(ray.getDirection(), N) * N;
+    reflexion.setDirection(new_dir);
+
+
+
+    return true;
+}
+
+
 void Intersection::cameraRay(AppContext &context, double xPos, double yPos, Ray &ray)
 {
-    // Calcul des valeurs du rayon lancé
+    // Calcul des valeurs de position du rayon lancé
     float x = (2.0f * xPos) / context.SCR_WIDTH - 1.0f;
     float y = 1.0f - (2.0f * yPos) / context.SCR_HEIGHT;
-    glm::vec4 rayClip(x, y, -1.0f, 1.0f);
+    glm::vec4 rayClip(x, y, -1.0f, 1.0f); // Vecteur clippé
 
+    // Inversion de la matrice de projection : retour dans la view
     glm::vec4 rayEye = glm::inverse(context.getProjection()) * rayClip;
     rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
+    // Inversion de la matrice de view : retour dans l'espace 3D
     glm::vec4 rayWorld = glm::inverse(context.getView()) * rayEye;
 
     glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
@@ -78,6 +119,8 @@ void Intersection::rayContextPath(AppContext &context, const Ray &ray, ptsTab &i
                     interDist.push_back(glm::length(nextRay.getOrigin() - currentRay.getOrigin()));
                     interInd.push_back(i);
                 }
+                
+                continue;
             }
         }
 

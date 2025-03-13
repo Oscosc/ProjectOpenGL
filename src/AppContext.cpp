@@ -29,34 +29,15 @@ void AppContext::addObject(AppContext::uniqueObject new_object)
 }
 
 
-AppContext::uniqueObjectsList::iterator AppContext::begin()
-{
-    return m_objects.begin();
-}
+AppContext::uniqueObjectsList::iterator AppContext::begin() {return m_objects.begin();}
 
+AppContext::uniqueObjectsList::const_iterator AppContext::begin() const {return m_objects.cbegin();}
 
-AppContext::uniqueObjectsList::const_iterator AppContext::begin() const
-{
-    return m_objects.cbegin();
-}
+AppContext::uniqueObjectsList::iterator AppContext::end() {return m_objects.end();}
 
+AppContext::uniqueObjectsList::const_iterator AppContext::end() const {return m_objects.cend();}
 
-AppContext::uniqueObjectsList::iterator AppContext::end()
-{
-    return m_objects.end();
-}
-
-
-AppContext::uniqueObjectsList::const_iterator AppContext::end() const
-{
-    return m_objects.cend();
-}
-
-
-unsigned int AppContext::size() const
-{
-    return m_objects.size();
-}
+unsigned int AppContext::size() const {return m_objects.size();}
 
 
 void AppContext::removeRays()
