@@ -97,7 +97,7 @@ int main()
 
     // Creating sphere
     srand(time(0));
-    for(int i=0; i < 1000; ++i) {
+    for(int i=0; i < 10; ++i) {
         glm::vec3 randVec3 = glm::vec3((float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(std::rand()) * DISPERSION_RATE);

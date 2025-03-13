@@ -56,7 +56,11 @@ public:
      * dynamic_cast vers le type ScalableElement car les données initiales sont stockées comme des
      * objets) 
      */
-    ScalableElement* getActiveObject();
+    ScalableElement* getActiveAsScalable();
+
+
+    Object* getActiveAsObject();
+
 
     /**
      * @brief Fonction begin() pour permettre d'itérer sur AppContext.
@@ -75,6 +79,9 @@ public:
      */
     uniqueObjectsList::iterator end();
     uniqueObjectsList::const_iterator end() const;
+
+    void nextObject();
+    void previousObject();
 
     unsigned int size() const;
     void removeRays();
@@ -99,6 +106,7 @@ public:
     void setDeltaTime(float value);
     float getLastFrame();
     void setLastFrame(float value);
+    unsigned int getActiveIndex();
 
 private:
 

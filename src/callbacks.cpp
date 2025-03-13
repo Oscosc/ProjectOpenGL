@@ -83,9 +83,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         Intersection::raySavePNG(*context, captureName);
     }
 
+    // Switch to next element in context
+    if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+        context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
+        context->nextObject();                                              // On passe à l'objet suivant
+        context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
+        std::cout << "Current item : " << context->getActiveIndex() << "/" << context->size() << std::endl;
+    }
+
+    // Switch to previous element in context
+    if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+        context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
+        context->previousObject();                                          // On passe à l'objet suivant
+        context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
+        std::cout << "Current item : " << context->getActiveIndex() << "/" << context->size() << std::endl;
+    }
 
     // ONLY SCALABLE ELEMENTS PART ----------------------------------------------------------------
-    ScalableElement* activeElement = context->getActiveObject();
+    ScalableElement* activeElement = context->getActiveAsScalable();
     if(!activeElement) return;
     // --------------------------------------------------------------------------------------------
 

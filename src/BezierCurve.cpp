@@ -6,6 +6,7 @@ BezierCurve::BezierCurve(ptsTab controlPoints) :
     m_nbCurvePoints(MIN_DISCRETE_POINTS)
 {
     updateCurvePoints();
+    setColor(glm::vec3(1.0));
 }
 
 
@@ -72,11 +73,11 @@ void BezierCurve::draw(Shader shader)
     glBindVertexArray(VAO);
 
     // Dessine le polygone de controle
-    shader.setVec3("color", 0.0f, 0.0f, 1.0f);
+    shader.setVec3("color", 1.0f, 0.0f, 0.0f);
     glDrawArrays(GL_LINE_STRIP, 0, m_controlPoints.size());
 
     // Dessine la courbe de Bezier
-    shader.setVec3("color", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("color", getColor());
     glDrawArrays(GL_LINE_STRIP, m_controlPoints.size(), m_curvePoints.size());
 
     // Optionnel : "déconnecte" le VAO

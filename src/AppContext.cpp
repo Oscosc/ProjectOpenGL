@@ -14,10 +14,16 @@ AppContext::AppContext(unsigned int screen_width, unsigned int screen_height, gl
 {}
 
 
-ScalableElement* AppContext::getActiveObject()
+ScalableElement* AppContext::getActiveAsScalable()
 {
     if(m_objects.empty()) return nullptr;
     return dynamic_cast<ScalableElement*>(m_objects[m_activeObjectIndex].get());
+}
+
+
+Object *AppContext::getActiveAsObject()
+{
+    return m_objects.empty() ? nullptr : m_objects[m_activeObjectIndex].get();
 }
 
 
@@ -36,6 +42,21 @@ AppContext::uniqueObjectsList::const_iterator AppContext::begin() const {return 
 AppContext::uniqueObjectsList::iterator AppContext::end() {return m_objects.end();}
 
 AppContext::uniqueObjectsList::const_iterator AppContext::end() const {return m_objects.cend();}
+
+
+void AppContext::nextObject()
+{
+    m_activeObjectIndex = (m_activeObjectIndex + 1) % size();
+}
+
+
+void AppContext::previousObject()
+{
+    // Modulo ne fonctionne pas pour -1 donc méthode if/else
+    if(m_activeObjectIndex > 0) m_activeObjectIndex--;
+    else m_activeObjectIndex = size() - 1;
+}
+
 
 unsigned int AppContext::size() const {return m_objects.size();}
 
@@ -89,3 +110,5 @@ void AppContext::setDeltaTime(float value) {m_deltaTime = value;}
 float AppContext::getLastFrame() {return m_lastFrame;}
 
 void AppContext::setLastFrame(float value) {m_lastFrame = value;}
+
+unsigned int AppContext::getActiveIndex() {return m_activeObjectIndex;}
