@@ -15,6 +15,8 @@ public:
     Sphere(float radius, glm::vec3 position, glm::vec3 color);
 
     void draw(Shader shader) override;
+    //void previous() override;
+    //void next() override;
 
     float getRadius() const;
 
@@ -30,6 +32,8 @@ private:
      */
     static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount,
         std::vector<unsigned int>* lineIndices);
+
+    void updateEBO(std::vector<unsigned int> triangleIndexes, std::vector<unsigned int> lineIndexes);
 
     unsigned int EBOTriangles;
     unsigned int EBOLines, VAOLines;

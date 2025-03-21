@@ -125,7 +125,10 @@ void Intersection::rayContextPath(AppContext &context, const Ray &ray, ptsTab &i
         }
 
         // No intersections = finished
-        if(interInd.size() == 0) return;
+        if(interInd.size() == 0) {
+            if(intersections.size() == 0) reflexion = ray.getDirection();
+            return;
+        }
 
         // Choose closest one
         unsigned int minIndex = std::min_element(interDist.begin(), interDist.end()) - interDist.begin();

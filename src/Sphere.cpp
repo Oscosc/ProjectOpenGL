@@ -3,6 +3,10 @@
 
 Sphere::Sphere(float radius) : m_radius(radius)
 {
+    // Completing Object constructor with EBO init
+    glGenBuffers(1, &EBOTriangles);
+    glGenBuffers(1, &EBOLines);
+
     std::vector<unsigned int> lineIndexes;
 
     unsigned int stacks = (radius > 1.0f) ? DEFAULT_STACKS : round(DEFAULT_STACKS * radius);
@@ -15,25 +19,16 @@ Sphere::Sphere(float radius) : m_radius(radius)
     m_nbVerticesLines = lineIndexes.size();
 
     updateVertices(vertices);
-
-    // Completing Object constructor with EBO init
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    glGenBuffers(1, &EBOTriangles);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVertices * sizeof(unsigned int), triangleIndexes.data(), GL_STATIC_DRAW);
-
-    glGenBuffers(1, &EBOLines);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVerticesLines * sizeof(unsigned int), lineIndexes.data(), GL_STATIC_DRAW);
+    updateEBO(triangleIndexes, lineIndexes);
 }
+
 
 Sphere::Sphere(float radius, glm::vec3 position, glm::vec3 color) : Sphere(radius)
 {
     setOrigin(position);
     setColor(color);
 }
+
 
 void Sphere::draw(Shader shader)
 {
@@ -46,9 +41,9 @@ void Sphere::draw(Shader shader)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
 
-    shader.setVec3("color", 0.f, 0.f, 0.f);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
-    glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
+    //shader.setVec3("color", 0.f, 0.f, 0.f);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
+    //glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
 }
 
 
@@ -134,4 +129,17 @@ std::vector<unsigned int> Sphere::generateIndexes(unsigned int stackCount, unsig
     }
 
     return indices;
+}
+
+
+void Sphere::updateEBO(std::vector<unsigned int> triangleIndexes, std::vector<unsigned int> lineIndexes)
+{
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVertices * sizeof(unsigned int), triangleIndexes.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbVerticesLines * sizeof(unsigned int), lineIndexes.data(), GL_STATIC_DRAW);
 }
