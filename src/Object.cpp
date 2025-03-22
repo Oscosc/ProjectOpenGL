@@ -1,7 +1,7 @@
 #include "Object.hpp"
 
 
-Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f))
+Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambient(0.2f)
 {
     // Création du VAO et du VBO
     glGenVertexArrays(1, &VAO);
@@ -59,4 +59,8 @@ glm::vec3 Object::getColor() const {return m_color;}
 
 void Object::setColor(glm::vec3 value) {m_color = value;}
 
-const std::vector<Triangle>* Object::getTriangles() {return &m_triangles;}
+float Object::getAmbient() const {return m_ambient;}
+
+void Object::setAmbient(float value) {m_ambient = value;}
+
+// const std::vector<Triangle>* Object::getTriangles() {return &m_triangles;}

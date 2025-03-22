@@ -66,6 +66,8 @@ public:
     void setOrigin(glm::vec3 value);
     glm::vec3 getColor() const;
     void setColor(glm::vec3 value);
+    float getAmbient() const;
+    void setAmbient(float value);
 
     const std::vector<Triangle>* getTriangles();
     // virtual void setTriangles() = 0;
@@ -75,7 +77,9 @@ protected:
     GLuint VAO, VBO;
     glm::vec3 m_origin;
     glm::vec3 m_color;
-    std::vector<Triangle> m_triangles;
+    float m_ambient;
+
+    //std::vector<Triangle> m_triangles; TODO
 
     /**
      * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.

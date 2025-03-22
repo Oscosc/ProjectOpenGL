@@ -2,8 +2,8 @@
 
 BezierSurface::BezierSurface(ptsGrid control_points) :
     m_controlPoints(control_points),
-    m_nbCurvePointsU(10),
-    m_nbCurvePointsV(10)
+    m_nbCurvePointsU(100),
+    m_nbCurvePointsV(100)
 {
     m_sizeU = control_points.size();
     m_sizeV = control_points[0].size();
@@ -52,9 +52,10 @@ void BezierSurface::draw(Shader shader)
     glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);
     shader.setMat4("model", model);
 
-    glBindVertexArray(VAO);
-
     shader.setVec3("color", m_color);
+    shader.setFloat("ambientStrength", m_ambient);
+
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
 }

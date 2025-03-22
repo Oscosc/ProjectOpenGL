@@ -34,7 +34,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define DISPERSION_RATE 5
+#define DISPERSION_RATE 2
 
 
 int main()
@@ -63,7 +63,7 @@ int main()
     
     // glfw custom user pointer
     // ------------------------
-    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.2f, 0.3f, 0.3f));
+    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.2f, 0.3f, 0.3f), glm::vec3(1.f, 0.0f, 0.5f));
     glfwSetWindowUserPointer(window, &contextIGAI);
     
     // glfw callbacks setup
@@ -127,19 +127,16 @@ int main()
     // -----------------------
     ptsGrid controlPolygonSurface = {
         {
-            {-1.f, -1.5f, -1.f},
-            {-1.f,  0.f,   0.f},
-            {-1.f, -1.5f,  1.f}
+            {-0.5f,  0.0f,  0.0f},
+            {-0.5f,  1.0f,  0.0f},
+            { 0.5f,  1.0f,  0.0f},
+            { 0.5f,  0.0f,  0.0f}
         },
         {
-            {0.f,   0.f,  -1.f},
-            {0.f,   1.5f,  0.f},
-            {0.f,   0.f,   1.f}
-        },
-        {
-            {1.f,  -1.5f, -1.f},
-            {1.f,   0.f,   0.f},
-            {1.f,  -1.5f,  1.f}
+            {-0.5f,  0.0f, -1.0f},
+            {-0.5f,  1.0f, -1.0f},
+            { 0.5f,  1.0f, -1.0f},
+            { 0.5f,  0.0f, -1.0f}
         }
     };
     contextIGAI.addObject(std::make_unique<BezierSurface>(controlPolygonSurface));
@@ -201,7 +198,7 @@ int main()
         monochromeShader.setMat4("view", contextIGAI.getView());
 
         // lightPos and lightColor
-        monochromeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.0f));
+        monochromeShader.setVec3("lightColor", contextIGAI.getLightColor());
         monochromeShader.setVec3("lightPos", contextIGAI.getActiveAsObject()->getOrigin());
 
         // draw context elements

@@ -7,11 +7,11 @@ in vec3 Normal;
 uniform vec3 color;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
+uniform float ambientStrength;
 
 void main()
 {
     // Ambient color (currently useless)
-    float ambientStrength = 0.2;
     vec3 ambient = ambientStrength * lightColor;
 
     // Diffuse color

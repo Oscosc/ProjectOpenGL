@@ -35,9 +35,10 @@ void Sphere::draw(Shader shader)
     glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);
     shader.setMat4("model", model);
 
-    glBindVertexArray(VAO);
-
     shader.setVec3("color", m_color);
+    shader.setFloat("ambientStrength", m_ambient);
+
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
 

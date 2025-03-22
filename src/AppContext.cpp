@@ -1,10 +1,11 @@
 #include "AppContext.hpp"
 
 
-AppContext::AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor) :
+AppContext::AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor, glm::vec3 lightColor) :
     SCR_WIDTH(screen_width),
     SCR_HEIGHT(screen_height),
     m_backgroundColor(backgroundColor),
+    m_lightColor(lightColor),
     m_activeObjectIndex(-1),
     m_camera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))),
     m_projection(glm::mat4(1.0f)),
@@ -78,6 +79,8 @@ Object* AppContext::getObject(size_t index) {
 glm::mat4 AppContext::getView(){return m_view;}
 
 glm::vec3 AppContext::getBackgroundColor() {return m_backgroundColor;}
+
+glm::vec3 AppContext::getLightColor() {return m_lightColor;}
 
 void AppContext::setView(glm::mat4 view) {m_view = view;}
 

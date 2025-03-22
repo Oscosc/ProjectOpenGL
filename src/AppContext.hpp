@@ -41,7 +41,7 @@ public:
     /**
      * @brief Constructeur par défaut.
      */
-    AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor);
+    AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor, glm::vec3 lightColor);
 
     /**
      * @brief Ajoute un objet à la liste des objets du contexte.
@@ -89,6 +89,8 @@ public:
     Object* getObject(size_t index);
 
     glm::vec3 getBackgroundColor();
+    glm::vec3 getLightColor();
+
     glm::mat4 getView();
     void setView(glm::mat4 view);
     glm::mat4 getProjection();
@@ -114,6 +116,7 @@ private:
     size_t m_activeObjectIndex;
 
     glm::vec3 m_backgroundColor;
+    glm::vec3 m_lightColor;
     
     glm::mat4 m_projection;
     glm::mat4 m_view;

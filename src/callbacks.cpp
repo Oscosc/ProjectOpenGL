@@ -85,17 +85,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     // Switch to next element in context
     if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-        context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
+        context->getActiveAsObject()->setAmbient(0.2f);                     // On repasse le precedent en faible lumiere
         context->nextObject();                                              // On passe à l'objet suivant
-        context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
+        context->getActiveAsObject()->setAmbient(1.0f);                     // On passe le nouveau en haute luminosité
+
         // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
     // Switch to previous element in context
     if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-        context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
+        context->getActiveAsObject()->setAmbient(0.2f);                     // On repasse le precedent en faible lumiere
         context->previousObject();                                          // On passe à l'objet suivant
-        context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
+        context->getActiveAsObject()->setAmbient(1.0f);                     // On passe le nouveau en haute luminosité
+
         // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
