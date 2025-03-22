@@ -88,7 +88,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
         context->nextObject();                                              // On passe à l'objet suivant
         context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
-        std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
+        // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
     // Switch to previous element in context
@@ -96,7 +96,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         context->getActiveAsObject()->setColor(glm::vec3(1.0f));            // On repasse le precedent en blanc
         context->previousObject();                                          // On passe à l'objet suivant
         context->getActiveAsObject()->setColor(glm::vec3(0.f, 1.0f, 0.f));  // On passe le nouveau en vert
-        std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
+        // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
     // ONLY SCALABLE ELEMENTS PART ----------------------------------------------------------------

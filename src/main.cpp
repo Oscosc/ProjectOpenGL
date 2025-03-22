@@ -27,6 +27,7 @@
 // Custom classes imports
 #include "callbacks.hpp"
 #include "BezierCurve.hpp"
+#include "BezierSurface.hpp"
 #include "Ray.hpp"
 #include "Sphere.hpp"
 
@@ -92,7 +93,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader bezierShader("shaders/bezier.vs", "shaders/bezier.fs");
+    Shader monochromeShader("shaders/lighted.vs", "shaders/lighted.fs");
 
 
     // Creating sphere
@@ -121,6 +122,27 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     contextIGAI.addObject(std::make_unique<BezierCurve>(controlPolygon));
+
+    // Creating Bezier Surface
+    // -----------------------
+    ptsGrid controlPolygonSurface = {
+        {
+            {-1.f, -1.5f, -1.f},
+            {-1.f,  0.f,   0.f},
+            {-1.f, -1.5f,  1.f}
+        },
+        {
+            {0.f,   0.f,  -1.f},
+            {0.f,   1.5f,  0.f},
+            {0.f,   0.f,   1.f}
+        },
+        {
+            {1.f,  -1.5f, -1.f},
+            {1.f,   0.f,   0.f},
+            {1.f,  -1.5f,  1.f}
+        }
+    };
+    contextIGAI.addObject(std::make_unique<BezierSurface>(controlPolygonSurface));
 
     // crosshair setup
     // ---------------
@@ -167,24 +189,28 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // active shader
-        bezierShader.use();
+        monochromeShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
         contextIGAI.setProjection(glm::perspective(glm::radians(contextIGAI.getCamera()->Zoom),
             (float)contextIGAI.SCR_WIDTH / (float)contextIGAI.SCR_HEIGHT, 0.1f, 100.0f));
-        bezierShader.setMat4("projection", contextIGAI.getProjection());
+        monochromeShader.setMat4("projection", contextIGAI.getProjection());
 
         // camera/view transformation
         contextIGAI.setView(contextIGAI.getCamera()->GetViewMatrix());
-        bezierShader.setMat4("view", contextIGAI.getView());
+        monochromeShader.setMat4("view", contextIGAI.getView());
+
+        // lightPos and lightColor
+        monochromeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.0f));
+        monochromeShader.setVec3("lightPos", contextIGAI.getActiveAsObject()->getOrigin());
 
         // draw context elements
         // ---------------------
         for(const auto& element : contextIGAI) {
             glm::mat4 model = glm::mat4(1.0f);
-            bezierShader.setMat4("model", model);
+            monochromeShader.setMat4("model", model);
 
-            element->draw(bezierShader);
+            element->draw(monochromeShader);
         }
 
 

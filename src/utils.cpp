@@ -10,6 +10,13 @@ int PascalValue(int i, int n)
 }
 
 
+float bersteinValue(float u, int i, int n)
+{
+    int p = PascalValue(i, n);
+    return p * pow(u, i) * pow((1.0f - u), n-i);
+}
+
+
 std::vector<unsigned int> Range(unsigned int n)
 {
     std::vector<unsigned int> rangeVector;

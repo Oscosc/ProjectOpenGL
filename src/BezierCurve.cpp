@@ -106,10 +106,3 @@ void BezierCurve::switchMode()
     altModeOn = !altModeOn;
     updateCurvePoints();
 }
-
-
-float BezierCurve::bersteinValue(float u, int i, int n)
-{
-    int p = PascalValue(i, n);
-    return p * pow(u, i) * pow((1.0f - u), n-i);
-}

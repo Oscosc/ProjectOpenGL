@@ -20,6 +20,13 @@
 int PascalValue(int i, int n);
 
 /**
+ * @brief Calcule la valeur du polynôme de Bernstein au point u en tenant compte de n et i.
+ * 
+ * https://fr.wikipedia.org/wiki/Polyn%C3%B4me_de_Bernstein 
+ */
+float bersteinValue(float u, int i, int n);
+
+/**
  * @brief Renvoie la liste des entiers de 0 (inclus) à n (exclus) à la mnière de la fonction
  * range() en Python.
  */

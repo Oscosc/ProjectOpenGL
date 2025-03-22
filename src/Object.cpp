@@ -12,7 +12,12 @@ Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f))
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     
     glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Optionnel : on se "déconnecte" du VAO et du VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -40,9 +45,6 @@ void Object::updateVertices(ptsTab points)
         points.data(),
         GL_DYNAMIC_DRAW
     );
-
-    // Lier les données aux attributs de vertex
-    glEnableVertexAttribArray(0);
 
     // Optionnel : on se "déconnecte" du VAO et du VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -126,13 +126,6 @@ private:
      * buffer avec les nouvelles valeurs discrètes.
      */
     void updateCurvePoints();
-
-    /**
-     * @brief Calcule la valeur du polynôme de Bernstein au point u en tenant compte de n et i.
-     * 
-     * https://fr.wikipedia.org/wiki/Polyn%C3%B4me_de_Bernstein 
-     */
-    float bersteinValue(float u, int i, int n);
 };
 
 #endif //BEZIER_CURVE_HPP

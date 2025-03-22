@@ -41,9 +41,11 @@ void Sphere::draw(Shader shader)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOTriangles);
     glDrawElements(GL_TRIANGLES, m_nbVertices, GL_UNSIGNED_INT, (void*)0);
 
-    //shader.setVec3("color", 0.f, 0.f, 0.f);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
-    //glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
+/*
+    shader.setVec3("color", 0.f, 0.f, 0.f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOLines);
+    glDrawElements(GL_LINES, m_nbVerticesLines, GL_UNSIGNED_INT, (void*)0);
+*/
 }
 
 
@@ -79,6 +81,7 @@ ptsTab Sphere::generateVertices(unsigned int stackCount, unsigned int sectorCoun
             x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
             y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
             vertices.push_back(glm::vec3(x, y, z));
+            vertices.push_back(glm::normalize(glm::vec3(x, y, z)));
         }
     }
 
