@@ -89,7 +89,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         context->nextObject();                                              // On passe à l'objet suivant
         context->getActiveAsObject()->setAmbient(1.0f);                     // On passe le nouveau en haute luminosité
 
-        // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
+        std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
     // Switch to previous element in context
@@ -98,7 +98,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         context->previousObject();                                          // On passe à l'objet suivant
         context->getActiveAsObject()->setAmbient(1.0f);                     // On passe le nouveau en haute luminosité
 
-        // std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
+        std::cout << "Current item : " << context->getActiveIndex() + 1 << "/" << context->size() << std::endl;
     }
 
     // ONLY SCALABLE ELEMENTS PART ----------------------------------------------------------------

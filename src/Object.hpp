@@ -47,7 +47,7 @@ public:
      * @brief Constructeur par défaut de la classe Object (ne peut pas être appelé sauf par une
      * classe dérivée de celle-ci).
      */
-    Object();
+    Object(bool enableNormal = true);
 
     /**
      * @brief Destructeur par défaut de la classe Object.

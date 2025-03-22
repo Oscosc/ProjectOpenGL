@@ -1,7 +1,7 @@
 #include "Object.hpp"
 
 
-Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambient(0.2f)
+Object::Object(bool enableNormal) : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambient(0.2f)
 {
     // Création du VAO et du VBO
     glGenVertexArrays(1, &VAO);
@@ -10,14 +10,17 @@ Object::Object() : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambien
     // "Connexion" au VAO et au VBO
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
     glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0);
+    unsigned int nbVec = (enableNormal) ? 2 : 1;
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, nbVec * sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    if(enableNormal) {
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, nbVec * sizeof(glm::vec3), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
 
     // Optionnel : on se "déconnecte" du VAO et du VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);

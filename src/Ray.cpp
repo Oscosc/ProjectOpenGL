@@ -1,13 +1,13 @@
 #include "Ray.hpp"
 
 
-Ray::Ray() : m_direction(glm::vec3(0.0f)), m_bounces(0)
+Ray::Ray() : m_direction(glm::vec3(0.0f)), m_bounces(0), Object(false)
 {
     setOrigin(glm::vec3(0.0f));
 }
 
 
-Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_bounces(0)
+Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_bounces(0), Object(false)
 {
     setOrigin(origin);
 
@@ -16,7 +16,7 @@ Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_boun
 
 
 Ray::Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 reflexion) :
-    m_direction(direction), m_bounces(intersections.size())
+    m_direction(direction), m_bounces(intersections.size()), Object(false)
 {
     setOrigin(origin);
     
