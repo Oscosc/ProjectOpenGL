@@ -36,11 +36,9 @@ void AppContext::addObject(AppContext::uniqueObject new_object)
 
 
 AppContext::uniqueObjectsList::iterator AppContext::begin() {return m_objects.begin();}
-
 AppContext::uniqueObjectsList::const_iterator AppContext::begin() const {return m_objects.cbegin();}
 
 AppContext::uniqueObjectsList::iterator AppContext::end() {return m_objects.end();}
-
 AppContext::uniqueObjectsList::const_iterator AppContext::end() const {return m_objects.cend();}
 
 
@@ -74,41 +72,32 @@ Object* AppContext::getObject(size_t index) {
     return m_objects[index].get();
 }
 
-
-glm::mat4 AppContext::getView(){return m_view;}
-
 glm::vec3 AppContext::getBackgroundColor() {return m_backgroundColor;}
 
 glm::vec3 AppContext::getLightColor() {return m_lightColor;}
 
+glm::mat4 AppContext::getView(){return m_view;}
 void AppContext::setView(glm::mat4 view) {m_view = view;}
 
 glm::mat4 AppContext::getProjection() {return m_projection;}
-
 void AppContext::setProjection(glm::mat4 projection) {m_projection = projection;}
 
 Camera* AppContext::getCamera() {return &m_camera;}
 
 glm::vec2 AppContext::getCursor() {return m_cursor;}
-
 void AppContext::setCursor(glm::vec2 value) {m_cursor = value;}
-
 void AppContext::setCursor(float x, float y) {m_cursor = {x, y};}
 
 bool AppContext::isMouseActive() {return m_mouseActive;}
-
 void AppContext::switchMouseActive() {m_mouseActive = !m_mouseActive;}
 
 bool AppContext::isFirstMouse() {return m_firstMouse;}
-
 void AppContext::firstMouseDone() {m_firstMouse = false;}
 
 float AppContext::getDeltaTime() {return m_deltaTime;}
-
 void AppContext::setDeltaTime(float value) {m_deltaTime = value;}
 
 float AppContext::getLastFrame() {return m_lastFrame;}
-
 void AppContext::setLastFrame(float value) {m_lastFrame = value;}
 
 unsigned int AppContext::getActiveIndex() {return m_activeObjectIndex;}
