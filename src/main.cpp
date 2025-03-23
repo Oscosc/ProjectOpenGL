@@ -63,7 +63,12 @@ int main()
     
     // glfw custom user pointer
     // ------------------------
-    AppContext contextIGAI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.2f, 0.3f, 0.3f), glm::vec3(1.f, 0.0f, 0.5f));
+    AppContext contextIGAI(
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        glm::vec3(0.1f, 0.1f, 0.1f),
+        glm::vec3(1.f, 1.0f, 1.0f)
+    );
     glfwSetWindowUserPointer(window, &contextIGAI);
     
     // glfw callbacks setup
@@ -106,7 +111,7 @@ int main()
         /* glm::vec3 randColor = glm::vec3((float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE,
                                        (float)(std::rand()) / (float)(RAND_MAX) * DISPERSION_RATE); */
-        contextIGAI.addObject(std::make_unique<Sphere>(randRadius, randVec3, glm::vec3(0.9f)));
+        contextIGAI.addObject(std::make_unique<Sphere>(randRadius, randVec3, glm::vec3(1.0f)));
     }
 
     // Creating Bezier Curve

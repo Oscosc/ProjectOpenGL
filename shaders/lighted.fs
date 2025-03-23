@@ -21,7 +21,11 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
 
+    // Distance shading
+    float alpha = 2.0;
+    float invDist = alpha / length(lightPos - FragPos);
+
     // Result color
-    vec3 result = (ambient + diffuse) * color;
+    vec3 result = (ambient + diffuse) * color * invDist;
     FragColor = vec4(result, 1.0);
 }

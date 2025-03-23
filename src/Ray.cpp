@@ -53,6 +53,7 @@ Ray::Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 
 void Ray::draw(Shader shader)
 {
     glBindVertexArray(VAO);
+    shader.setFloat("ambientStrength", 1.0f);
 
     if(m_bounces == 0) {
         shader.setVec3("color", 0.0f, 1.0f, 0.0f);
