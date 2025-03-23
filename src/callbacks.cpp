@@ -24,16 +24,14 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     if (context->isFirstMouse())
     {
-        context->setCursorX(xpos);
-        context->setCursorY(ypos);
+        context->setCursor(xpos, ypos);
         context->firstMouseDone();
     }
 
-    float xoffset = xpos - context->getCursorX();
-    float yoffset = context->getCursorY() - ypos; // reversed since y-coordinates go from bottom to top
+    float xoffset = xpos - context->getCursor().x;
+    float yoffset = context->getCursor().y - ypos; // reversed since y-coordinates go from bottom to top
 
-    context->setCursorX(xpos);
-    context->setCursorY(ypos);
+    context->setCursor(xpos, ypos);
 
     context->getCamera()->ProcessMouseMovement(xoffset, yoffset);
 }
@@ -69,7 +67,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     // Remove all casted rays
     if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
-        context->removeRays();
+        context->clearRays();
     }
 
     // Exit app

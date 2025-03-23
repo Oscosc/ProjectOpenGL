@@ -41,7 +41,8 @@ public:
     /**
      * @brief Constructeur par défaut.
      */
-    AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor, glm::vec3 lightColor);
+    AppContext(unsigned int screen_width, unsigned int screen_height, glm::vec3 backgroundColor,
+        glm::vec3 lightColor);
 
     /**
      * @brief Ajoute un objet à la liste des objets du contexte.
@@ -58,7 +59,9 @@ public:
      */
     ScalableElement* getActiveAsScalable();
 
-
+    /**
+     * @brief Retourne la référence à l'objet actif dans le contexte.
+     */
     Object* getActiveAsObject();
 
 
@@ -80,34 +83,135 @@ public:
     uniqueObjectsList::iterator end();
     uniqueObjectsList::const_iterator end() const;
 
+    /**
+     * @brief Passe l'objet actif dans la scène à l'objet suivant dans la liste des objets du
+     * contexte (effectue une boucle sur les objets).
+     */
     void nextObject();
+
+    /**
+     * @brief Passe l'objet actif dans la scène à l'objet précedent dans la liste des objets du
+     * contexte (effectue une boucle sur les objets).
+     */
     void previousObject();
-
+    
+    /**
+     * @brief Retourne la taille du contexte, ici le nombre d'éléments de type Object dans la
+     * scène.
+     */
     unsigned int size() const;
-    void removeRays();
 
+    /**
+     * @brief Supprime tous les rayons qui ont été lancés dans la scène (et leur réflexion s'ils
+     * en ont une).
+     */
+    void clearRays();
+    
+    /**
+     * @brief Retourne un pointeur vers l'objet d'index égal à celui passé en paramètre. S'il n y a
+     * pas d'objet avec cet index, c'est un nullptr qui est renvoyé.
+     * @param index index de l'objet que l'on veut récupérer.
+     */
     Object* getObject(size_t index);
 
+    /**
+     * @brief Retourne la couleur de fond de la scène.
+     */
     glm::vec3 getBackgroundColor();
-    glm::vec3 getLightColor();
 
+    /**
+     * @brief Retourne la couleur de la lumière qui éclaire la scène.
+     */
+    glm::vec3 getLightColor();
+    
+    /**
+     * @brief Retourne la view matrix de la scène.
+     */
     glm::mat4 getView();
+
+    /**
+     * @brief Définit la view matrix de la scène.
+     * @param view nouvelle view matrix pour la scène
+     */
     void setView(glm::mat4 view);
+
+    /**
+     * @brief Retourne la projection matrix de la scène.
+     */
     glm::mat4 getProjection();
+
+    /**
+     * @brief Définit la projection matrix de la scène.
+     * @param projection nouvelle projection matrix pour la scène
+     */
     void setProjection(glm::mat4 projection);
+
+    /**
+     * @brief Retourne un pointeur vers la caméra de l'utilisateur.
+     */
     Camera* getCamera();
-    float getCursorX();
-    void setCursorX(float value);
-    float getCursorY();
-    void setCursorY(float value);
+
+    /**
+     * @brief Retourne la valeur de position du curseur en X.
+     */
+    glm::vec2 getCursor();
+
+    /**
+     * @brief Définit la position du curseur en X
+     * @param value nouvelle valeur de position du curseur en X
+     */
+    void setCursor(glm::vec2 value);
+    void setCursor(float x, float y);
+
+    /**
+     * @brief Retourne true si la souris est visible pour l'utilisateur, false sinon
+     */
     bool isMouseActive();
+
+    /**
+     * @brief Bascule dans l'état opposé la variable de visibilité de la souris. Attention ! Cette
+     * fonction NE MODIFIE PAS les valeurs glfw pour le curseur, cette fonction sers juste à
+     * modifier un état.
+     */
     void switchMouseActive();
+
+    /**
+     * @brief Retourne true si l'utilisateur n'a pas encore changé l'état de sa souris depuis le
+     * lancement du programme, false sinon.
+     */
     bool isFirstMouse();
+
+    /**
+     * @brief Bascule à false la variable firstMouse (à appeler quand l'utilisateur à modifié pour
+     * la première fois l'état de la souris).
+     */
     void firstMouseDone();
+
+    /**
+     * @brief Retourne le temps écoulé depuis la dernière frame.
+     */
     float getDeltaTime();
+
+    /**
+     * @brief Modifie la temps écoulé depuis la dernière frame.
+     * @param value nouvelle valeur de temps écoulé.
+     */
     void setDeltaTime(float value);
+
+    /**
+     * @brief Récupère la valeur de la dernière frame.
+     */
     float getLastFrame();
+
+    /**
+     * @brief Modifie la valeur de la dernière frame.
+     * @param value nouvelle valeur de dernière frame.
+     */
     void setLastFrame(float value);
+
+    /**
+     * @brief Renvoie l'index de l'élément actif dans la scène.
+     */
     unsigned int getActiveIndex();
 
 private:
@@ -122,8 +226,7 @@ private:
     glm::mat4 m_view;
     Camera m_camera;
 
-    float m_cursorX;
-    float m_cursorY;
+    glm::vec2 m_cursor;
 
     bool m_mouseActive = true;
     bool m_firstMouse = true; // To remove in future, used only once
