@@ -1,7 +1,7 @@
 #include "Object.hpp"
 
 
-Object::Object(bool enableNormal) : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambient(0.2f)
+Object::Object(bool enableNormal) : m_origin(glm::vec3(0.0f)), m_color(glm::vec3(1.0f)), m_ambient(OBJECT_AMBIENT_STRENGTH)
 {
     // Création du VAO et du VBO
     glGenVertexArrays(1, &VAO);

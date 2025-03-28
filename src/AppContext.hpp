@@ -21,6 +21,10 @@
 #include "Ray.hpp"
 #include "../includes/camera.hpp"
 
+#define STANDARD_DISPLAY_MODE 0
+#define NORMAL_DISPLAY_MODE 1
+#define UV_DISPLAY_MODE 2
+
 /**
  * @class AppContext
  * @brief Objet englobant les éléments du contexte de la fenetre.
@@ -123,6 +127,9 @@ public:
      * @brief Retourne la couleur de la lumière qui éclaire la scène.
      */
     glm::vec3 getLightColor();
+
+    unsigned int getDisplayMode() const;
+    void setDisplayMode(unsigned int value);
     
     /**
      * @brief Retourne la view matrix de la scène.
@@ -221,6 +228,7 @@ private:
 
     glm::vec3 m_backgroundColor;
     glm::vec3 m_lightColor;
+    unsigned int m_displayMode;
     
     glm::mat4 m_projection;
     glm::mat4 m_view;

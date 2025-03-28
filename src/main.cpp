@@ -31,6 +31,7 @@
 #include "Ray.hpp"
 #include "Sphere.hpp"
 
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -66,7 +67,7 @@ int main()
     AppContext contextIGAI(
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
-        glm::vec3(0.1f, 0.1f, 0.1f),
+        glm::vec3(0.2f, 0.3f, 0.3f),
         glm::vec3(1.f, 1.0f, 1.0f)
     );
     glfwSetWindowUserPointer(window, &contextIGAI);
@@ -211,6 +212,7 @@ int main()
         for(const auto& element : contextIGAI) {
             glm::mat4 model = glm::mat4(1.0f);
             monochromeShader.setMat4("model", model);
+            monochromeShader.setInt("displayMode", contextIGAI.getDisplayMode());
 
             element->draw(monochromeShader);
         }

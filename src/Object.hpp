@@ -20,6 +20,8 @@
 
 #include "../includes/shader.hpp"
 
+#define OBJECT_AMBIENT_STRENGTH 0.2
+
 
 typedef struct s_Triangle {
     glm::vec3 a;

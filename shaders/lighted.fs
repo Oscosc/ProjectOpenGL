@@ -9,8 +9,18 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform float ambientStrength;
 
+// 0 = Visualisation des couleurs
+// 1 = Visualisation de la normale
+// 2 = Visualisation de la UV map
+uniform int displayMode;
+
 void main()
 {
+    if(displayMode == 1) {
+        FragColor = vec4(Normal * 0.5 + 0.5, 1.0);
+        return;
+    }
+
     // Ambient color (currently useless)
     vec3 ambient = ambientStrength * lightColor;
 
