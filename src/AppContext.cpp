@@ -8,7 +8,7 @@ AppContext::AppContext(unsigned int screen_width, unsigned int screen_height, gl
     m_lightColor(lightColor),
     m_displayMode(STANDARD_DISPLAY_MODE),
     m_activeObjectIndex(-1),
-    m_camera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))),
+    m_camera(Camera(glm::vec3(-3.0f, 0.5f, 6.0f))),
     m_projection(glm::mat4(1.0f)),
     m_view(glm::mat4(1.0f)),
     m_cursor({SCR_WIDTH / 2.0f, SCR_HEIGHT / 2.0f})

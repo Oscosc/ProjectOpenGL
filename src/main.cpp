@@ -128,9 +128,20 @@ int main()
         {-0.5f, -0.5f, 0.5f}
     };
     contextIGAI.addObject(std::make_unique<BezierCurve>(controlPolygon));
+    contextIGAI.getObject(contextIGAI.size()-1)->setOrigin({-1.f, 0.5f, -0.5f});
 
     // Creating Bezier Surface
     // -----------------------
+    /*
+    std::vector<std::vector<glm::vec3>> controlPolygonSurface = {
+        { {0.0f, 0.0f, 0.0f}, {2.0f, 1.99f, 0.0f}, {4.0f, 0.28f, 0.0f}, {6.0f, -1.96f, 0.0f}, {8.0f, -0.56f, 0.0f}, {10.0f, 1.88f, 0.0f} },
+        { {0.0f, 0.0f, 2.0f}, {2.0f, 0.14f, 2.0f}, {4.0f, 0.02f, 2.0f}, {6.0f, -0.14f, 2.0f}, {8.0f, -0.04f, 2.0f}, {10.0f, 0.13f, 2.0f} },
+        { {0.0f, 0.0f, 4.0f}, {2.0f, -1.98f, 4.0f}, {4.0f, -0.28f, 4.0f}, {6.0f, 1.94f, 4.0f}, {8.0f, 0.55f, 4.0f}, {10.0f, -1.86f, 4.0f} },
+        { {0.0f, 0.0f, 6.0f}, {2.0f, -0.42f, 6.0f}, {4.0f, -0.06f, 6.0f}, {6.0f, 0.41f, 6.0f}, {8.0f, 0.12f, 6.0f}, {10.0f, -0.40f, 6.0f} },
+        { {0.0f, 0.0f, 8.0f}, {2.0f, 1.92f, 8.0f}, {4.0f, 0.27f, 8.0f}, {6.0f, -1.88f, 8.0f}, {8.0f, -0.54f, 8.0f}, {10.0f, 1.80f, 8.0f} },
+        { {0.0f, 0.0f, 10.0f}, {2.0f, 0.69f, 10.0f}, {4.0f, 0.10f, 10.0f}, {6.0f, -0.68f, 10.0f}, {8.0f, -0.19f, 10.0f}, {10.0f, 0.65f, 10.0f} }
+    };
+    */
     ptsGrid controlPolygonSurface = {
         {
             {-0.5f,  0.0f,  0.0f},
@@ -146,6 +157,11 @@ int main()
         }
     };
     contextIGAI.addObject(std::make_unique<BezierSurface>(controlPolygonSurface));
+    contextIGAI.getObject(contextIGAI.size()-1)->setOrigin({-3.f, 0.f, 0.f});
+
+    // Creating Sphere
+    // ---------------
+    contextIGAI.addObject(std::make_unique<Sphere>(0.5f, glm::vec3(-5.f, 0.5f, 0.f), glm::vec3(1.0f)));
 
     // crosshair setup
     // ---------------

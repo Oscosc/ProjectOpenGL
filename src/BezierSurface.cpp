@@ -125,6 +125,8 @@ void BezierSurface::gridToGlfwDisplayableRepresentation(const ptsGrid &points, c
             // Ajout des point au VBO
             tableVBO.push_back(points[i][j]);
             tableVBO.push_back(normals[i][j]);
+            tableVBO.push_back(glm::vec3(float(i)/m_nbCurvePointsU, float(j)/m_nbCurvePointsV, 0.0f));
+            // std::cout << glm::to_string(glm::vec3(float(i)/m_nbCurvePointsU, float(j)/m_nbCurvePointsV, 0.0f)) << std::endl;
             
             // Ajout des index a l'EBO
             if(i != (m_nbCurvePointsU-1) && j != (m_nbCurvePointsV-1)) {

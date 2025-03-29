@@ -1,13 +1,13 @@
 #include "Ray.hpp"
 
 
-Ray::Ray() : m_direction(glm::vec3(0.0f)), m_bounces(0), Object(false)
+Ray::Ray() : m_direction(glm::vec3(0.0f)), m_bounces(0), Object(false, false)
 {
     setOrigin(glm::vec3(0.0f));
 }
 
 
-Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_bounces(0), Object(false)
+Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_bounces(0), Object(false, false)
 {
     setOrigin(origin);
 
@@ -16,7 +16,7 @@ Ray::Ray(glm::vec3 origin, glm::vec3 direction) : m_direction(direction), m_boun
 
 
 Ray::Ray(glm::vec3 origin, glm::vec3 direction, ptsTab intersections, glm::vec3 reflexion) :
-    m_direction(direction), m_bounces(intersections.size()), Object(false)
+    m_direction(direction), m_bounces(intersections.size()), Object(false, false)
 {
     setOrigin(origin);
     
@@ -54,6 +54,7 @@ void Ray::draw(Shader shader)
 {
     glBindVertexArray(VAO);
     shader.setFloat("ambientStrength", 1.0f);
+    shader.setBool("uniformColor", true);
 
     if(m_bounces == 0) {
         shader.setVec3("color", 0.0f, 1.0f, 0.0f);
@@ -66,6 +67,7 @@ void Ray::draw(Shader shader)
         glDrawArrays(GL_LINE_STRIP, 1, m_bounces + 1);
     }
 
+    shader.setBool("uniformColor", false);
     // Optionnel : "déconnecte" le VAO
     glBindVertexArray(0);
 }

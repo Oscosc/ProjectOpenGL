@@ -4,7 +4,7 @@
 BezierCurve::BezierCurve(ptsTab controlPoints) :
     m_controlPoints(controlPoints),
     m_nbCurvePoints(MIN_DISCRETE_POINTS),
-    Object(false)
+    Object(false, false)
 {
     updateCurvePoints();
     setColor(glm::vec3(1.0));
@@ -72,6 +72,8 @@ void BezierCurve::updateCurvePoints()
 void BezierCurve::draw(Shader shader)
 {
     glBindVertexArray(VAO);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);
+    shader.setMat4("model", model);
     shader.setFloat("ambientStrength", m_ambient);
 
     // Dessine le polygone de controle

@@ -72,6 +72,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_N && action == GLFW_PRESS) {
         context->setDisplayMode(NORMAL_DISPLAY_MODE);
     }
+    if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+        context->setDisplayMode(UV_DISPLAY_MODE);
+    }
 
     // Remove all casted rays
     if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {

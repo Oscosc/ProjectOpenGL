@@ -3,11 +3,13 @@ out vec4 FragColor;
 
 in vec3 FragPos;
 in vec3 Normal;
+in vec3 UV;
 
 uniform vec3 color;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform float ambientStrength;
+uniform bool uniformColor;
 
 // 0 = Visualisation des couleurs
 // 1 = Visualisation de la normale
@@ -16,8 +18,18 @@ uniform int displayMode;
 
 void main()
 {
+    if(uniformColor) {
+        FragColor = vec4(color, 1.0f);
+        return;
+    }
+
     if(displayMode == 1) {
         FragColor = vec4(Normal * 0.5 + 0.5, 1.0);
+        return;
+    }
+
+    if(displayMode == 2) {
+        FragColor = vec4(UV, 1.0);
         return;
     }
 

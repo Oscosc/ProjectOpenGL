@@ -81,8 +81,11 @@ ptsTab Sphere::generateVertices(unsigned int stackCount, unsigned int sectorCoun
             // vertex position (x, y, z)
             x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
             y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-            vertices.push_back(glm::vec3(x, y, z));
-            vertices.push_back(glm::normalize(glm::vec3(x, y, z)));
+
+            vertices.push_back(glm::vec3(x, y, z)); // Position
+            vertices.push_back(glm::normalize(glm::vec3(x, y, z))); // Normal
+            vertices.push_back(glm::vec3(float(i)/stackCount, float(j)/sectorCount, 0.0f)); // UV
+
         }
     }
 
