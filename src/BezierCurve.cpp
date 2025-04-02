@@ -75,6 +75,7 @@ void BezierCurve::draw(Shader shader)
     glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);
     shader.setMat4("model", model);
     shader.setFloat("ambientStrength", m_ambient);
+    shader.setBool("uniformColor", true);
 
     // Dessine le polygone de controle
     shader.setVec3("color", 1.0f, 0.0f, 0.0f);
@@ -84,6 +85,7 @@ void BezierCurve::draw(Shader shader)
     shader.setVec3("color", getColor());
     glDrawArrays(GL_LINE_STRIP, m_controlPoints.size(), m_curvePoints.size());
 
+    shader.setBool("uniformColor", false);
     // Optionnel : "déconnecte" le VAO
     glBindVertexArray(0);
 }

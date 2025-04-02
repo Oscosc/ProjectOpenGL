@@ -80,6 +80,35 @@ glm::vec3 AppContext::getLightColor() {return m_lightColor;}
 unsigned int AppContext::getDisplayMode() const {return m_displayMode;}
 void AppContext::setDisplayMode(unsigned int value) {m_displayMode = value;}
 
+
+void AppContext::drawContext(Shader shader)
+{
+    // active shader
+    shader.use();
+
+    // pass projection matrix to shader (note that in this case it could change every frame)
+    setProjection(glm::perspective(glm::radians(getCamera()->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f));
+    shader.setMat4("projection", getProjection());
+
+    // camera/view transformation
+    setView(getCamera()->GetViewMatrix());
+    shader.setMat4("view", getView());
+
+    // lightPos and lightColor
+    shader.setVec3("lightColor", getLightColor());
+    shader.setVec3("lightPos", getActiveAsObject()->getOrigin());
+
+    // Items drawing
+    for(const auto& element : *this) {
+        glm::mat4 model = glm::mat4(1.0f);
+        shader.setMat4("model", model);
+        shader.setInt("displayMode", getDisplayMode());
+
+        element->draw(shader);
+    }
+}
+
+
 glm::mat4 AppContext::getView(){return m_view;}
 void AppContext::setView(glm::mat4 view) {m_view = view;}
 

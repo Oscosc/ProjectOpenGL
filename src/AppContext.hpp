@@ -130,6 +130,8 @@ public:
 
     unsigned int getDisplayMode() const;
     void setDisplayMode(unsigned int value);
+
+    void drawContext(Shader shader);
     
     /**
      * @brief Retourne la view matrix de la scène.

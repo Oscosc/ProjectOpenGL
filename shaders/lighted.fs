@@ -44,7 +44,7 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // Distance shading
-    float alpha = 2.0;
+    float alpha = 4.0;
     float invDist = alpha / length(lightPos - FragPos);
 
     // Result color
