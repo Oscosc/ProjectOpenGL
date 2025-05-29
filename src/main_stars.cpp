@@ -35,17 +35,8 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define DISPERSION_RATE 2
 
-typedef struct planet_t {
-    Sphere object;
-    float position;
-    float speed;
-    float range;
-} Planet;
-
-
-int StarsMain()
+int main()
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -60,7 +51,9 @@ int StarsMain()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Projet IGAI", NULL, NULL);
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Projet IGAI", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -99,34 +92,12 @@ int StarsMain()
         return -1;
     }
 
-    // configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
-
-
     // build and compile our shader program
     // ------------------------------------
-    Shader monochromeShader("shaders/lighted.vs", "shaders/lighted.fs");
+    Shader shader("shaders/artistic.vs", "shaders/artistic.fs");
 
-
-    // Creating planets
-    // ----------------
-    Sphere sun(2.f, glm::vec3(0.f), glm::vec3(1.f, 1.f, 0.f));
-    Planet planetA = {
-        Sphere(1.0f),   // object
-        0.0f,           // position
-        0.01f,           // speed
-        4.f,            // range
-    };
-
-    // Creating Sphere
-    // ---------------
-    contextIGAI.addObject(std::make_unique<Sphere>(0.5f, glm::vec3(-5.f, 0.5f, 0.f), glm::vec3(1.0f)));
-
-    // crosshair setup
-    // ---------------
-    Shader crosshairShader("shaders/quad.vs", "shaders/quad.fs");
-
+    // Quad Triangles
+    // --------------
     float quadVertices[] = {
         -1.0f, -1.0f,
          1.0f, -1.0f,
@@ -157,51 +128,11 @@ int StarsMain()
         contextIGAI.setDeltaTime(currentFrame - contextIGAI.getLastFrame());
         contextIGAI.setLastFrame(currentFrame);
 
-        // input
-        // -----
-        processInput(window);
-
-        // render
-        // ------
-        glm::vec3 clColor = contextIGAI.getBackgroundColor();
-        glClearColor(clColor.x, clColor.y, clColor.z, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // active shader
-        monochromeShader.use();
-
-        // pass projection matrix to shader (note that in this case it could change every frame)
-        contextIGAI.setProjection(glm::perspective(glm::radians(contextIGAI.getCamera()->Zoom),
-            (float)contextIGAI.SCR_WIDTH / (float)contextIGAI.SCR_HEIGHT, 0.1f, 100.0f));
-        monochromeShader.setMat4("projection", contextIGAI.getProjection());
-
-        // camera/view transformation
-        contextIGAI.setView(contextIGAI.getCamera()->GetViewMatrix());
-        monochromeShader.setMat4("view", contextIGAI.getView());
-
-        // lightPos and lightColor
-        monochromeShader.setVec3("lightColor", contextIGAI.getLightColor());
-        monochromeShader.setVec3("lightPos", {0.f, 0.f, 0.f});
-
-        // Update planets positions
-        // ------------------------
-        planetA.position += planetA.speed;
-        glm::vec3 realPos = glm::vec3(cosf(planetA.position), 0.f, sinf(planetA.position)) * planetA.range;
-        planetA.object.setOrigin(realPos);
-
-        // draw planets in scene
-        // ---------------------
-        sun.draw(monochromeShader);
-        planetA.object.draw(monochromeShader);
-
-
-        // draw crosshair
-        // --------------
-        crosshairShader.use();
-        crosshairShader.setVec2("screenSize", contextIGAI.SCR_WIDTH, contextIGAI.SCR_HEIGHT);
+        shader.use();
+        shader.setFloat("iTime", currentFrame);
+        shader.setVec2("iResolution", mode->width, mode->height);
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
  
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

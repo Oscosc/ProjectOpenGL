@@ -38,7 +38,7 @@
 #define DISPERSION_RATE 2
 
 
-int main()
+int off_main()
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -191,6 +191,8 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        glPointSize(5);
+
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
