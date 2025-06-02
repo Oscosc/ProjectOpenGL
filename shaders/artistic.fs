@@ -23,6 +23,15 @@ float sdPentagon(vec2 p, float r) {
     return length(p) * sign(p.y);
 }
 
+vec2 rotate(vec2 pos, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return vec2(
+        c * pos.x - s * pos.y,
+        s * pos.x + c * pos.y
+    );
+}
+
 void main()
 {
     vec2 fragCoord = fragUV * iResolution;
@@ -31,6 +40,7 @@ void main()
     vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
     vec2 uv0 = uv;
     vec3 finalColor = vec3(0.0);
+    uv = rotate(uv, iTime);
 
     for (float i = 0.0; i < 6.0; i++) {
         uv = fract(uv * 1.5) - 0.5;
