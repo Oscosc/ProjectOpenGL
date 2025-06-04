@@ -30,6 +30,7 @@
 #include "BezierSurface.hpp"
 #include "Ray.hpp"
 #include "Sphere.hpp"
+#include "Mesh.hpp"
 
 
 #define SCREEN_WIDTH 800
@@ -100,6 +101,7 @@ int main()
     // build and compile our shader program
     // ------------------------------------
     Shader monochromeShader("shaders/lighted.vs", "shaders/lighted.fs");
+    Shader meshShader("shaders/monochrome.vs", "shaders/monochrome.fs");
 
 
     // Creating sphere
@@ -159,6 +161,8 @@ int main()
     contextIGAI.addObject(std::make_unique<BezierSurface>(controlPolygonSurface));
     contextIGAI.getObject(contextIGAI.size()-1)->setOrigin({-3.f, 0.f, 0.f});
 
+    Mesh myMesh = Mesh("resources/teapot.obj");
+
     // Creating Sphere
     // ---------------
     contextIGAI.addObject(std::make_unique<Sphere>(0.5f, glm::vec3(-5.f, 0.5f, 0.f), glm::vec3(1.0f)));
@@ -210,6 +214,7 @@ int main()
         // draw context elements
         // ---------------------
         contextIGAI.drawContext(monochromeShader);
+        myMesh.draw(meshShader);
 
 
         // draw crosshair
