@@ -89,9 +89,41 @@ void Mesh::draw(Shader shader)
 
 Mesh::LineType Mesh::identify(std::string token)
 {
-    if (token.length() != 1)    return LineType::NONE;
-    else if (token[0] == '#')   return LineType::COMMENT;
-    else if (token[0] == 'v')   return LineType::VERTEX;
-    else if (token[0] == 'f')   return LineType::FACET;
-    else                        return LineType::NONE;
+    if(token.length() == 1) {
+        if      (token[0] == '#') return LineType::COMMENT;
+        else if (token[0] == 'v') return LineType::POSITION;
+        else if (token[0] == 'f') return LineType::INDEX;
+        else                      return LineType::NONE;
+    }
+    if(token.length() == 2 && token[0] == 'v') {
+        if      (token[1] == 'n') return LineType::NORMAL;
+        else if (token[1] == 't') return LineType::UV;
+        else                      return LineType::NONE;
+    }
+    else return LineType::NONE;
+}
+
+void Mesh::parseAsData(Mesh::LineType id, std::vector<std::string> tokens, vec3Array &positions, vec3Array &normals, vec2Array &uvs)
+{
+    if(tokens.size() != 3) {std::cout << "[ERREUR] Le fichier .obj est malformé ou corrompu" << std::endl; exit(1);}
+
+    switch (id)
+    {
+    case LineType::POSITION:
+        positions.push_back(glm::vec3(std::stof(tokens[0]), std::stof(tokens[1]), std::stof(tokens[2])));
+        break;
+
+    case LineType::NORMAL:
+        normals.push_back(glm::vec3(std::stof(tokens[0]), std::stof(tokens[1]), std::stof(tokens[2])));
+        break;
+
+    case LineType::UV:
+        uvs.push_back(glm::vec3(std::stof(tokens[0]), std::stof(tokens[1]), std::stof(tokens[2])));
+        break;
+    
+    default:
+        std::cout << "[ERREUR] Erreur rencontrée lors du parsing de l'id" << std::endl;
+        exit(2);
+        break;
+    }
 }
