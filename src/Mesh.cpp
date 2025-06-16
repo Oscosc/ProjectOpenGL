@@ -145,28 +145,49 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
     for(std::string token : tokens) {
         if(i == 0) continue;
 
-        std::vector<std::string> sub_tokens = split(token, IDX_DELIMITER);
-        if(sub_tokens.size() <= 0 || sub_tokens.size() > 3) {
+        std::vector<std::string> subTokens = split(token, IDX_DELIMITER);
+        if(subTokens.size() <= 0 || subTokens.size() > 3) {
             std::cout << "[ERREUR] Erreur rencontrée lors du parsing des index" << std::endl;
             exit(4);
         }
 
         VertexIndex index {
-            std::stof(sub_tokens[0]) - 1,
-            sub_tokens.size() < 2 ? -1 : std::stof(sub_tokens[1]) - 1,
-            sub_tokens.size() < 3 ? -1 : std::stof(sub_tokens[2]) - 1
+            std::stof(subTokens[0]) - 1,
+            subTokens.size() < 2 ? -1 : std::stof(subTokens[1]) - 1,
+            subTokens.size() < 3 ? -1 : std::stof(subTokens[2]) - 1
         };
     }
 }
 
 void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     const vec2Array &uvs, const std::vector<VertexIndex> &indexes)
-{
-    /* TODO : Pour chaque élément dans la liste indexes :
-        - Si l'élément existe déjà dans la liste de Vertex finale, ajouter son indice dans la liste
-        des indexes pour l'EBO
-        - Si l'élément n'existe pas déjà dans la liste de Vertex finale, le construire avec les
-        éléments des différentes listes en paramètre, puis l'ajouter dans la liste de Vertex finale
-        et ajouter son indice dans la liste des indexes pour l'EBO
-    */
+{   
+    std::vector<Vertex> vertexBuffer;
+    std::vector<Vertex>::iterator it;
+    std::vector<unsigned int> elementBuffer;
+    unsigned int itPos;
+
+    for(VertexIndex index : indexes) {
+        // Construction du Vertex
+        Vertex item {
+            (index.position != -1) ? positions[index.position] : glm::vec3(0.0f),
+            (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f),
+            (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
+        };
+
+        // Recher du Vertex
+        it = std::find(vertexBuffer.begin(), vertexBuffer.end(), item);
+        if(it != vertexBuffer.end()) {
+            itPos = std::distance(vertexBuffer.begin(), it);
+        }
+        else {
+            itPos = vertexBuffer.size();
+            vertexBuffer.push_back(item);
+        }
+        elementBuffer.push_back(itPos);
+
+        // Mise à jour des attributs
+        this->m_vertices = vertexBuffer;
+        this->m_indexes = elementBuffer;
+    }
 }
