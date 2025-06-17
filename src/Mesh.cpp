@@ -1,10 +1,10 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::string filename)
+Mesh::Mesh(std::string filename) : m_filename(filename), m_origin(glm::vec3(0.0f))
 {
+    auto start = std::chrono::high_resolution_clock::now();
     std::string lineBuffer;
     std::ifstream reader(filename);
-    this->m_filename = filename;
 
     vec3Array positions;
     vec3Array normals;
@@ -34,32 +34,29 @@ Mesh::Mesh(std::string filename)
     }
     reader.close();
 
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Mesh readed in " 
+          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+          << " ms" << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+
     // INITIALISATION DE L'OBJET //
 
     this->m_hasNormals = !normals.empty();
     this->m_hasUVs = !uvs.empty();
     computeUniques(positions, normals, uvs, indexes);
 
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Mesh computed in " 
+          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+          << " ms" << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+
     glGenVertexArrays(1, &this->m_VAO);
     glGenBuffers(1, &this->m_VBO);
     glGenBuffers(1, &this->m_EBO);
 
     glBindVertexArray(this->m_VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        this->m_vertices.size() * sizeof(Vertex),
-        this->m_vertices.data(),
-        GL_DYNAMIC_DRAW
-    );
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
-
-    glEnableVertexAttribArray(0);
-    if(this->hasNormals()) glEnableVertexAttribArray(1);
-    if(this->hasUVs()) glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
     glBufferData(
@@ -69,8 +66,30 @@ Mesh::Mesh(std::string filename)
         GL_STATIC_DRAW
     );
 
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        this->m_vertices.size() * sizeof(Vertex),
+        this->m_vertices.data(),
+        GL_STATIC_DRAW
+    );
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Mesh initialized in " 
+          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+          << " ms" << std::endl;
+
+    displayInformations();
 }
 
 
@@ -84,7 +103,6 @@ void Mesh::draw(Shader shader)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(this->m_VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
     glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
 }
 

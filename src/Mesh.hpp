@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include <chrono>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
