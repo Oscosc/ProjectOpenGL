@@ -4,11 +4,14 @@ Mesh::Mesh(std::string filename)
 {
     std::string lineBuffer;
     std::ifstream reader(filename);
+    this->m_filename = filename;
 
     vec3Array positions;
     vec3Array normals;
     vec2Array uvs;
     std::vector<VertexIndex> indexes;
+
+    // LECTURE DU FICHIER OBJ //
 
     while(std::getline(reader, lineBuffer)) {
         std::vector<std::string> tokens = split(lineBuffer, STD_DELIMITER);
@@ -23,15 +26,19 @@ Mesh::Mesh(std::string filename)
 
         case LineType::INDEX:
             parseAsIndexes(id, tokens, indexes);
-            // TODO
             break;
         
         default: // => LineType::NONE || LineType::COMMENT
             break;
         }
     }
-
     reader.close();
+
+    // INITIALISATION DE L'OBJET //
+
+    this->m_hasNormals = !normals.empty();
+    this->m_hasUVs = !uvs.empty();
+    computeUniques(positions, normals, uvs, indexes);
 
     glGenVertexArrays(1, &this->m_VAO);
     glGenBuffers(1, &this->m_VBO);
@@ -42,12 +49,17 @@ Mesh::Mesh(std::string filename)
     glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
     glBufferData(
         GL_ARRAY_BUFFER,
-        this->m_vertices.size() * sizeof(glm::vec3),
+        this->m_vertices.size() * sizeof(Vertex),
         this->m_vertices.data(),
         GL_DYNAMIC_DRAW
     );
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    if(this->hasNormals()) glEnableVertexAttribArray(1);
+    if(this->hasUVs()) glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
     glBufferData(
@@ -76,6 +88,18 @@ void Mesh::draw(Shader shader)
     glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
 }
 
+void Mesh::displayInformations()
+{
+    std::string normals = hasNormals() ? "YES" : "NO";
+    std::string uvs = hasUVs() ? "YES" : "NO";
+
+    std::cout << "Object \"" << getName() << "\"" << std::endl;
+    std::cout << "\tNormals : " << normals << std::endl;
+    std::cout << "\tUVs : " << uvs << std::endl;
+    std::cout << this->m_vertices.size() << " vertices computed" << std::endl;
+    std::cout << this->m_indexes.size() << " indexes computed" << std::endl;
+}
+
 bool Mesh::hasNormals()
 {
     return this->m_hasNormals;
@@ -84,6 +108,11 @@ bool Mesh::hasNormals()
 bool Mesh::hasUVs()
 {
     return this->m_hasUVs;
+}
+
+std::string Mesh::getName()
+{
+    return this->m_filename;
 }
 
 Mesh::LineType Mesh::identify(std::string token)
@@ -141,9 +170,9 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
         exit(3);
     }
 
-    unsigned int i = 0;
+    bool i = false;
     for(std::string token : tokens) {
-        if(i == 0) continue;
+        if(!i) {i = true; continue;}
 
         std::vector<std::string> subTokens = split(token, IDX_DELIMITER);
         if(subTokens.size() <= 0 || subTokens.size() > 3) {
@@ -151,11 +180,11 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
             exit(4);
         }
 
-        VertexIndex index {
-            std::stof(subTokens[0]) - 1,
-            subTokens.size() < 2 ? -1 : std::stof(subTokens[1]) - 1,
-            subTokens.size() < 3 ? -1 : std::stof(subTokens[2]) - 1
-        };
+        indexes.push_back({
+            std::stoi(subTokens[0]) - 1,
+            subTokens.size() < 2 ? -1 : std::stoi(subTokens[1]) - 1,
+            subTokens.size() < 3 ? -1 : std::stoi(subTokens[2]) - 1
+        });
     }
 }
 
@@ -185,9 +214,9 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
             vertexBuffer.push_back(item);
         }
         elementBuffer.push_back(itPos);
-
-        // Mise à jour des attributs
-        this->m_vertices = vertexBuffer;
-        this->m_indexes = elementBuffer;
     }
+
+    // Mise à jour des attributs
+    this->m_vertices = vertexBuffer;
+    this->m_indexes = elementBuffer;
 }

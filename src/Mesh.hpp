@@ -98,6 +98,12 @@ public:
     void draw(Shader shader);
 
     /**
+     * @brief Affiche les propriétés du mesh dans la console (pour du debug)
+     * 
+     */
+    void displayInformations();
+
+    /**
      * @brief Donne l'information d'état des normales du mesh
      * 
      * @return état des normales (on/off)
@@ -110,6 +116,13 @@ public:
      * @return état des UVs (on/off)
      */
     bool hasUVs();
+
+    /**
+     * @brief Retourne le nom du fichier contenant les infos sur l'objet
+     * 
+     * @return nom de l'objet
+     */
+    std::string getName();
 
 private:
 
@@ -176,6 +189,7 @@ private:
     bool m_hasUVs;
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indexes;
+    std::string m_filename;
 
     glm::vec3 m_origin;
 };
