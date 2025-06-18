@@ -100,7 +100,7 @@ void Mesh::draw(Shader shader)
 
     shader.setVec3("color", glm::vec3(1.f)); // TODO : color
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(this->m_VAO);
     glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
@@ -209,10 +209,9 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
 void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     const vec2Array &uvs, const std::vector<VertexIndex> &indexes)
 {   
+    std::unordered_map<Vertex, unsigned int> vertexToIndex;
     std::vector<Vertex> vertexBuffer;
-    std::vector<Vertex>::iterator it;
     std::vector<unsigned int> elementBuffer;
-    unsigned int itPos;
 
     for(VertexIndex index : indexes) {
         // Construction du Vertex
@@ -223,18 +222,19 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
         };
 
         // Recher du Vertex
-        it = std::find(vertexBuffer.begin(), vertexBuffer.end(), item);
-        if(it != vertexBuffer.end()) {
-            itPos = std::distance(vertexBuffer.begin(), it);
+        auto it = vertexToIndex.find(item);
+        if(it != vertexToIndex.end()) {
+            elementBuffer.push_back(it->second); // (key, -> value <-)
         }
         else {
-            itPos = vertexBuffer.size();
+            unsigned int newIndex = vertexBuffer.size();
             vertexBuffer.push_back(item);
+            vertexToIndex[item] = newIndex;
+            elementBuffer.push_back(newIndex);
         }
-        elementBuffer.push_back(itPos);
     }
 
     // Mise à jour des attributs
-    this->m_vertices = vertexBuffer;
-    this->m_indexes = elementBuffer;
+    this->m_vertices = std::move(vertexBuffer);
+    this->m_indexes = std::move(elementBuffer);
 }

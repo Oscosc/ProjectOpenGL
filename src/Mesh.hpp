@@ -45,6 +45,18 @@ struct Vertex {
     }
 };
 
+namespace std {
+    template <>
+    struct hash<Vertex> {
+        std::size_t operator()(const Vertex& v) const {
+            std::size_t hPos = std::hash<float>()(v.position.x) ^ std::hash<float>()(v.position.y) ^ std::hash<float>()(v.position.z);
+            std::size_t hNorm = std::hash<float>()(v.normal.x) ^ std::hash<float>()(v.normal.y) ^ std::hash<float>()(v.normal.z);
+            std::size_t hUV = std::hash<float>()(v.uv.x) ^ std::hash<float>()(v.uv.y);
+            return hPos ^ (hNorm << 1) ^ (hUV << 2);
+        }
+    };
+}
+
 /**
  * @brief Représentation d'un indexe pour un vertex. Cette structure est une structure
  * intermédiaire avant de former une liste de Vertex qui sera passée au VAO.
