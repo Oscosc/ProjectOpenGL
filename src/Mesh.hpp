@@ -45,13 +45,24 @@ struct Vertex {
     }
 };
 
+/**
+ * @brief Spécialisation de la fonction de hash pour la structure Vertex afin de permettre aux
+ * Vertex d'être ajouté dans une unordered map (fonction computeUniques)
+ * 
+ */
 namespace std {
     template <>
     struct hash<Vertex> {
         std::size_t operator()(const Vertex& v) const {
-            std::size_t hPos = std::hash<float>()(v.position.x) ^ std::hash<float>()(v.position.y) ^ std::hash<float>()(v.position.z);
-            std::size_t hNorm = std::hash<float>()(v.normal.x) ^ std::hash<float>()(v.normal.y) ^ std::hash<float>()(v.normal.z);
-            std::size_t hUV = std::hash<float>()(v.uv.x) ^ std::hash<float>()(v.uv.y);
+            std::size_t hPos = std::hash<float>()(v.position.x)
+                ^ std::hash<float>()(v.position.y)
+                ^ std::hash<float>()(v.position.z);
+            std::size_t hNorm = std::hash<float>()(v.normal.x)
+                ^ std::hash<float>()(v.normal.y)
+                ^ std::hash<float>()(v.normal.z);
+            std::size_t hUV = std::hash<float>()(v.uv.x)
+                ^ std::hash<float>()(v.uv.y);
+                
             return hPos ^ (hNorm << 1) ^ (hUV << 2);
         }
     };

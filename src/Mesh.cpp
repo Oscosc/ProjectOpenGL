@@ -2,7 +2,6 @@
 
 Mesh::Mesh(std::string filename) : m_filename(filename), m_origin(glm::vec3(0.0f))
 {
-    auto start = std::chrono::high_resolution_clock::now();
     std::string lineBuffer;
     std::ifstream reader(filename);
 
@@ -34,23 +33,11 @@ Mesh::Mesh(std::string filename) : m_filename(filename), m_origin(glm::vec3(0.0f
     }
     reader.close();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "Mesh readed in " 
-          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
-          << " ms" << std::endl;
-    start = std::chrono::high_resolution_clock::now();
-
     // INITIALISATION DE L'OBJET //
 
     this->m_hasNormals = !normals.empty();
     this->m_hasUVs = !uvs.empty();
     computeUniques(positions, normals, uvs, indexes);
-
-    end = std::chrono::high_resolution_clock::now();
-    std::cout << "Mesh computed in " 
-          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
-          << " ms" << std::endl;
-    start = std::chrono::high_resolution_clock::now();
 
     glGenVertexArrays(1, &this->m_VAO);
     glGenBuffers(1, &this->m_VBO);
@@ -84,12 +71,7 @@ Mesh::Mesh(std::string filename) : m_filename(filename), m_origin(glm::vec3(0.0f
 
     glBindVertexArray(0);
 
-    end = std::chrono::high_resolution_clock::now();
-    std::cout << "Mesh initialized in " 
-          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
-          << " ms" << std::endl;
-
-    displayInformations();
+    // displayInformations();
 }
 
 
