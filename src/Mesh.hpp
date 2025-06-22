@@ -121,6 +121,7 @@ public:
      */
     Mesh(std::string file);
     Mesh(std::string file, Transform transformation);
+    Mesh(std::string file, Transform transformation, glm::vec3 color);
 
     /**
      * @brief "Dessine" le mesh à l'écran (au sens graphique) en s'appuyant sur le shader passé en
@@ -168,6 +169,8 @@ private:
      * @return type de ligne trouvée, NONE si inconnue ou non implémenté
      */
     LineType identify(std::string token);
+
+    void loadInitMesh(std::string filename);
     
     /**
      * @brief Parse la ligne en la considérant comme une ligne avec de l'information de donnée
@@ -227,6 +230,7 @@ private:
     std::string m_filename;
 
     Transform m_transform;
+    glm::vec3 m_color;
 };
 
 #endif // MESH_HPP

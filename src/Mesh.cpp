@@ -1,9 +1,95 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::string filename) : m_filename(filename)
+Mesh::Mesh(std::string file) :
+    m_filename(file),
+    m_transform({glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f)}),
+    m_color(glm::vec3(1.0f))
 {
-    this->m_transform = {glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f)};
+    loadInitMesh(file);
+}
 
+Mesh::Mesh(std::string file, Transform transformation) :
+    m_filename(file),
+    m_transform(transformation),
+    m_color(glm::vec3(1.0f))
+{
+    loadInitMesh(file);
+    
+}
+
+Mesh::Mesh(std::string file, Transform transformation, glm::vec3 color) :
+    m_filename(file),
+    m_transform(transformation),
+    m_color(color)
+{
+    loadInitMesh(file);
+}
+
+void Mesh::draw(Shader shader)
+{
+    shader.use();
+
+    glm::mat4 model;
+    model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
+    model = glm::scale(model, this->m_transform.scale);
+    shader.setMat4("model", model);
+    
+    shader.setVec3("color", this->m_color);
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    glBindVertexArray(this->m_VAO);
+    glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void Mesh::displayInformations()
+{
+    std::string normals = hasNormals() ? "YES" : "NO";
+    std::string uvs = hasUVs() ? "YES" : "NO";
+
+    std::cout << "Object \"" << getName() << "\"" << std::endl;
+    std::cout << "\tNormals : " << normals << std::endl;
+    std::cout << "\tUVs : " << uvs << std::endl;
+    std::cout << this->m_vertices.size() << " vertices computed" << std::endl;
+    std::cout << this->m_indexes.size() << " indexes computed" << std::endl;
+}
+
+bool Mesh::hasNormals()
+{
+    return this->m_hasNormals;
+}
+
+bool Mesh::hasUVs()
+{
+    return this->m_hasUVs;
+}
+
+std::string Mesh::getName()
+{
+    return this->m_filename;
+}
+
+Mesh::LineType Mesh::identify(std::string token)
+{
+    if(token.length() == 1) {
+        if      (token[0] == '#') return LineType::COMMENT;
+        else if (token[0] == 'v') return LineType::POSITION;
+        else if (token[0] == 'f') return LineType::INDEX;
+        else                      return LineType::NONE;
+    }
+    if(token.length() == 2 && token[0] == 'v') {
+        if      (token[1] == 'n') return LineType::NORMAL;
+        else if (token[1] == 't') return LineType::UV;
+        else                      return LineType::NONE;
+    }
+    else return LineType::NONE;
+}
+
+void Mesh::loadInitMesh(std::string filename)
+{
     std::string lineBuffer;
     std::ifstream reader(filename);
 
@@ -74,72 +160,6 @@ Mesh::Mesh(std::string filename) : m_filename(filename)
     glBindVertexArray(0);
 
     // displayInformations();
-}
-
-Mesh::Mesh(std::string file, Transform transformation) : Mesh(file)
-{
-    this->m_transform = transformation;
-}
-
-void Mesh::draw(Shader shader)
-{
-    glm::mat4 model;
-    model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
-    model = glm::scale(model, this->m_transform.scale);
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
-    shader.setMat4("model", model);
-
-    shader.setVec3("color", glm::vec3(1.f)); // TODO : color
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glBindVertexArray(this->m_VAO);
-    glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
-}
-
-void Mesh::displayInformations()
-{
-    std::string normals = hasNormals() ? "YES" : "NO";
-    std::string uvs = hasUVs() ? "YES" : "NO";
-
-    std::cout << "Object \"" << getName() << "\"" << std::endl;
-    std::cout << "\tNormals : " << normals << std::endl;
-    std::cout << "\tUVs : " << uvs << std::endl;
-    std::cout << this->m_vertices.size() << " vertices computed" << std::endl;
-    std::cout << this->m_indexes.size() << " indexes computed" << std::endl;
-}
-
-bool Mesh::hasNormals()
-{
-    return this->m_hasNormals;
-}
-
-bool Mesh::hasUVs()
-{
-    return this->m_hasUVs;
-}
-
-std::string Mesh::getName()
-{
-    return this->m_filename;
-}
-
-Mesh::LineType Mesh::identify(std::string token)
-{
-    if(token.length() == 1) {
-        if      (token[0] == '#') return LineType::COMMENT;
-        else if (token[0] == 'v') return LineType::POSITION;
-        else if (token[0] == 'f') return LineType::INDEX;
-        else                      return LineType::NONE;
-    }
-    if(token.length() == 2 && token[0] == 'v') {
-        if      (token[1] == 'n') return LineType::NORMAL;
-        else if (token[1] == 't') return LineType::UV;
-        else                      return LineType::NONE;
-    }
-    else return LineType::NONE;
 }
 
 void Mesh::parseAsData(const Mesh::LineType id, const std::vector<std::string> tokens,
