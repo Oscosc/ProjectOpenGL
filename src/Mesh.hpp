@@ -80,6 +80,16 @@ struct VertexIndex {
 };
 
 /**
+ * @brief Représentation d'une transformation d'un Mesh dans l'espace
+ * 
+ */
+struct Transform {
+    glm::vec3 position;
+    glm::vec3 scale;
+    glm::vec3 rotation;
+};
+
+/**
  * @brief Représentation d'un Mesh au sens d'un objet graphique qui peut être rendu.
  * 
  * Le mesh est construit à partir d'un fichier .obj dont le chemin d'accès est passé en paramètre.
@@ -110,6 +120,7 @@ public:
      * @param file chemin d'accès vers le fichier .obj
      */
     Mesh(std::string file);
+    Mesh(std::string file, Transform transformation);
 
     /**
      * @brief "Dessine" le mesh à l'écran (au sens graphique) en s'appuyant sur le shader passé en
@@ -215,7 +226,7 @@ private:
     std::vector<unsigned int> m_indexes;
     std::string m_filename;
 
-    glm::vec3 m_origin;
+    Transform m_transform;
 };
 
 #endif // MESH_HPP

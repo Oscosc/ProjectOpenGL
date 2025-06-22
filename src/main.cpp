@@ -31,6 +31,7 @@
 #include "Ray.hpp"
 #include "Sphere.hpp"
 #include "Mesh.hpp"
+#include "Scene.hpp"
 
 
 #define SCREEN_WIDTH 800
@@ -161,7 +162,13 @@ int main()
     contextIGAI.addObject(std::make_unique<BezierSurface>(controlPolygonSurface));
     contextIGAI.getObject(contextIGAI.size()-1)->setOrigin({-3.f, 0.f, 0.f});
 
-    Mesh myMesh = Mesh("resources/teapot.obj");
+    Scene scene;
+    scene.addMesh(Mesh("resources/wall.obj"));
+    scene.addMesh(Mesh("resources/wall.obj", {
+        glm::vec3(0.0f, 0.0f, 5.0f),
+        glm::vec3(1.0f),
+        glm::vec3(0.0f, 90.0f, 0.0f)
+    }));
 
     // Creating Sphere
     // ---------------
@@ -214,7 +221,7 @@ int main()
         // draw context elements
         // ---------------------
         contextIGAI.drawContext(monochromeShader);
-        myMesh.draw(meshShader);
+        scene.draw(meshShader);
 
 
         // draw crosshair
