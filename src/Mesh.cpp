@@ -29,12 +29,13 @@ void Mesh::draw(Shader shader)
 {
     shader.use();
 
-    glm::mat4 model;
+    glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
     model = glm::scale(model, this->m_transform.scale);
+    
     shader.setMat4("model", model);
     
     shader.setVec3("color", this->m_color);
@@ -125,6 +126,8 @@ void Mesh::loadInitMesh(std::string filename)
 
     this->m_hasNormals = !normals.empty();
     this->m_hasUVs = !uvs.empty();
+    
+    if(!hasNormals()) subComputeNormals(positions, normals, indexes);
     computeUniques(positions, normals, uvs, indexes);
 
     glGenVertexArrays(1, &this->m_VAO);
@@ -226,6 +229,9 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     std::vector<Vertex> vertexBuffer;
     std::vector<unsigned int> elementBuffer;
 
+    // Creation des normales si nécessaire
+    // TODO
+
     for(VertexIndex index : indexes) {
         // Construction du Vertex
         Vertex item {
@@ -234,7 +240,7 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
             (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
         };
 
-        // Recher du Vertex
+        // Recherche du Vertex
         auto it = vertexToIndex.find(item);
         if(it != vertexToIndex.end()) {
             elementBuffer.push_back(it->second); // (key, -> value <-)
@@ -251,3 +257,60 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     this->m_vertices = std::move(vertexBuffer);
     this->m_indexes = std::move(elementBuffer);
 }
+
+void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std::vector<VertexIndex> &indexes)
+{
+    normals.resize(positions.size(), glm::vec3(0.0f)); // Une normale par sommet
+
+    // Accumulation des normales par sommet
+    for (unsigned int i = 0; i + 2 < indexes.size(); i += 3) {
+        int i0 = indexes[i].position;
+        int i1 = indexes[i + 1].position;
+        int i2 = indexes[i + 2].position;
+
+        const glm::vec3 &v0 = positions[i0];
+        const glm::vec3 &v1 = positions[i1];
+        const glm::vec3 &v2 = positions[i2];
+
+        glm::vec3 edge1 = v1 - v0;
+        glm::vec3 edge2 = v2 - v0;
+        glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
+
+        normals[i0] += faceNormal;
+        normals[i1] += faceNormal;
+        normals[i2] += faceNormal;
+    }
+
+    // Normalisation des normales par sommet
+    for (glm::vec3 &n : normals) {
+        if (glm::length(n) > 0.0f)
+            n = glm::normalize(n);
+        else
+            n = glm::vec3(0.0f, 1.0f, 0.0f); // Normale par défaut si nécessaire
+    }
+
+    // Mise à jour des indexes pour pointer vers la normale du sommet (identique à l’index de position)
+    for (VertexIndex &vi : indexes) {
+        vi.normal = vi.position;
+    }
+}
+
+/*
+void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std::vector<VertexIndex> &indexes)
+{
+    for(unsigned int i = 0; i + 2 < indexes.size(); ++i) {
+
+        const glm::vec3 &v0 = positions[indexes[i].position];
+        const glm::vec3 &v1 = positions[indexes[i+1].position];
+        const glm::vec3 &v2 = positions[indexes[i+2].position];
+
+        glm::vec3 edge1 = v1 - v0;
+        glm::vec3 edge2 = v2 - v0;
+        normals.push_back(glm::normalize(glm::cross(edge1, edge2)));
+        
+        indexes[i].normal = normals.size() - 1;
+        indexes[i+1].normal = normals.size() - 1;
+        indexes[i+2].normal = normals.size() - 1;
+    }
+}
+*/

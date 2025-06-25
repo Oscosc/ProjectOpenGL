@@ -213,6 +213,9 @@ private:
      */
     void computeUniques(const vec3Array &positions, const vec3Array &normals, const vec2Array &uvs,
         const std::vector<VertexIndex> &indexes);
+
+    void subComputeNormals(const vec3Array &positions, vec3Array &normals,
+        std::vector<VertexIndex> &indexes);
     
 
     /*********************************************************************************************

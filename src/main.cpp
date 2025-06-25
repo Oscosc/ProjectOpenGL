@@ -104,39 +104,47 @@ int main()
     Shader meshShader("shaders/lighted.vs", "shaders/lighted.fs");
 
     Scene scene;
+    /*
+    // BACK
     scene.addMesh(Mesh("resources/wall.obj", {
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f),
         glm::vec3(0.0f, 0.0f, 0.0f)
     }, glm::vec3(0.8f)));
+    // DOWN
     scene.addMesh(Mesh("resources/wall.obj", {
         glm::vec3(0.0f, 0.0f, 5.0f),
         glm::vec3(1.0f),
-        glm::vec3(0.0f, 90.0f, 0.0f)
+        glm::vec3(270.0f, 0.0f, 0.0f)
     }, glm::vec3(0.8f)));
+    //
     scene.addMesh(Mesh("resources/wall.obj", {
-        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 5.0f, 0.0f),
         glm::vec3(1.0f),
         glm::vec3(90.0f, 0.0f, 0.0f)
     }, glm::vec3(1.0f, 1.0f, 0.88f)));
+    //
     scene.addMesh(Mesh("resources/wall.obj", {
         glm::vec3(0.0f, 5.0f, 0.0f),
         glm::vec3(1.0f),
         glm::vec3(90.0f, 0.0f, 0.0f)
     }, glm::vec3(0.8f)));
+    /*
     scene.addMesh(Mesh("resources/wall.obj", {
         glm::vec3(5.0f, 0.0f, 5.0f),
         glm::vec3(1.0f),
         glm::vec3(0.0f, 90.0f, 0.0f)
     }, glm::vec3(0.8f)));
+    */
 
-    scene.addMesh(Mesh("resources/teapot.obj", {
+    scene.addMesh(Mesh("resources/homer.obj", {
         glm::vec3(2.5f, 0.0f, 2.5f),
-        glm::vec3(0.5f),
+        glm::vec3(1.f),
         glm::vec3(0.0f, 0.0f, 0.0f)
     }, glm::vec3(1.0f,  0.68f, 0.68f)));
 
-    scene.setLightSource(glm::vec3(2.5f, 4.0f, 2.5f));
+    scene.setLightSource(glm::vec3(2.5f, 4.f, 2.5f));
+    scene.setLightColor(glm::vec3(1.0f, 1.0f, 0.2f));
 
     // crosshair setup
     // ---------------
@@ -189,7 +197,10 @@ int main()
             (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
             0.1f,
             100.0f));
+
         meshShader.use();
+        meshShader.setInt("displayMode", contextIGAI.getDisplayMode());
+        meshShader.setVec3("viewPos", contextIGAI.getCamera()->Position);
         meshShader.setMat4("view", contextIGAI.getCamera()->GetViewMatrix());
         meshShader.setMat4("projection", contextIGAI.getProjection());
         scene.draw(meshShader);
