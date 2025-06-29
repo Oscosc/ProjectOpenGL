@@ -1,10 +1,9 @@
 #include "BezierCurve.hpp"
 
 
-BezierCurve::BezierCurve(ptsTab controlPoints) :
+BezierCurve::BezierCurve(vec3Array controlPoints) :
     m_controlPoints(controlPoints),
     m_nbCurvePoints(MIN_DISCRETE_POINTS),
-    Object(false, false)
 {
     updateCurvePoints();
     setColor(glm::vec3(1.0));
@@ -34,9 +33,9 @@ glm::vec3 BezierCurve::curveValue(float u)
 }
 
 
-ptsTab BezierCurve::normalDiscretization()
+vec3Array BezierCurve::normalDiscretization()
 {
-    ptsTab discretizedValues;
+    vec3Array discretizedValues;
     for(float i=0; i < m_nbCurvePoints; ++i) {
         discretizedValues.push_back(curveValue(i/(m_nbCurvePoints-1)));
     }
@@ -44,9 +43,9 @@ ptsTab BezierCurve::normalDiscretization()
 }
 
 
-ptsTab BezierCurve::equalDiscretization()
+vec3Array BezierCurve::equalDiscretization()
 {
-    ptsTab vertices = {m_controlPoints[0]};
+    vec3Array vertices = {m_controlPoints[0]};
 
     unsigned int current = 0;
     for(float i = 0; i <= 1; i += DISCRETIZATION_STEP) {
@@ -69,7 +68,7 @@ void BezierCurve::updateCurvePoints()
 }
 
 
-void BezierCurve::draw(Shader shader)
+void BezierCurve::draw(Scene* scene)
 {
     glBindVertexArray(VAO);
     glm::mat4 model = glm::translate(glm::mat4(1.0f), m_origin);

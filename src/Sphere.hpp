@@ -11,12 +11,9 @@
 class Sphere : public Object
 {
 public:
-    Sphere(float radius);
-    Sphere(float radius, glm::vec3 position, glm::vec3 color);
+    Sphere(float radius, glm::vec3 position = {0, 0, 0}, glm::vec3 color = {1, 1, 1});
 
-    void draw(Shader shader) override;
-    //void previous() override;
-    //void next() override;
+    void draw(Scene* scene) override;
 
     float getRadius() const;
 
@@ -25,21 +22,14 @@ private:
     /**
      * @brief Code from : https://www.songho.ca/opengl/gl_sphere.html#sphere
      */
-    static ptsTab generateVertices(unsigned int stackCount, unsigned int sectorCount, float radius);
+    static std::vector<Vertex> generateVertices(unsigned int stackCount, unsigned int sectorCount, float radius);
 
     /**
      * @brief Code also from : https://www.songho.ca/opengl/gl_sphere.html#sphere
      */
-    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount,
-        std::vector<unsigned int>* lineIndices);
-
-    void updateEBO(std::vector<unsigned int> triangleIndexes, std::vector<unsigned int> lineIndexes);
-
-    unsigned int EBOTriangles;
-    unsigned int EBOLines, VAOLines;
+    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount);
     
     float m_radius;
-    unsigned int m_nbVertices, m_nbVerticesLines;
 };
 
 #endif // SPHERE_HPP
