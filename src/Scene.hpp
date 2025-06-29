@@ -1,28 +1,44 @@
-#ifndef SCENE_HPP
-#define SCENE_HPP
+#pragma once
 
-#include <iostream>
-#include <string>
 #include <vector>
 
-#include "Mesh.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#include "../includes/camera.hpp"
 #include "../includes/shader.hpp"
+#include "Light.hpp"
+#include "PointLight.hpp"
+#include "ProjViewMatrix.hpp"
+
+class Object;
 
 class Scene
 {
 public:
-    Scene();
-    void draw(Shader shader);
-    void addMesh(Mesh mesh);
-    void setLightSource(glm::vec3 position);
-    glm::vec3 getLightSource();
-    void setLightColor(glm::vec3 color);
-    glm::vec3 getLightColor();
+    Scene(Camera* camera);
+    Scene(Camera* camera, std::vector<Object*> objects);
+    ~Scene() = default;
+
+    void render();
+    void updateActiveCameraPV();
+    void updateLigth(Shader* shader);
+
+    void addObject(Object* object);
+    void addLight(Light* light);
+
+    Camera* getActiveCamera();
+    ProjViewMatrix getActiveCameraPV();
+
+    Light* getLight(unsigned int index) { return m_lights.at(index); }
+    Object* getObject(unsigned int index) { return m_objects.at(index); }
 
 private:
-    std::vector<Mesh> m_meshes;
-    glm::vec3 m_lightSource;
-    glm::vec3 m_lightColor;
-};
+    unsigned int m_activeCamera;
+    ProjViewMatrix m_activeCameraPV;
 
-#endif // SCENE_HPP
+    std::vector<Camera*> m_cameras;
+    std::vector<Object*> m_objects;
+    std::vector<Light*> m_lights;
+
+};

@@ -2,32 +2,28 @@
 
 Mesh::Mesh(std::string file) :
     m_filename(file),
-    m_transform({glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f)}),
-    m_color(glm::vec3(1.0f))
+    Object({glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f)})
 {
     loadInitMesh(file);
 }
 
 Mesh::Mesh(std::string file, Transform transformation) :
-    m_filename(file),
-    m_transform(transformation),
-    m_color(glm::vec3(1.0f))
+    m_filename(file), Object(transformation)
 {
     loadInitMesh(file);
     
 }
 
-Mesh::Mesh(std::string file, Transform transformation, glm::vec3 color) :
-    m_filename(file),
-    m_transform(transformation),
-    m_color(color)
+Mesh::Mesh(std::string file, Transform transformation, Material material) :
+    m_filename(file), Object(transformation, material)
 {
     loadInitMesh(file);
 }
 
-void Mesh::draw(Shader shader)
+void Mesh::draw(Scene* scene)
 {
-    shader.use();
+    Shader* shader = this->getMaterial().shader;
+    shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
@@ -36,14 +32,24 @@ void Mesh::draw(Shader shader)
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
     model = glm::scale(model, this->m_transform.scale);
     
-    shader.setMat4("model", model);
-    
-    shader.setVec3("color", this->m_color);
+    shader->setVec3("color", this->getMaterial().color);
+
+    shader->setMat4("model", model);
+    shader->setMat4("view", scene->getActiveCameraPV().view);
+    shader->setMat4("projection", scene->getActiveCameraPV().projection);
+
+    scene->updateLigth(shader);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(this->m_VAO);
     glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
+
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+        std::cout << "[GLError] " << err << std::endl;
+    }
 }
 
 void Mesh::displayInformations()
@@ -130,37 +136,7 @@ void Mesh::loadInitMesh(std::string filename)
     if(!hasNormals()) subComputeNormals(positions, normals, indexes);
     computeUniques(positions, normals, uvs, indexes);
 
-    glGenVertexArrays(1, &this->m_VAO);
-    glGenBuffers(1, &this->m_VBO);
-    glGenBuffers(1, &this->m_EBO);
-
-    glBindVertexArray(this->m_VAO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        this->m_indexes.size() * sizeof(unsigned int),
-        this->m_indexes.data(),
-        GL_STATIC_DRAW
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        this->m_vertices.size() * sizeof(Vertex),
-        this->m_vertices.data(),
-        GL_STATIC_DRAW
-    );
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
+    initGLObject();
 
     // displayInformations();
 }
@@ -294,23 +270,3 @@ void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std
         vi.normal = vi.position;
     }
 }
-
-/*
-void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std::vector<VertexIndex> &indexes)
-{
-    for(unsigned int i = 0; i + 2 < indexes.size(); ++i) {
-
-        const glm::vec3 &v0 = positions[indexes[i].position];
-        const glm::vec3 &v1 = positions[indexes[i+1].position];
-        const glm::vec3 &v2 = positions[indexes[i+2].position];
-
-        glm::vec3 edge1 = v1 - v0;
-        glm::vec3 edge2 = v2 - v0;
-        normals.push_back(glm::normalize(glm::cross(edge1, edge2)));
-        
-        indexes[i].normal = normals.size() - 1;
-        indexes[i+1].normal = normals.size() - 1;
-        indexes[i+2].normal = normals.size() - 1;
-    }
-}
-*/

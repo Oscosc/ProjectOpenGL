@@ -1,93 +1,108 @@
-#ifndef OBJECT_HPP
-#define OBJECT_HPP
-
-/**
- * @file Object.hpp
- * @brief Définition de la classe abstraite Object.
- * 
- * Ce fichier contient la définition d'un objet affichable au sens d'OpenGL.
- * 
- * @author Oscar G.
- * @date 2025-03-01
- */
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
+#pragma once
 
 #include "../includes/shader.hpp"
+#include "Scene.hpp"
+#include "ProjViewMatrix.hpp"
+#include "ShaderManager.hpp"
 
-#define OBJECT_AMBIENT_STRENGTH 0.2
-
-
-typedef struct s_Triangle {
-    glm::vec3 a;
-    glm::vec3 b;
-    glm::vec3 c;
-} Triangle;
-
-
-using ptsTab = std::vector<glm::vec3>;
-
+using vec3Array = std::vector<glm::vec3>;
+using vec2Array = std::vector<glm::vec2>;
 
 /**
- * @class Object
- * @brief Classe abstraite pour les objets qui doivent être rendus en OpenGL.
+ * @brief Représentation complète d'un vertex au sens graphique.
+ * Encapsule la position, la normale et les UVs, ainsi que l'opérateur d'égalité.
  * 
- * Pour chaque objet, on définit un VAO et un VBO qui serviront au rendu OpenGL.
- * Chaque classe dérivée doit implémenter la fonction "draw()" qui dessine l'objet à l'écran selon
- * les spécificités de rendu de cet objet (type de traits, prétraitement, etc).
  */
+struct Vertex {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 uv;
+
+    /**
+     * @brief Implémentation de l'opérateur d'égalité pour les Vertex
+     * 
+     * Si la position, la normale et les UV sont égaux, alors les Vertex sont égaux. Sinon non.
+     * 
+     * @param other Vertex à comparer
+     * @return true si les deux Vertex sont les mêmes, false sinon
+     */
+    bool operator==(const Vertex& other) const {
+        return position == other.position && normal == other.normal && uv == other.uv;
+    }
+};
+
+/**
+ * @brief Spécialisation de la fonction de hash pour la structure Vertex afin de permettre aux
+ * Vertex d'être ajouté dans une unordered map (fonction computeUniques)
+ * 
+ */
+namespace std {
+    template <>
+    struct hash<Vertex> {
+        std::size_t operator()(const Vertex& v) const {
+            std::size_t hPos = std::hash<float>()(v.position.x)
+                ^ std::hash<float>()(v.position.y)
+                ^ std::hash<float>()(v.position.z);
+            std::size_t hNorm = std::hash<float>()(v.normal.x)
+                ^ std::hash<float>()(v.normal.y)
+                ^ std::hash<float>()(v.normal.z);
+            std::size_t hUV = std::hash<float>()(v.uv.x)
+                ^ std::hash<float>()(v.uv.y);
+                
+            return hPos ^ (hNorm << 1) ^ (hUV << 2);
+        }
+    };
+}
+
+/**
+ * @brief Représentation d'un indexe pour un vertex. Cette structure est une structure
+ * intermédiaire avant de former une liste de Vertex qui sera passée au VAO.
+ * 
+ */
+struct VertexIndex {
+    int position;
+    int normal;
+    int uv;
+};
+
+struct Material {
+    Shader* shader;
+    glm::vec3 color;
+};
+
+struct Transform {
+    glm::vec3 position;
+    glm::vec3 scale;
+    glm::vec3 rotation;
+};
+
 class Object
 {
 public:
+    Object(Transform transform) : m_transform(transform) {}
+    Object(Transform transform, Material material) : m_transform(transform), m_material(material) {}
+    virtual ~Object() = default;
 
-    /**
-     * @brief Constructeur par défaut de la classe Object (ne peut pas être appelé sauf par une
-     * classe dérivée de celle-ci).
-     */
-    Object(bool enableNormal = true, bool enableUV = true);
+    virtual void draw(Scene* scene) = 0;
 
-    /**
-     * @brief Destructeur par défaut de la classe Object.
-     */
-    virtual ~Object();
+    Material getMaterial() { return m_material; }
+    void setMaterial(Material material) { m_material = material; }
 
-    /**
-     * @brief Fonction à redéfinir pour chaque classe dérivée.
-     * 
-     * Cette fonction est supposée s'appuyer sur les fonctions OpenGL de rendu pour dessiner
-     * l'objet en question à l'écran.
-     */
-    virtual void draw(Shader shader) = 0;
-
-    glm::vec3 getOrigin() const;
-    void setOrigin(glm::vec3 value);
-    glm::vec3 getColor() const;
-    void setColor(glm::vec3 value);
-    float getAmbient() const;
-    void setAmbient(float value);
-
-    const std::vector<Triangle>* getTriangles();
-    // virtual void setTriangles() = 0;
+    Transform getTransform() { return m_transform; }
+    void setTransform(Transform transform) { m_transform = transform; }
 
 protected:
+    void initGLObject();
 
-    GLuint VAO, VBO;
-    glm::vec3 m_origin;
-    glm::vec3 m_color;
-    float m_ambient;
+    Transform m_transform;
+    Material m_material;
 
-    //std::vector<Triangle> m_triangles; TODO
+    GLuint m_VAO;
+    GLuint m_VBO;
+    GLuint m_EBO;
 
-    /**
-     * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.
-     * @param points Liste des nouveaux points qui seront stockées dans le buffer GPU.
-     */
-    void updateVertices(ptsTab points);
+    bool m_hasNormals;
+    bool m_hasUVs;
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indexes;
 };
-
-#endif // OBJECT_HPP

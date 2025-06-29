@@ -6,7 +6,6 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
-#include <chrono>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,80 +13,11 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "utils.hpp"
+#include "Object.hpp"
 #include "../includes/shader.hpp"
 
 #define STD_DELIMITER " "
 #define IDX_DELIMITER "/"
-
-using vec3Array = std::vector<glm::vec3>;
-using vec2Array = std::vector<glm::vec2>;
-
-/**
- * @brief Représentation complète d'un vertex au sens graphique.
- * Encapsule la position, la normale et les UVs, ainsi que l'opérateur d'égalité.
- * 
- */
-struct Vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 uv;
-
-    /**
-     * @brief Implémentation de l'opérateur d'égalité pour les Vertex
-     * 
-     * Si la position, la normale et les UV sont égaux, alors les Vertex sont égaux. Sinon non.
-     * 
-     * @param other Vertex à comparer
-     * @return true si les deux Vertex sont les mêmes, false sinon
-     */
-    bool operator==(const Vertex& other) const {
-        return position == other.position && normal == other.normal && uv == other.uv;
-    }
-};
-
-/**
- * @brief Spécialisation de la fonction de hash pour la structure Vertex afin de permettre aux
- * Vertex d'être ajouté dans une unordered map (fonction computeUniques)
- * 
- */
-namespace std {
-    template <>
-    struct hash<Vertex> {
-        std::size_t operator()(const Vertex& v) const {
-            std::size_t hPos = std::hash<float>()(v.position.x)
-                ^ std::hash<float>()(v.position.y)
-                ^ std::hash<float>()(v.position.z);
-            std::size_t hNorm = std::hash<float>()(v.normal.x)
-                ^ std::hash<float>()(v.normal.y)
-                ^ std::hash<float>()(v.normal.z);
-            std::size_t hUV = std::hash<float>()(v.uv.x)
-                ^ std::hash<float>()(v.uv.y);
-                
-            return hPos ^ (hNorm << 1) ^ (hUV << 2);
-        }
-    };
-}
-
-/**
- * @brief Représentation d'un indexe pour un vertex. Cette structure est une structure
- * intermédiaire avant de former une liste de Vertex qui sera passée au VAO.
- * 
- */
-struct VertexIndex {
-    int position;
-    int normal;
-    int uv;
-};
-
-/**
- * @brief Représentation d'une transformation d'un Mesh dans l'espace
- * 
- */
-struct Transform {
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::vec3 rotation;
-};
 
 /**
  * @brief Représentation d'un Mesh au sens d'un objet graphique qui peut être rendu.
@@ -95,7 +25,7 @@ struct Transform {
  * Le mesh est construit à partir d'un fichier .obj dont le chemin d'accès est passé en paramètre.
  * 
  */
-class Mesh
+class Mesh : public Object
 {
 public:
 
@@ -121,7 +51,7 @@ public:
      */
     Mesh(std::string file);
     Mesh(std::string file, Transform transformation);
-    Mesh(std::string file, Transform transformation, glm::vec3 color);
+    Mesh(std::string file, Transform transformation, Material material);
 
     /**
      * @brief "Dessine" le mesh à l'écran (au sens graphique) en s'appuyant sur le shader passé en
@@ -131,7 +61,7 @@ public:
      * attributs de vertex que ceux du mesh. Par défaut, si vous ne connaissez pas les attributs
      * du mesh chargé, il est conseillé d'activer la position, la normale et les UVs.
      */
-    void draw(Shader shader);
+    void draw(Scene* scene) override;
 
     /**
      * @brief Affiche les propriétés du mesh dans la console (pour du debug)
@@ -221,19 +151,8 @@ private:
     /*********************************************************************************************
      **                                        ATTRIBUTS                                        **
      *********************************************************************************************/
-
-    GLuint m_VAO;
-    GLuint m_VBO;
-    GLuint m_EBO;
-
-    bool m_hasNormals;
-    bool m_hasUVs;
-    std::vector<Vertex> m_vertices;
-    std::vector<unsigned int> m_indexes;
+    
     std::string m_filename;
-
-    Transform m_transform;
-    glm::vec3 m_color;
 };
 
 #endif // MESH_HPP

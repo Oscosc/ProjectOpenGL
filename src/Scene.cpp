@@ -1,43 +1,64 @@
 #include "Scene.hpp"
+#include "Object.hpp"
 
-Scene::Scene()
+Scene::Scene(Camera *camera)
 {
+    this->m_cameras.push_back(camera);
+    this->m_activeCamera = 0;
 }
 
-void Scene::draw(Shader shader)
+Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {
-    shader.use();
-    shader.setVec3("lightPos", this->m_lightSource);
-    shader.setVec3("lightColor", this->m_lightColor);
-    shader.setFloat("ambientStrength", 0.4f);
-    shader.setFloat("specularStrength", 0.5f);
+    this->m_cameras.push_back(camera);
+    this->m_activeCamera = 0;
+}
 
-    for(Mesh mesh : this->m_meshes) {
-        mesh.draw(shader);
+void Scene::render() {
+    updateActiveCameraPV();
+
+    for(auto object : this->m_objects) {
+        object->draw(this);
     }
 }
 
-void Scene::addMesh(Mesh mesh)
+void Scene::updateActiveCameraPV()
 {
-    this->m_meshes.push_back(mesh);
+    this->m_activeCameraPV.projection = glm::perspective(
+        glm::radians(getActiveCamera()->Zoom),
+        getActiveCamera()->Ratio,
+        0.1f,
+        100.0f
+    );
+    this->m_activeCameraPV.view = getActiveCamera()->GetViewMatrix();
 }
 
-void Scene::setLightSource(glm::vec3 position)
+void Scene::updateLigth(Shader *shader)
 {
-    this->m_lightSource = position;
+    shader->use();
+
+    shader->setVec3("lightColor", getLight(0)->getColor());
+    shader->setFloat("ambientStrength", getLight(0)->getStrength());
+    shader->setFloat("specularStrength", getLight(0)->getStrength());
+    
+    shader->setVec3("lightPos", static_cast<PointLight*>(getLight(0))->getPosition());
 }
 
-glm::vec3 Scene::getLightSource()
+void Scene::addObject(Object *object)
 {
-    return this->m_lightSource;
+    this->m_objects.push_back(object);
 }
 
-void Scene::setLightColor(glm::vec3 color)
+void Scene::addLight(Light *light)
 {
-    this->m_lightColor = color;
+    this->m_lights.push_back(light);
 }
 
-glm::vec3 Scene::getLightColor()
+Camera *Scene::getActiveCamera()
 {
-    return this->m_lightColor;
+    return this->m_cameras.at(this->m_activeCamera);
+}
+
+ProjViewMatrix Scene::getActiveCameraPV()
+{
+    return this->m_activeCameraPV;
 }
