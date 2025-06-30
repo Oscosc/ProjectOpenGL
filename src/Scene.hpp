@@ -16,6 +16,7 @@ class Object;
 class Scene
 {
 public:
+    Scene() {}
     Scene(Camera* camera);
     Scene(Camera* camera, std::vector<Object*> objects);
     ~Scene() = default;
