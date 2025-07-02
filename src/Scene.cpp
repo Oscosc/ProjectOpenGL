@@ -14,6 +14,11 @@ Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 }
 
 void Scene::render() {
+    if(!camerasCount()) {
+        std::cout << "[WARNING] No camera instanciated, scene render will be skipped" << std::endl;
+        return;
+    }
+
     updateActiveCameraPV();
 
     for(auto object : this->m_objects) {
@@ -34,6 +39,11 @@ void Scene::updateActiveCameraPV()
 
 void Scene::updateLigth(Shader *shader)
 {
+    if(lightsCount() == 0) {
+        std::cout << "[WARNING] No light source was instanciated, for somes shaders, nothing will be drawn" << std::endl;
+        return;
+    }
+
     shader->use();
 
     shader->setVec3("lightColor", getLight(0)->getColor());
@@ -46,6 +56,7 @@ void Scene::updateLigth(Shader *shader)
 void Scene::addCamera(Camera *camera)
 {
     this->m_cameras.push_back(camera);
+    if(camerasCount() == 1) { this->m_activeCamera = 0; }
 }
 
 void Scene::addObject(Object *object)

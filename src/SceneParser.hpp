@@ -29,5 +29,9 @@ public:
 private:
     static void parseObjectAs_Camera(Scene* scene, json item);
     static void parseObjectAs_Mesh(Scene* scene, json item);
+    static void parseObjectAs_Sphere(Scene* scene, json item);
     static void parseObjectAs_PointLight(Scene* scene, json item);
+
+    static glm::vec3 jsonToVec3(json json, const std::string& attribute);
+    static float jsonToFloat(json json, const std::string& attribute);
 };

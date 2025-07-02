@@ -1,7 +1,10 @@
-#include "Parser.hpp"
+#include "SceneParser.hpp"
 
 #include <fstream>
 #include <iostream>
+
+#include "Mesh.hpp"
+#include "Sphere.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -40,6 +43,7 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         break;
 
     case POINT_LIGHT:
+        parseObjectAs_PointLight(scene, item);
         break;
 
     case SPOT_LIGHT:
@@ -51,23 +55,57 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         exit(1);
         
     case SPHERE:
+        parseObjectAs_Sphere(scene, item);
         break;
 
     case MESH:
+        parseObjectAs_Mesh(scene, item);
         break;
     }
 }
 
 void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
 {
-    std::vector<float> position = static_cast<std::vector<float>>(item["position"]);
-    scene->addCamera(new Camera({position[0], position[1], position[2]}));
+    scene->addCamera(new Camera(jsonToVec3(item, "position")));
 }
 
 void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
 {
+    glm::vec3 position = jsonToVec3(item, "position");
+    glm::vec3 rotation = jsonToVec3(item, "rotation");
+    glm::vec3 scale = jsonToVec3(item, "scale");
+
+    scene->addObject(new Mesh(item["file"], {position, scale, rotation}));
+
+    Mesh* obj = static_cast<Mesh*>(scene->getObject(scene->objectsCount() - 1));
+    obj->displayInformations();
+}
+
+void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
+{
+    glm::vec3 position = jsonToVec3(item, "position");
+    float size = jsonToFloat(item, "size");
+
+    scene->addObject(new Sphere(size, position));
 }
 
 void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
 {
+    glm::vec3 color = jsonToVec3(item, "color");
+    glm::vec3 position = jsonToVec3(item, "position");
+    float strength = jsonToFloat(item, "strength");
+
+    scene->addLight(new PointLight(position, color, strength));
+}
+
+glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
+{
+    std::vector<float> value = static_cast<std::vector<float>>(json[attribute]);
+    return glm::vec3(value[0], value[1], value[2]);
+}
+
+float SceneParser::jsonToFloat(json json, const std::string &attribute)
+{
+    float value = static_cast<float>(json[attribute]);
+    return value;
 }

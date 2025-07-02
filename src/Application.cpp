@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "SceneParser.hpp"
 
 Application::Application() : m_screenWidth(DEFAULT_SCREEN_WIDTH), m_screenHeight(DEFAULT_SCREEN_HEIGHT)
 {
@@ -62,26 +63,14 @@ void Application::initShaders()
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
 }
 
-void Application::initScene()
+void Application::initScene(const std::string& file)
 {
-    Camera* initialCam = new Camera(glm::vec3(2.5f, 4.0f, 12.0f));
-    initialCam->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
+    this->m_scene = new Scene(SceneParser::parseScene(file));
+    this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
 
-    this->m_scene = new Scene(initialCam);
-    
-    this->m_scene->addObject(new Mesh("resources/teapot.obj"));
-    this->m_scene->getObject(0)->setMaterial({
-        ShaderManager::getInstance().getShader("lighted"),
-        glm::vec3(1.0f)
-    });
-
-    this->m_scene->addObject(new Sphere(0.2, {0, 5, 0}));
-
-    this->m_scene->addLight(new PointLight(
-        {0.f, 5.f, 0.f},
-        {1.f, 1.f, 1.f},
-        0.5f
-    ));
+    std::cout << "   |-> " << m_scene->camerasCount() << " cameras" << std::endl;
+    std::cout << "   |-> " << m_scene->lightsCount() << " lights" << std::endl;
+    std::cout << "   |-> " << m_scene->objectsCount() << " objects" << std::endl;
 }
 
 void Application::initHUD()
@@ -119,15 +108,27 @@ void Application::loop()
     glfwTerminate();
 }
 
-void Application::run()
+void Application::run(const std::string& sceneFile)
 {
     initWindow();
+    std::cout << "[INFO] OpenGL Window correctly loaded" << std::endl;
+
     initGLComponents();
+    std::cout << "[INFO] OpenGL/GLAD components correctly loaded" << std::endl;
+
     initCallbacks();
+    std::cout << "[INFO] Callbacks correctly instancied" << std::endl;
+
     initShaders();
-    initScene();
+    std::cout << "[INFO] Shaders correctly loaded and computed" << std::endl;
+
+    initScene(sceneFile);
+    std::cout << "[INFO] Scene correctly loaded" << std::endl;
+
     initHUD();
+    std::cout << "[INFO] HUD correctly computed" << std::endl;
     
+    std::cout << "[INFO] Starting application loop" << std::endl;
     loop();
 }
 

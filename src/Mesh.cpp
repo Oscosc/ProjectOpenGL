@@ -23,6 +23,9 @@ Mesh::Mesh(std::string file, Transform transformation, Material material) :
 void Mesh::draw(Scene* scene)
 {
     Shader* shader = this->getMaterial().shader;
+    if(shader == nullptr) {
+        std::cout << "[ERROR] No shader instanciated for this object" << std::endl;
+    }
     shader->use();
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -60,8 +63,12 @@ void Mesh::displayInformations()
     std::cout << "Object \"" << getName() << "\"" << std::endl;
     std::cout << "\tNormals : " << normals << std::endl;
     std::cout << "\tUVs : " << uvs << std::endl;
-    std::cout << this->m_vertices.size() << " vertices computed" << std::endl;
-    std::cout << this->m_indexes.size() << " indexes computed" << std::endl;
+    std::cout << "\t" << this->m_vertices.size() << " vertices computed" << std::endl;
+    std::cout << "\t" << this->m_indexes.size() << " indexes computed" << std::endl;
+    std::cout << "\tPosition :" << glm::to_string(this->getTransform().position) << std::endl;
+    std::cout << "\tRotation :" << glm::to_string(this->getTransform().rotation) << std::endl;
+    std::cout << "\tScale :" << glm::to_string(this->getTransform().scale) << std::endl;
+    std::cout << "\tColor :" << glm::to_string(this->getMaterial().color) << std::endl;
 }
 
 bool Mesh::hasNormals()

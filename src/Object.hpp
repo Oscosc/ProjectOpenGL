@@ -79,7 +79,9 @@ struct Transform {
 class Object
 {
 public:
-    Object(Transform transform) : m_transform(transform) {}
+    Object(Transform transform) :
+        m_transform(transform),
+        m_material({ShaderManager::getInstance().getShader("monochrome"), glm::vec3(1.0f)}) {}
     Object(Transform transform, Material material) : m_transform(transform), m_material(material) {}
     virtual ~Object() = default;
 

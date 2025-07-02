@@ -29,11 +29,11 @@ public:
     void initGLComponents();
     void initCallbacks();
     void initShaders();
-    void initScene();
+    void initScene(const std::string& file);
     void initHUD();
     void loop();
 
-    void run();
+    void run(const std::string& sceneFile);
 
     const unsigned int getScreenWidth() { return m_screenWidth; }
     const unsigned int getScreenHeight() { return m_screenHeight; }

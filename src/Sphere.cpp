@@ -1,7 +1,7 @@
 #include "Sphere.hpp"
 
 Sphere::Sphere(float radius, glm::vec3 position, glm::vec3 color) : m_radius(radius),
-    Object({position, glm::vec3(1.0f), glm::vec3(0.0f)}, {ShaderManager::getInstance().getShader("monochrome"), color})
+    Object({position, glm::vec3(1.0f), glm::vec3(0.0f)})
 {
     unsigned int stacks = (radius > 1.0f) ? DEFAULT_STACKS : round(DEFAULT_STACKS * radius);
     unsigned int sectors = (radius > 1.0f) ? DEFAULT_SECTORS : round(DEFAULT_SECTORS * radius);
