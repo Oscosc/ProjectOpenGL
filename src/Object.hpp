@@ -5,6 +5,9 @@
 #include "ProjViewMatrix.hpp"
 #include "ShaderManager.hpp"
 
+#define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
+#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), glm::vec3(1.0f)}
+
 using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;
 
@@ -79,10 +82,11 @@ struct Transform {
 class Object
 {
 public:
-    Object(Transform transform) :
-        m_transform(transform),
-        m_material({ShaderManager::getInstance().getShader("monochrome"), glm::vec3(1.0f)}) {}
-    Object(Transform transform, Material material) : m_transform(transform), m_material(material) {}
+    Object(
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    ) : m_transform(transform), m_material(material) {}
+
     virtual ~Object() = default;
 
     virtual void draw(Scene* scene) = 0;

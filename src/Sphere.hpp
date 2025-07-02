@@ -11,7 +11,10 @@
 class Sphere : public Object
 {
 public:
-    Sphere(float radius, glm::vec3 position = {0, 0, 0}, glm::vec3 color = {1, 1, 1});
+    Sphere(float radius,
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    );
 
     void draw(Scene* scene) override;
 

@@ -67,10 +67,6 @@ void Application::initScene(const std::string& file)
 {
     this->m_scene = new Scene(SceneParser::parseScene(file));
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
-
-    std::cout << "   |-> " << m_scene->camerasCount() << " cameras" << std::endl;
-    std::cout << "   |-> " << m_scene->lightsCount() << " lights" << std::endl;
-    std::cout << "   |-> " << m_scene->objectsCount() << " objects" << std::endl;
 }
 
 void Application::initHUD()

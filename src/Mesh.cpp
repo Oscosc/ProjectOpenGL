@@ -1,19 +1,5 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::string file) :
-    m_filename(file),
-    Object({glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f)})
-{
-    loadInitMesh(file);
-}
-
-Mesh::Mesh(std::string file, Transform transformation) :
-    m_filename(file), Object(transformation)
-{
-    loadInitMesh(file);
-    
-}
-
 Mesh::Mesh(std::string file, Transform transformation, Material material) :
     m_filename(file), Object(transformation, material)
 {

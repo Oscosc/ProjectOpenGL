@@ -5,6 +5,9 @@
 
 using json = nlohmann::json;
 
+struct Transform;
+struct Material;
+
 class SceneParser
 {
 public:
@@ -34,4 +37,6 @@ private:
 
     static glm::vec3 jsonToVec3(json json, const std::string& attribute);
     static float jsonToFloat(json json, const std::string& attribute);
+    static Transform jsonToTransform(json json);
+    static Material jsonToMaterial(json json);
 };

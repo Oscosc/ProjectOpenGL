@@ -49,9 +49,10 @@ public:
      * 
      * @param file chemin d'accès vers le fichier .obj
      */
-    Mesh(std::string file);
-    Mesh(std::string file, Transform transformation);
-    Mesh(std::string file, Transform transformation, Material material);
+    Mesh(std::string file,
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    );
 
     /**
      * @brief "Dessine" le mesh à l'écran (au sens graphique) en s'appuyant sur le shader passé en

@@ -5,6 +5,7 @@
 
 #include "Mesh.hpp"
 #include "Sphere.hpp"
+#include "Object.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -71,22 +72,29 @@ void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
 
 void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
 {
-    glm::vec3 position = jsonToVec3(item, "position");
-    glm::vec3 rotation = jsonToVec3(item, "rotation");
-    glm::vec3 scale = jsonToVec3(item, "scale");
-
-    scene->addObject(new Mesh(item["file"], {position, scale, rotation}));
-
-    Mesh* obj = static_cast<Mesh*>(scene->getObject(scene->objectsCount() - 1));
-    obj->displayInformations();
+    if(item["transform"] != nullptr) {
+        if(item["material"] != nullptr) {
+            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+        } else {
+            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"])));
+        }
+    } else {
+        scene->addObject(new Mesh(item["file"]));
+    }
 }
 
 void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
 {
-    glm::vec3 position = jsonToVec3(item, "position");
     float size = jsonToFloat(item, "size");
-
-    scene->addObject(new Sphere(size, position));
+    if(item["transform"] != nullptr) {
+        if(item["material"] != nullptr) {
+            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+        } else {
+            scene->addObject(new Sphere(size, jsonToTransform(item["transform"])));
+        }
+    } else {
+        scene->addObject(new Sphere(size));
+    }
 }
 
 void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
@@ -108,4 +116,21 @@ float SceneParser::jsonToFloat(json json, const std::string &attribute)
 {
     float value = static_cast<float>(json[attribute]);
     return value;
+}
+
+Transform SceneParser::jsonToTransform(json json)
+{
+    return {
+        jsonToVec3(json, "position"),
+        jsonToVec3(json, "scale"),
+        jsonToVec3(json, "rotation")
+    };
+}
+
+Material SceneParser::jsonToMaterial(json json)
+{
+    return {
+        ShaderManager::getInstance().getShader(json["shader"]),
+        jsonToVec3(json, "color")
+    };
 }
