@@ -25,12 +25,18 @@ public:
     void updateActiveCameraPV();
     void updateLigth(Shader* shader);
 
-    void addObject(Object* object);
-    void addLight(Light* light);
-
     Camera* getActiveCamera();
     ProjViewMatrix getActiveCameraPV();
 
+    void addCamera(Camera* camera);
+    void addObject(Object* object);
+    void addLight(Light* light);
+
+    const unsigned int camerasCount() { return m_cameras.size(); }
+    const unsigned int lightsCount() { return m_lights.size(); }
+    const unsigned int objectsCount() { return m_objects.size(); }
+
+    Camera* getCamera(unsigned int index) { return m_cameras.at(index); }
     Light* getLight(unsigned int index) { return m_lights.at(index); }
     Object* getObject(unsigned int index) { return m_objects.at(index); }
 

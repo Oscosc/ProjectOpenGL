@@ -43,6 +43,11 @@ void Scene::updateLigth(Shader *shader)
     shader->setVec3("lightPos", static_cast<PointLight*>(getLight(0))->getPosition());
 }
 
+void Scene::addCamera(Camera *camera)
+{
+    this->m_cameras.push_back(camera);
+}
+
 void Scene::addObject(Object *object)
 {
     this->m_objects.push_back(object);

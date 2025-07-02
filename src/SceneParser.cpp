@@ -1,94 +1,73 @@
-#include "SceneParser.hpp"
-#include "Scene.hpp"
+#include "Parser.hpp"
 
-Scene *SceneParser::parseScene(const std::string &file)
+#include <fstream>
+#include <iostream>
+
+Scene SceneParser::parseScene(const std::string &file)
 {
-    std::string lineBuffer;
-    std::ifstream reader(file);
+    std::ifstream stream(file);
+    json data = json::parse(stream);
 
     Scene newScene;
 
-    unsigned int lineID = 1;
+    for(auto& item : data) {
+        addObjectToScene(&newScene, item);
+    }
 
-    while(std::getline(reader, lineBuffer)) {
-        std::vector<std::string> tokens = split(lineBuffer, STD_SCENE_DELIMITER);
-        KeywordInfo lineInfo;
+    if(newScene.camerasCount() == 0)
+        std::cout << "[WARNING] Scene without camera will not display anything" << std::endl;
 
-        // Validating grammar
-        if(!validateLine(tokens, lineInfo)) {
-            std::cout << "[ERROR] " << file << ": Problem in file structure at line " << lineID << std::endl;
-            exit(1);
-        }
-
-        // Creating object
-        if(lineInfo.isObject) {
-            switch(lineInfo.key) {
-                case CAMERA: createCamera(tokens, &newScene, reader, lineBuffer);
-                case POINT_LIGHT:
-                case DIR_LIGHT:
-                case SPOT_LIGHT:
-                case SPHERE:
-                case MESH:
-            }
-        }
-
-        lineID++;
-    } reader.close();
-
-    return nullptr;
+    return newScene;
 }
 
-bool SceneParser::validateLine(const std::vector<std::string> &tokens, KeywordInfo& infoBuffer)
+void SceneParser::addObjectToScene(Scene *scene, json item)
 {
-    const std::string strKey = tokens[0];
-    auto it = s_KeyMap.find(strKey);
-
-    if(tokens.empty() || tokens[0].empty() || tokens[0][0] == '#') return true;
-
-    if(it == s_KeyMap.end()) {
-        std::cout << "[ERROR] Key '" << strKey << "' is not defined in .scene language" << std::endl;
-        return false;
-    }
-    const KeywordInfo info = it->second;
-
-    if(info.isObject == readingObject()) {
-        info.isObject ?
-            std::cout << "[ERROR] Unable to create an object inside of another" << std::endl :
-            std::cout << "[ERROR] Unable to define attributes outside of an object" << std::endl;
-        return false;
+    if(item["type"] == nullptr) {
+        std::cout << "[ERROR] Scene object must have a 'type' defined" << std::endl;
+        exit(1);
     }
 
-    if(info.length != tokens.size() - 1) {
-        std::cout << "[ERROR] " << info.length << " parameters expected but " << tokens.size() - 1
-            << " were given for attribute '" << strKey << "'" << std::endl;
-        return false;
+    auto it = s_TypeAliases.find(item["type"]);
+    if(it == s_TypeAliases.end()) {
+        std::cout << "[ERROR] Type " << item["type"] << " does not exist" << std::endl;
+        exit(1);
     }
+    
+    ElementType type = it->second;
+    switch(type) {
+    case CAMERA:
+        parseObjectAs_Camera(scene, item);
+        break;
 
-    if(info.isObject) m_inObject = true;
-    if(info.key == OBJ_END) m_inObject = false;
+    case POINT_LIGHT:
+        break;
 
-    infoBuffer = info;
-    return true;
+    case SPOT_LIGHT:
+        std::cout << "[ERROR] 'spot_light' Not implemented yet" << std::endl;
+        exit(1);
+
+    case DIR_LIGHT:
+        std::cout << "[ERROR] 'dir_light' Not implemented yet" << std::endl;
+        exit(1);
+        
+    case SPHERE:
+        break;
+
+    case MESH:
+        break;
+    }
 }
 
-std::vector<float> SceneParser::parseLineAsFloats(const std::string& tokens, const KeywordInfo& info)
+void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
 {
-    std::vector<float> elements;
-    for(unsigned int i = 1; i < tokens.size(); ++i) {
-        elements.push_back(std::stof(&tokens[i]));
-    }
-    return elements;
+    std::vector<float> position = static_cast<std::vector<float>>(item["position"]);
+    scene->addCamera(new Camera({position[0], position[1], position[2]}));
 }
 
-std::vector<std::string> SceneParser::parseLineAsStrings(const std::string& tokens, const KeywordInfo& info)
+void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
 {
-    std::vector<std::string> elements;
-    for(unsigned int i = 1; i < tokens.size(); ++i) {
-        elements.push_back(&tokens[i]);
-    }
-    return elements;
 }
 
-void SceneParser::createCamera(const std::vector<std::string>& tokens, Scene* scene)
+void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
 {
 }

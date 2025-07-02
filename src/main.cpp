@@ -1,9 +1,8 @@
 #include "Application.hpp"
-#include "SceneParser.hpp"
+#include "Parser.hpp"
 
 int main() {
-    SceneParser myParser;
-    myParser.parseScene("resources/default.scene");
+    SceneParser::parseScene("resources/default_scene.json");
 
     Application app;
     app.run();
