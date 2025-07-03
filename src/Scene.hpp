@@ -32,7 +32,7 @@ public:
      * @param camera default camera
      * @param objects list of scene objects
      */
-    Scene(Camera* camera, std::vector<Object*> objects = std::vector<Obejct*>());
+    Scene(Camera* camera, std::vector<Object*> objects = std::vector<Object*>());
 
     /**
      * @brief Default destructor for Scene object.
