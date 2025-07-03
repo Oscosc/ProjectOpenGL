@@ -2,6 +2,14 @@
 
 #include <glm/glm.hpp>
 
+#define DEFAULT_LIGHT_MATERIAL {glm::vec3(0.2), glm::vec3(0.5), glm::vec3(1.0)}
+
+struct LightMaterial {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
 /**
  * @brief Abstract class for lights objects.
  */
@@ -15,40 +23,18 @@ public:
      * @param color Color emmited by this light
      * @param strength Intensity of the light emmited
      */
-    Light(glm::vec3 color, float strength) : m_color(color), m_strength(strength) {}
+    Light(LightMaterial material = DEFAULT_LIGHT_MATERIAL) : m_material(material) {}
 
     /**
      * @brief default destructor (virtual to keep class abstract).
      */
     virtual ~Light() = 0;
 
-    /**
-     * @brief Return the color of the light.
-     */
-    glm::vec3 getColor() { return m_color; }
-
-    /**
-     * @brief Set a new color for this light.
-     * 
-     * @param color new light color.
-     */
-    void setColor(glm::vec3 color) { m_color = color; }
-    
-    /**
-     * @brief Return the intensity of the light.
-     */
-    float getStrength() { return m_strength; }
-
-    /**
-     * @brief Set a new intensity for this light.
-     * 
-     * @param strength new intensity.
-     */
-    void setStrength(float strength) { m_strength = strength; }
+    LightMaterial getLightMaterial() { return m_material; }
+    void setLightMaterial(LightMaterial material) { m_material = material; }
 
 private:
-    glm::vec3 m_color;
-    float m_strength;
+    LightMaterial m_material;
 };
 
 /**

@@ -6,6 +6,7 @@
 #include "Mesh.hpp"
 #include "Sphere.hpp"
 #include "Object.hpp"
+#include "Light.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -99,11 +100,12 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
 
 void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
 {
-    glm::vec3 color = jsonToVec3(item, "color");
     glm::vec3 position = jsonToVec3(item, "position");
-    float strength = jsonToFloat(item, "strength");
-
-    scene->addLight(new PointLight(position, color, strength));
+    if(item["material"] != nullptr) {
+        scene->addLight(new PointLight(position, jsonToLightMaterial(item["material"])));
+    } else {
+        scene->addLight(new PointLight(position));
+    }
 }
 
 glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
@@ -131,6 +133,25 @@ Material SceneParser::jsonToMaterial(json json)
 {
     return {
         ShaderManager::getInstance().getShader(json["shader"]),
-        jsonToVec3(json, "color")
+        jsonToShaderMaterial(json["shader material"])
+    };
+}
+
+ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
+{
+    return {
+        jsonToVec3(json, "ambient"),
+        jsonToVec3(json, "diffuse"),
+        jsonToVec3(json, "specular"),
+        jsonToFloat(json, "shininess")
+    };
+}
+
+LightMaterial SceneParser::jsonToLightMaterial(json json)
+{
+    return {
+        jsonToVec3(json, "ambient"),
+        jsonToVec3(json, "diffuse"),
+        jsonToVec3(json, "specular")
     };
 }

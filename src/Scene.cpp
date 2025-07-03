@@ -40,11 +40,11 @@ void Scene::updateLigth(Shader *shader)
 
     shader->use();
 
-    shader->setVec3("lightColor", getLight(0)->getColor());
-    shader->setFloat("ambientStrength", getLight(0)->getStrength());
-    shader->setFloat("specularStrength", getLight(0)->getStrength());
+    shader->setVec3("light.ambient", getLight(0)->getLightMaterial().ambient);
+    shader->setVec3("light.diffuse", getLight(0)->getLightMaterial().diffuse);
+    shader->setVec3("light.specular", getLight(0)->getLightMaterial().specular);
     
-    shader->setVec3("lightPos", static_cast<PointLight*>(getLight(0))->getPosition());
+    shader->setVec3("light.position", static_cast<PointLight*>(getLight(0))->getPosition());
 }
 
 void Scene::addCamera(Camera *camera)

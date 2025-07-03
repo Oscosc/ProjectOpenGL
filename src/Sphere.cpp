@@ -22,11 +22,11 @@ void Sphere::draw(Scene* scene)
 
     glm::mat4 model = glm::translate(glm::mat4(1.0f), getTransform().position);
 
-    shader->setVec3("color", this->getMaterial().color);
-
     shader->setMat4("model", model);
     shader->setMat4("view", scene->getActiveCameraPV().view);
     shader->setMat4("projection", scene->getActiveCameraPV().projection);
+
+    updateMaterial(shader);
 
     scene->updateLigth(shader);
 
@@ -36,7 +36,7 @@ void Sphere::draw(Scene* scene)
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)
     {
-        std::cout << "[GLError] " << err << std::endl;
+        std::cout << "[ERROR] in Sphere : GLError " << err << std::endl;
     }
 }
 

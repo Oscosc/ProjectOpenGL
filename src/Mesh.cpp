@@ -20,13 +20,13 @@ void Mesh::draw(Scene* scene)
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
     model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
     model = glm::scale(model, this->m_transform.scale);
-    
-    shader->setVec3("color", this->getMaterial().color);
 
     shader->setMat4("model", model);
     shader->setMat4("view", scene->getActiveCameraPV().view);
     shader->setMat4("projection", scene->getActiveCameraPV().projection);
 
+    updateMaterial(shader);
+    
     scene->updateLigth(shader);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -37,7 +37,7 @@ void Mesh::draw(Scene* scene)
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)
     {
-        std::cout << "[GLError] " << err << std::endl;
+        std::cout << "[ERROR] in Mesh drawing : GLError " << err << std::endl;
     }
 }
 
@@ -54,7 +54,6 @@ void Mesh::displayInformations()
     std::cout << "\tPosition :" << glm::to_string(this->getTransform().position) << std::endl;
     std::cout << "\tRotation :" << glm::to_string(this->getTransform().rotation) << std::endl;
     std::cout << "\tScale :" << glm::to_string(this->getTransform().scale) << std::endl;
-    std::cout << "\tColor :" << glm::to_string(this->getMaterial().color) << std::endl;
 }
 
 bool Mesh::hasNormals()
@@ -131,6 +130,7 @@ void Mesh::loadInitMesh(std::string filename)
 
     initGLObject();
 
+    // DEBUG
     // displayInformations();
 }
 

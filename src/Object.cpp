@@ -1,5 +1,6 @@
 #include "Object.hpp"
 
+
 void Object::initGLObject()
 {
     glGenVertexArrays(1, &this->m_VAO);
@@ -33,4 +34,14 @@ void Object::initGLObject()
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
+}
+
+void Object::updateMaterial(Shader *shader)
+{
+    shader->use();
+    
+    shader->setVec3("material.ambient", this->getMaterial().matShader.ambient);
+    shader->setVec3("material.diffuse", this->getMaterial().matShader.diffuse);
+    shader->setVec3("material.specular", this->getMaterial().matShader.specular);
+    shader->setFloat("material.shininess", this->getMaterial().matShader.shininess);
 }

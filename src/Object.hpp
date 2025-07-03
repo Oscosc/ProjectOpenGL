@@ -6,7 +6,7 @@
 #include "ShaderManager.hpp"
 
 #define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
-#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), glm::vec3(1.0f)}
+#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), glm::vec3(0.5), glm::vec3(0.5), 32.f}}
 
 using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;
@@ -64,12 +64,19 @@ struct VertexIndex {
     int uv;
 };
 
+struct ShaderMaterial {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
 /**
  * @brief Structure that contains informations about an object material.
  */
 struct Material {
     Shader* shader;
-    glm::vec3 color;
+    ShaderMaterial matShader;
 };
 
 /**
@@ -137,7 +144,9 @@ public:
     void setTransform(Transform transform) { m_transform = transform; }
 
 protected:
+
     void initGLObject();
+    void updateMaterial(Shader* shader);
 
     Transform m_transform;
     Material m_material;

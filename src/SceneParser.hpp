@@ -7,6 +7,8 @@ using json = nlohmann::json;
 
 struct Transform;
 struct Material;
+struct ShaderMaterial;
+struct LightMaterial;
 
 /**
  * @brief Class containing parsing functions for scene files (.json)
@@ -118,4 +120,8 @@ private:
      * @param attribute name of the attribute to convert
      */
     static Material jsonToMaterial(json json);
+
+    static ShaderMaterial jsonToShaderMaterial(json json);
+
+    static LightMaterial jsonToLightMaterial(json json);
 };

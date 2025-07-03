@@ -19,9 +19,8 @@ public:
      * @param strength intensity of the light
      */
     PointLight(glm::vec3 position = {0.f, 0.f, 0.f},
-        glm::vec3 color = {1.f, 1.f, 1.f},
-        float strength = 1.0)
-        : Light(color, strength), m_position(position) {}
+        LightMaterial material = DEFAULT_LIGHT_MATERIAL)
+        : Light(material), m_position(position) {}
 
     /**
      * @brief return the light position.
