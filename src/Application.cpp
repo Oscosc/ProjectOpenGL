@@ -1,10 +1,6 @@
 #include "Application.hpp"
 #include "SceneParser.hpp"
 
-Application::Application() : m_screenWidth(DEFAULT_SCREEN_WIDTH), m_screenHeight(DEFAULT_SCREEN_HEIGHT)
-{
-}
-
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight)
 {
