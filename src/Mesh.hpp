@@ -20,34 +20,34 @@
 #define IDX_DELIMITER "/"
 
 /**
- * @brief Représentation d'un Mesh au sens d'un objet graphique qui peut être rendu.
+ * @brief Representation of a mesh in the sense of renderable object.
  * 
- * Le mesh est construit à partir d'un fichier .obj dont le chemin d'accès est passé en paramètre.
- * 
+ * A mesh is constructed by reading a .obj file containing information about it's vertices.
  */
 class Mesh : public Object
 {
 public:
 
     /**
-     * @brief Enumération pour représenter les différents types de lignes dans un fichier .obj
+     * @brief Enumeration for representing types of lines in a .obj file
      * 
-     * Cette enum sert uniquement pour appeler la bonne méthode dans les fonctions de parsing.
-     * 
+     * This enumeration is used to call the right function in the parsing context.
      */
     enum LineType {
-        COMMENT,    // Commence par '#'
-        POSITION,   // Commence par 'v'
-        NORMAL,     // Commence par 'vn'
-        UV,         // Commence par 'vt'
-        INDEX,      // Commence par 'f'
-        NONE        // Valeur par défaut
+        COMMENT,    // Starts with '#'
+        POSITION,   // Starts with 'v'
+        NORMAL,     // Starts with 'vn'
+        UV,         // Starts with 'vt'
+        INDEX,      // Starts with 'f'
+        NONE        // Default value
     };
 
     /**
-     * @brief Construit un nouveau Mesh à partir d'un fichier .obj
+     * @brief Construct a new Mesh with a .obj file.
      * 
-     * @param file chemin d'accès vers le fichier .obj
+     * @param file path to the .obj file
+     * @param transform transformation of the Mesh in the scene world
+     * @param material material used to render the Mesh in the application
      */
     Mesh(std::string file,
         Transform transform = DEFAULT_OBJECT_TRANSFORM,
@@ -55,103 +55,102 @@ public:
     );
 
     /**
-     * @brief "Dessine" le mesh à l'écran (au sens graphique) en s'appuyant sur le shader passé en
-     * paramètre.
+     * @brief Draw the mesh in the scene.
      * 
-     * @param shader shader utilisé pour afficher le mesh. Le shader doit accepter les mêmes
-     * attributs de vertex que ceux du mesh. Par défaut, si vous ne connaissez pas les attributs
-     * du mesh chargé, il est conseillé d'activer la position, la normale et les UVs.
+     * @param scene Scene (and by consequent the window) where the mesh will be drawn
      */
     void draw(Scene* scene) override;
 
     /**
-     * @brief Affiche les propriétés du mesh dans la console (pour du debug)
-     * 
+     * @brief Display mesh properties in logs for debug purposes
      */
     void displayInformations();
 
     /**
-     * @brief Donne l'information d'état des normales du mesh
-     * 
-     * @return état des normales (on/off)
+     * @brief Give information about the disponibility of the normals for this mesh.
      */
     bool hasNormals();
 
     /**
-     * @brief Donne l'information d'état des UVs du mesh
-     * 
-     * @return état des UVs (on/off)
+     * @brief Give information about the disponibility of the UVs for this mesh.
      */
     bool hasUVs();
 
     /**
-     * @brief Retourne le nom du fichier contenant les infos sur l'objet
-     * 
-     * @return nom de l'objet
+     * @brief Return the filename used for this mesh.
      */
     std::string getName();
 
 private:
 
     /**
-     * @brief Identifie le type de ligne à partir du token passé en entrée
+     * @brief Identify the type of line based on the first token, according to .obj documentation.
      * 
-     * @param token premier token de la ligne lue dans le .obj
-     * @return type de ligne trouvée, NONE si inconnue ou non implémenté
+     * @param token fisrt token of the line obtained after line parsing
      */
     LineType identify(std::string token);
 
+    /**
+     * @brief Main fuction called while creating a Mesh object to compute vertices and init GL
+     * properties.
+     * 
+     * @param filename filename of the mesh (.obj)
+     */
     void loadInitMesh(std::string filename);
     
     /**
-     * @brief Parse la ligne en la considérant comme une ligne avec de l'information de donnée
-     * (position, normale ou UV). Mets à jour la liste correspondant au type de ligne identifié.
-     * 
-     * ATTENTION : On suppose que la fonction est appelée correctement par rapport à l'ID parsé.
-     * Sinon, le comportement est indéterminé
-     * 
-     * @param id identifiant de la ligne (token 0)
-     * @param tokens liste des tokens de la ligne (token 0 compris !)
-     * @param positions liste des positions déjà lues depuis le début de la construction mesh
-     * @param normals liste des normales déjà lues depuis le début de la construction du mesh
-     * @param uvs liste des UVs déjà lus depuis le début de la construction du mesh
+     * @brief Parses the line as a line with data information
+     * (position, normal, or UV). Updates the list corresponding to the identified line type.
+     *
+     * WARNING: It is assumed that the function is called correctly based on the parsed ID.
+     * Otherwise, the behavior is undefined.
+     *
+     * @param id Line identifier (token 0)
+     * @param tokens List of tokens in the line (including token 0!)
+     * @param positions List of positions already read since the beginning of mesh construction
+     * @param normals List of normals already read since the beginning of mesh construction
+     * @param uvs List of UVs already read since the beginning of mesh construction
      */
     void parseAsData(const LineType id, const std::vector<std::string> tokens,
         vec3Array &positions, vec3Array &normals, vec2Array &uvs);
 
     /**
-     * @brief Parse la ligne en la considérant comme une ligne avec de l'information sur les index.
-     * Mets à jour la liste des indexes passée en paramètre pour la construction future.
-     * 
-     * @param id identifiant de la ligne (token 0)
-     * @param tokens liste des tokens de la ligne (token 0 compris !)
-     * @param indexes liste des indexes déjà lus depuis le début de la construction du mesh
+     * @brief Parses the line as a line with index information.
+     * Updates the list of indexes passed as a parameter for future construction.
+     *
+     * @param id Line identifier (token 0)
+     * @param tokens List of tokens in the line (including token 0!)
+     * @param indexes List of indexes already read since the start of mesh construction
      */
     void parseAsIndexes(const LineType id, const std::vector<std::string> tokens,
         std::vector<VertexIndex> &indexes);
 
     /**
-     * @brief Construit la liste de vertex finale qui composera le mesh à partir des listes de
-     * positions, normales, UVs et indexes extraites dans les fonctions de parsing lors de la
-     * lecture du mesh.
-     * 
-     * Cette fonction n'a pas besoin que le fichier .obj soit ouverte pour fonctionner.
-     * 
-     * @param positions liste des positions lues dans le fichier .obj lors du parsing
-     * @param normals liste des normales lues dans le fichier .obj lors du parsing
-     * @param uvs liste des UVs lus dans le fichier .obj lors du parsing
-     * @param indexes liste des indexes lus dans le fichier .obj lors du parsing
+     * @brief Constructs the final vertex list that will compose the mesh from the lists of
+     * positions, normals, UVs, and indexes extracted in the parsing functions when
+     * reading the mesh.
+     *
+     * This function does not require the .obj file to be open to work.
+     *
+     * @param positions List of positions read from the .obj file during parsing
+     * @param normals List of normals read from the .obj file during parsing
+     * @param uvs List of UVs read from the .obj file during parsing
+     * @param indexes List of indexes read from the .obj file during parsing
      */
     void computeUniques(const vec3Array &positions, const vec3Array &normals, const vec2Array &uvs,
         const std::vector<VertexIndex> &indexes);
 
+    /**
+     * @brief If normals are not defined in the .obj file, this function will be called to generate
+     * default normals for this mesh.
+     * 
+     * @param positions positions of the vertices loaded, used to define normals of triangles
+     * @param normals normal array, empty at the beggining but filled during the process
+     * @param indexes indexes of the Vertices, will be updated during the process to reflect
+     * normals informations
+     */
     void subComputeNormals(const vec3Array &positions, vec3Array &normals,
         std::vector<VertexIndex> &indexes);
-    
-
-    /*********************************************************************************************
-     **                                        ATTRIBUTS                                        **
-     *********************************************************************************************/
     
     std::string m_filename;
 };

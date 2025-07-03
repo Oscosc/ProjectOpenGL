@@ -1,12 +1,6 @@
 #include "Scene.hpp"
 #include "Object.hpp"
 
-Scene::Scene(Camera *camera)
-{
-    this->m_cameras.push_back(camera);
-    this->m_activeCamera = 0;
-}
-
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {
     this->m_cameras.push_back(camera);
