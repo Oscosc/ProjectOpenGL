@@ -8,16 +8,35 @@
 #define DEFAULT_STACKS 64
 #define DEFAULT_SECTORS 64
 
+/**
+ * @brief Class used to define a Sphere object that can be rendered on the screen.
+ */
 class Sphere : public Object
 {
 public:
-    Sphere(float radius);
-    Sphere(float radius, glm::vec3 position, glm::vec3 color);
 
-    void draw(Shader shader) override;
-    //void previous() override;
-    //void next() override;
+    /**
+     * @brief Construct Vertices of a sphere and save it as an object
+     * 
+     * @param radius Radius of the sphere to create
+     * @param transform Sphere default transformation
+     * @param material Sphere default material
+     */
+    Sphere(float radius,
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    );
 
+    /**
+     * @brief Draw sphere in the scene (in consequent on the linked app window).
+     * 
+     * @param scene scene where the sphere is rendered
+     */
+    void draw(Scene* scene) override;
+
+    /**
+     * @brief Gives the radius of the sphere.
+     */
     float getRadius() const;
 
 private:
@@ -25,21 +44,14 @@ private:
     /**
      * @brief Code from : https://www.songho.ca/opengl/gl_sphere.html#sphere
      */
-    static ptsTab generateVertices(unsigned int stackCount, unsigned int sectorCount, float radius);
+    static std::vector<Vertex> generateVertices(unsigned int stackCount, unsigned int sectorCount, float radius);
 
     /**
      * @brief Code also from : https://www.songho.ca/opengl/gl_sphere.html#sphere
      */
-    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount,
-        std::vector<unsigned int>* lineIndices);
-
-    void updateEBO(std::vector<unsigned int> triangleIndexes, std::vector<unsigned int> lineIndexes);
-
-    unsigned int EBOTriangles;
-    unsigned int EBOLines, VAOLines;
+    static std::vector<unsigned int> generateIndexes(unsigned int stackCount, unsigned int sectorCount);
     
     float m_radius;
-    unsigned int m_nbVertices, m_nbVerticesLines;
 };
 
 #endif // SPHERE_HPP

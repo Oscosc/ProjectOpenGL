@@ -12,6 +12,7 @@
  */
 
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 
 /**
@@ -49,6 +50,10 @@ std::vector<unsigned int> combine(std::vector<unsigned int> vecA, std::vector<un
  * @return true si des racines ont été trouvées, false sinon
  */
 bool solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1);
+
+std::string trim(const std::string& str);
+
+std::vector<std::string> split(const std::string& s, const std::string& delimiter);
 
 
 #endif // UTILS_HPP

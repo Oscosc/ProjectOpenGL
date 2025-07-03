@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.scene": "ini",
         "cmath": "cpp",
         "ostream": "cpp",
         "cctype": "cpp",
@@ -70,6 +71,12 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "any": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "regex": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }

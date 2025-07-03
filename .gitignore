@@ -7,5 +7,8 @@ doc/*
 # Répertoire de configuration
 .vscode/*
 
+# Répertoire de ressources
+resources/*
+
 # Exécutable
 igai_exe

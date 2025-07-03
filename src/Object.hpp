@@ -1,93 +1,153 @@
-#ifndef OBJECT_HPP
-#define OBJECT_HPP
-
-/**
- * @file Object.hpp
- * @brief Définition de la classe abstraite Object.
- * 
- * Ce fichier contient la définition d'un objet affichable au sens d'OpenGL.
- * 
- * @author Oscar G.
- * @date 2025-03-01
- */
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
+#pragma once
 
 #include "../includes/shader.hpp"
+#include "Scene.hpp"
+#include "ProjViewMatrix.hpp"
+#include "ShaderManager.hpp"
 
-#define OBJECT_AMBIENT_STRENGTH 0.2
+#define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
+#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), glm::vec3(1.0f)}
 
-
-typedef struct s_Triangle {
-    glm::vec3 a;
-    glm::vec3 b;
-    glm::vec3 c;
-} Triangle;
-
-
-using ptsTab = std::vector<glm::vec3>;
-
+using vec3Array = std::vector<glm::vec3>;
+using vec2Array = std::vector<glm::vec2>;
 
 /**
- * @class Object
- * @brief Classe abstraite pour les objets qui doivent être rendus en OpenGL.
+ * @brief Complete representation of a vertice in a graphic sense.
+ * Contain position, normal, uv and equality operator.
+ */
+struct Vertex {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 uv;
+
+    /**
+     * @brief Implementation of the equality operator for Vertices.
+     * 
+     * Vertices are equals if all their attributes are equals.
+     * 
+     * @param other Vertice to compare with
+     */
+    bool operator==(const Vertex& other) const {
+        return position == other.position && normal == other.normal && uv == other.uv;
+    }
+};
+
+/**
+ * @brief Specialization of the hash function for the Vertex structure to allow
+ * Vertices to be added to an unordered map (computeUniques function)
+ */
+namespace std {
+    template <>
+    struct hash<Vertex> {
+        std::size_t operator()(const Vertex& v) const {
+            std::size_t hPos = std::hash<float>()(v.position.x)
+                ^ std::hash<float>()(v.position.y)
+                ^ std::hash<float>()(v.position.z);
+            std::size_t hNorm = std::hash<float>()(v.normal.x)
+                ^ std::hash<float>()(v.normal.y)
+                ^ std::hash<float>()(v.normal.z);
+            std::size_t hUV = std::hash<float>()(v.uv.x)
+                ^ std::hash<float>()(v.uv.y);
+                
+            return hPos ^ (hNorm << 1) ^ (hUV << 2);
+        }
+    };
+}
+
+/**
+ * @brief Intermediate structure for representing Vertex indices (one index per vertex attribute).
  * 
- * Pour chaque objet, on définit un VAO et un VBO qui serviront au rendu OpenGL.
- * Chaque classe dérivée doit implémenter la fonction "draw()" qui dessine l'objet à l'écran selon
- * les spécificités de rendu de cet objet (type de traits, prétraitement, etc).
+ */
+struct VertexIndex {
+    int position;
+    int normal;
+    int uv;
+};
+
+/**
+ * @brief Structure that contains informations about an object material.
+ */
+struct Material {
+    Shader* shader;
+    glm::vec3 color;
+};
+
+/**
+ * @brief Structure that contains informations about an object transformation.
+ */
+struct Transform {
+    glm::vec3 position;
+    glm::vec3 scale;
+    glm::vec3 rotation;
+};
+
+/**
+ * @brief This abstract class is defining any type of object that can be represented visualy in
+ * a 3D world, with transformation and material.
  */
 class Object
 {
 public:
 
     /**
-     * @brief Constructeur par défaut de la classe Object (ne peut pas être appelé sauf par une
-     * classe dérivée de celle-ci).
-     */
-    Object(bool enableNormal = true, bool enableUV = true);
-
-    /**
-     * @brief Destructeur par défaut de la classe Object.
-     */
-    virtual ~Object();
-
-    /**
-     * @brief Fonction à redéfinir pour chaque classe dérivée.
+     * @brief Construct a general object by defining his default values.
      * 
-     * Cette fonction est supposée s'appuyer sur les fonctions OpenGL de rendu pour dessiner
-     * l'objet en question à l'écran.
+     * @param transform transformation of the object in the 3D world
+     * @param material material of the object used to render it
      */
-    virtual void draw(Shader shader) = 0;
+    Object(
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    ) : m_transform(transform), m_material(material) {}
 
-    glm::vec3 getOrigin() const;
-    void setOrigin(glm::vec3 value);
-    glm::vec3 getColor() const;
-    void setColor(glm::vec3 value);
-    float getAmbient() const;
-    void setAmbient(float value);
+    /**
+     * @brief Default destructor for object class.
+     */
+    virtual ~Object() = default;
 
-    const std::vector<Triangle>* getTriangles();
-    // virtual void setTriangles() = 0;
+    /**
+     * @brief draw this object in the scene gived in argument.
+     * 
+     * @param scene Scene where this object will be rendered
+     */
+    virtual void draw(Scene* scene) = 0;
+
+    /**
+     * @brief Give the material of this object.
+     */
+    Material getMaterial() { return m_material; }
+
+    /**
+     * @brief Set a new material for this object.
+     * 
+     * @param material new material
+     */
+    void setMaterial(Material material) { m_material = material; }
+
+    /**
+     * @brief Give the transformation state of this object.
+     */
+    Transform getTransform() { return m_transform; }
+
+    /**
+     * @brief Set a new transformation for this object.
+     * 
+     * @param transform new transform
+     */
+    void setTransform(Transform transform) { m_transform = transform; }
 
 protected:
+    void initGLObject();
 
-    GLuint VAO, VBO;
-    glm::vec3 m_origin;
-    glm::vec3 m_color;
-    float m_ambient;
+    Transform m_transform;
+    Material m_material;
 
-    //std::vector<Triangle> m_triangles; TODO
+    GLuint m_VAO;
+    GLuint m_VBO;
+    GLuint m_EBO;
 
-    /**
-     * @brief Mets à jour le VBO et le VAO avec les nouvelles données en paramètre.
-     * @param points Liste des nouveaux points qui seront stockées dans le buffer GPU.
-     */
-    void updateVertices(ptsTab points);
+    bool m_hasNormals;
+    bool m_hasUVs;
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indexes;
 };
-
-#endif // OBJECT_HPP

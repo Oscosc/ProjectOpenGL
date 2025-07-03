@@ -10,7 +10,7 @@ void main()
     float thickness = 0.002;
     float xRatio = screenSize.y / screenSize.x;
     float size = 0.02;
-
+    
     // Vérifie si le fragment est sur la ligne horizontale ou verticale du crosshair
     if ((abs(TexCoords.x) < thickness || abs(TexCoords.y) < thickness)
         && abs(TexCoords.x) < (size * xRatio) && abs(TexCoords.y) < size) {
