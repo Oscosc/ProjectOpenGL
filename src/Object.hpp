@@ -143,6 +143,8 @@ public:
      */
     void setTransform(Transform transform) { m_transform = transform; }
 
+    void debugMaterial();
+
 protected:
 
     void initGLObject();

@@ -45,6 +45,7 @@ void Scene::updateLigth(Shader *shader)
     shader->setVec3("light.specular", getLight(0)->getLightMaterial().specular);
     
     shader->setVec3("light.position", static_cast<PointLight*>(getLight(0))->getPosition());
+    shader->setVec3("viewPos", this->getActiveCamera()->Position);
 }
 
 void Scene::addCamera(Camera *camera)

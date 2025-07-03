@@ -47,13 +47,15 @@ void Mesh::displayInformations()
     std::string uvs = hasUVs() ? "YES" : "NO";
 
     std::cout << "Object \"" << getName() << "\"" << std::endl;
-    std::cout << "\tNormals : " << normals << std::endl;
-    std::cout << "\tUVs : " << uvs << std::endl;
-    std::cout << "\t" << this->m_vertices.size() << " vertices computed" << std::endl;
-    std::cout << "\t" << this->m_indexes.size() << " indexes computed" << std::endl;
-    std::cout << "\tPosition :" << glm::to_string(this->getTransform().position) << std::endl;
-    std::cout << "\tRotation :" << glm::to_string(this->getTransform().rotation) << std::endl;
-    std::cout << "\tScale :" << glm::to_string(this->getTransform().scale) << std::endl;
+    std::cout << "  |- Normals : " << normals << std::endl;
+    std::cout << "  |- UVs : " << uvs << std::endl;
+    std::cout << "  |- " << this->m_vertices.size() << " vertices computed" << std::endl;
+    std::cout << "  |- " << this->m_indexes.size() << " indexes computed" << std::endl;
+    std::cout << "  |- Position :" << glm::to_string(this->getTransform().position) << std::endl;
+    std::cout << "  |- Rotation :" << glm::to_string(this->getTransform().rotation) << std::endl;
+    std::cout << "  |- Scale :" << glm::to_string(this->getTransform().scale) << std::endl;
+
+    debugMaterial();
 }
 
 bool Mesh::hasNormals()
@@ -126,6 +128,8 @@ void Mesh::loadInitMesh(std::string filename)
     this->m_hasUVs = !uvs.empty();
     
     if(!hasNormals()) subComputeNormals(positions, normals, indexes);
+    this->m_hasNormals = true;
+
     computeUniques(positions, normals, uvs, indexes);
 
     initGLObject();
@@ -199,7 +203,6 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     std::vector<unsigned int> elementBuffer;
 
     // Creation des normales si nécessaire
-    // TODO
 
     for(VertexIndex index : indexes) {
         // Construction du Vertex

@@ -1,5 +1,12 @@
 #include "Object.hpp"
 
+void Object::debugMaterial()
+{
+    std::cout << "  |- Ambient   : " << glm::to_string(getMaterial().matShader.ambient) << std::endl;
+    std::cout << "  |- Diffuse   : " << glm::to_string(getMaterial().matShader.diffuse) << std::endl;
+    std::cout << "  |- Specular  : " << glm::to_string(getMaterial().matShader.specular) << std::endl;
+    std::cout << "  |- Shininess : " << getMaterial().matShader.shininess << std::endl;
+}
 
 void Object::initGLObject()
 {
