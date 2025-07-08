@@ -1,6 +1,8 @@
 #include "Application.hpp"
 #include "SceneParser.hpp"
 
+// #define LOAD_TEXTURES
+
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight)
 {
@@ -57,6 +59,13 @@ void Application::initShaders()
     ShaderManager::getInstance().loadShader("lighted", "shaders/lighted.vs", "shaders/lighted.fs");
     ShaderManager::getInstance().loadShader("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs");
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
+    ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
+
+#ifdef LOAD_TEXTURES
+    TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
+    TextureManager::getInstance().loadTexture("ceres", "resources/4k_ceres.jpg");
+    TextureManager::getInstance().loadTexture("metal", "resources/4k_metal.jpg");
+#endif
 }
 
 void Application::initScene(const std::string& file)

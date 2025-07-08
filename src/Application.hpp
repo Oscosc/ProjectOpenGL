@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <iostream>
 #include <vector>
 
 #include <glad/glad.h>
@@ -10,6 +9,7 @@
 #include "Scene.hpp"
 #include "Callbacks.hpp"
 #include "ShaderManager.hpp"
+#include "TextureManager.hpp"
 #include "HUD.hpp"
 #include "Mesh.hpp"
 #include "Sphere.hpp"

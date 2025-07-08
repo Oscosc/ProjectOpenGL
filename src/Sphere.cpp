@@ -20,7 +20,16 @@ void Sphere::draw(Scene* scene)
     Shader* shader = this->getMaterial().shader;
     shader->use();
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), getTransform().position);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
+
+    this->m_transform.rotation.z += 0.5;
+    if(this->m_transform.rotation.z > 360.0) this->m_transform.rotation.z = 0;
+
+    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
+    model = glm::scale(model, this->m_transform.scale);
 
     shader->setMat4("model", model);
     shader->setMat4("view", scene->getActiveCameraPV().view);
@@ -76,7 +85,7 @@ std::vector<Vertex> Sphere::generateVertices(unsigned int stackCount, unsigned i
             vertices.push_back({
                 glm::vec3(x, y, z), // Position
                 glm::normalize(glm::vec3(x, y, z)), // Normal
-                glm::vec3(float(i)/stackCount, float(j)/sectorCount, 0.0f) // UV
+                glm::vec3(float(j)/sectorCount, float(i)/stackCount, 0.0f) // UV
             });
         }
     }

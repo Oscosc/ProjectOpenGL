@@ -4,6 +4,7 @@
 #include "Scene.hpp"
 #include "ProjViewMatrix.hpp"
 #include "ShaderManager.hpp"
+#include "TextureManager.hpp"
 
 #define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), glm::vec3(0.5), glm::vec3(0.5), 32.f}}

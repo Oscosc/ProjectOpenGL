@@ -56,6 +56,8 @@ void Mesh::displayInformations()
     std::cout << "  |- Scale :" << glm::to_string(this->getTransform().scale) << std::endl;
 
     debugMaterial();
+
+    std::cout << std::endl;
 }
 
 bool Mesh::hasNormals()
