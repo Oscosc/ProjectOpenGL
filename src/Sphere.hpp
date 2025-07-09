@@ -2,6 +2,7 @@
 #define SPHERE_HPP
 
 #include "Object.hpp"
+#include "Hittable.hpp"
 #include "utils.hpp"
 #include <math.h>
 
@@ -11,7 +12,7 @@
 /**
  * @brief Class used to define a Sphere object that can be rendered on the screen.
  */
-class Sphere : public Object
+class Sphere : public Object, public Hittable
 {
 public:
 
@@ -26,6 +27,8 @@ public:
         Transform transform = DEFAULT_OBJECT_TRANSFORM,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
+
+    bool hit(const Ray& ray, float tMin, float tMax, HitRecord& record) const override;
 
     /**
      * @brief Draw sphere in the scene (in consequent on the linked app window).

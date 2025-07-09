@@ -1,30 +1,24 @@
 #include "RayTracing.hpp"
 
 #include "utils.hpp"
+#include "Sphere.hpp"
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
 #define duration std::chrono::duration_cast<std::chrono::milliseconds>
-
-#define IMAGE_WIDTH 800
-#define IMAGE_HEIGHT 600
+#define micro_duration std::chrono::duration_cast<std::chrono::microseconds>
 
 void RayTracing::computeImage(const std::string &filename, Scene& scene)
 {
     auto timerA = timer::now();
+    std::cout << "[PERFORMANCE] Starting Ray-tracing computation..." << std::endl;
 
     std::vector<unsigned char> pixels;
     pixels.resize(IMAGE_WIDTH * IMAGE_HEIGHT * 4);
 
     for(unsigned int w = 0; w < IMAGE_WIDTH; ++w) {
         for(unsigned int h = 0; h < IMAGE_HEIGHT; ++h) {
-            Ray ray = Ray(w, h, IMAGE_WIDTH, IMAGE_HEIGHT,
-                scene.getActiveCamera()->Fov,
-                scene.getActiveCamera()->GetViewMatrix(),
-                scene.getActiveCamera()->Position
-            );
-            glm::vec3 rayColor = rayValue(ray, scene);
-            writePixel(pixels, w, h, glm::vec4(rayColor, 1.0));
+            computePixel(w, h, scene, pixels);
         }
     }
 
@@ -33,19 +27,48 @@ void RayTracing::computeImage(const std::string &filename, Scene& scene)
 
     savePNG(pixels, IMAGE_WIDTH, IMAGE_HEIGHT, filename);
 
-    timerA  = timer::now();
-    std::cout << "[PERFORMANCE] File saving computing time : " << duration(timerA - timerB).count() << " ms" << std::endl;
+    auto timerC  = timer::now();
+    std::cout << "[PERFORMANCE] File saving computing time : " << duration(timerC - timerB).count() << " ms" << std::endl;
+}
+
+void RayTracing::computePixel(const float& x, const float& y, Scene& scene, std::vector<unsigned char>& pixels)
+{
+#if RAYS_PER_PIXEL != 1
+
+    glm::vec3 finalColor = glm::vec3(0.f);
+    for(unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
+        glm::vec2 noised = noise2D(x, y);
+
+        Ray ray = Ray(noised.x, noised.y, IMAGE_WIDTH, IMAGE_HEIGHT,
+            scene.getActiveCamera()->Fov,
+            scene.getActiveCamera()->GetViewMatrix(),
+            scene.getActiveCamera()->Position
+        );
+
+        finalColor += rayValue(ray, scene) / (float)RAYS_PER_PIXEL;
+    }
+    writePixel(pixels, x, y, glm::vec4(finalColor, 1.0));
+
+#else
+
+    Ray ray = Ray(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
+        scene.getActiveCamera()->Fov,
+        scene.getActiveCamera()->GetViewMatrix(),
+        scene.getActiveCamera()->Position
+    );
+    writePixel(pixels, x, y, glm::vec4(rayValue(ray, scene), 1.0));
+
+#endif
 }
 
 glm::vec3 RayTracing::rayValue(Ray &ray, Scene& scene)
 {
     for(unsigned int i = 0; i < scene.objectsCount(); ++i) {
-        Sphere* sphere = dynamic_cast<Sphere*>(scene.getObject(i));
-        if(sphere != nullptr) {
-            float t = ray.hitSphere(*sphere);
-            if(t > 0.f) {
-                glm::vec3 N = glm::normalize(ray.at(t) - sphere->getTransform().position);
-                return 0.5f * (N + 1.0f);
+        Sphere* obj = dynamic_cast<Sphere*>(scene.getObject(i));
+        if(obj != nullptr) {
+            HitRecord rec;
+            if(obj->hit(ray, 0.f, 100.f, rec)) {
+                return 0.5f * (rec.normal + 1.0f);
             }
         }
     }

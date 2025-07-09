@@ -103,3 +103,21 @@ void savePNG(const std::vector<unsigned char> &pixels, const unsigned int width,
 float lengthSquared(glm::vec3 v) {
     return pow(v.x, 2.f) + pow(v.y, 2.f) + pow(v.z, 2.f);
 }
+
+float randomFloat() {
+    // Returns a random real in [0,1).
+    return std::rand() / (RAND_MAX + 1.0f);
+}
+
+float randomFloat(float min, float max) {
+    // Returns a random real in [min,max).
+    return min + (max - min) * randomFloat();
+}
+
+glm::vec2 noise2D(const float &x, const float &y, const float &intensity)
+{
+    return {
+        (randomFloat() - 0.5f + x) * intensity,
+        (randomFloat() - 0.5f + y) * intensity, 
+    };
+}

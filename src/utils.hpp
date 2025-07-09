@@ -64,4 +64,9 @@ void savePNG(
 
 float lengthSquared(glm::vec3 v);
 
+float randomFloat();
+float randomFloat(float min, float max);
+
+glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
+
 #endif // UTILS_HPP
