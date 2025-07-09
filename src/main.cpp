@@ -1,5 +1,6 @@
 #include "Application.hpp"
 #include "SceneParser.hpp"
+#include "RayTracing.hpp"
 
 int main(int argc, char* argv[]) {
 
@@ -12,6 +13,8 @@ int main(int argc, char* argv[]) {
     } else {
         std::cout << "[ERROR] Two many arguments provided, expected one : name of the scene file to load" << std::endl;
     }
+
+    RayTracing::computeImage("raytracing.png", *app.getCurrentScene());
 
     return 0;
 }

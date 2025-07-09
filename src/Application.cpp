@@ -131,6 +131,8 @@ void Application::run(const std::string& sceneFile)
     
     std::cout << "[INFO] Starting application loop" << std::endl;
     loop();
+
+    std::cout << "[INFO] Application closed" << std::endl;
 }
 
 Application *Application::getApplicationFromWindow(GLFWwindow *window)

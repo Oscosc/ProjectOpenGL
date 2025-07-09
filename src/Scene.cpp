@@ -23,7 +23,7 @@ void Scene::render() {
 void Scene::updateActiveCameraPV()
 {
     this->m_activeCameraPV.projection = glm::perspective(
-        glm::radians(getActiveCamera()->Zoom),
+        glm::radians(getActiveCamera()->Fov),
         getActiveCamera()->Ratio,
         0.1f,
         100.0f

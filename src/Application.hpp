@@ -175,6 +175,8 @@ public:
      */
     Camera* getActiveCamera() { return this->m_scene->getActiveCamera(); }
 
+    Scene* getCurrentScene() { return this->m_scene; }
+
     /**
      * @brief static function to retrive an application object linked to the window given in
      * parameter.

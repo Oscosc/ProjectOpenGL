@@ -1,5 +1,8 @@
 #include "utils.hpp"
 
+#include <iostream>
+#include "lodepng.h"
+
 
 int PascalValue(int i, int n)
 {
@@ -85,4 +88,18 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
     tokens.push_back(ss.substr(start));
 
     return tokens;
+}
+
+void savePNG(const std::vector<unsigned char> &pixels, const unsigned int width, const unsigned int height, const std::string &filename)
+{
+    if((width * height * 4) != pixels.size()) {
+        std::cout << "[ERROR] " << width << "x" << height << " do not match pixels number (" << pixels.size() << ")" << std::endl;
+    }
+
+    unsigned error = lodepng::encode(filename, pixels, width, height);
+    if(!error) std::cout << "[INFO] Image saved as '" << filename << "'" << std::endl;
+}
+
+float lengthSquared(glm::vec3 v) {
+    return pow(v.x, 2.f) + pow(v.y, 2.f) + pow(v.z, 2.f);
 }

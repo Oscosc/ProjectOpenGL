@@ -55,5 +55,13 @@ std::string trim(const std::string& str);
 
 std::vector<std::string> split(const std::string& s, const std::string& delimiter);
 
+void savePNG(
+    const std::vector<unsigned char>& pixels,
+    const unsigned int width,
+    const unsigned int height,
+    const std::string& filename
+);
+
+float lengthSquared(glm::vec3 v);
 
 #endif // UTILS_HPP
