@@ -12,6 +12,9 @@
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600
 #define RAYS_PER_PIXEL 10
+#define MAX_DEPTH 50
+
+class ShaderMaterial;
 
 class RayTracing
 {
@@ -27,7 +30,7 @@ public:
         std::vector<Sphere*> sceneSpheres
     );
 
-    static glm::vec3 rayValue(Ray& ray, const std::vector<Sphere*>& sceneSpheres);
+    static glm::vec3 rayValue(const Ray& ray, const std::vector<Sphere*>& sceneSpheres, const unsigned int depth = MAX_DEPTH);
 
 private:
 

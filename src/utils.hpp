@@ -64,8 +64,11 @@ void savePNG(
 
 float lengthSquared(glm::vec3 v);
 
-float randomFloat();
-float randomFloat(float min, float max);
+float randomFloat(float min = 0, float max = 1);
+
+glm::vec3 randomUnitVec3(float min = -1, float max = 1);
+
+glm::vec3 randomEmisphereVec3(const glm::vec3& normal);
 
 glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
 

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Ray.hpp"
+#include "Object.hpp"
 
 struct HitRecord {
     glm::vec3 point;
     glm::vec3 normal;
+    ShaderMaterial material;
     float t;
 };
 

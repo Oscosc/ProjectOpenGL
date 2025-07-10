@@ -78,13 +78,26 @@ void RayTracing::computePixel(
 #endif
 }
 
-glm::vec3 RayTracing::rayValue(Ray &ray, const std::vector<Sphere*>& sceneSpheres)
+glm::vec3 RayTracing::rayValue(const Ray &ray, const std::vector<Sphere*>& sceneSpheres, const unsigned int depth)
 {
+    // Max bounces
+    if(depth <= 0) return glm::vec3(0.f);
+
+    HitRecord finalRec;
+    finalRec.t = INFINITY;
+
+    // Loop through scene objects
     for(Sphere* sphere : sceneSpheres) {
         HitRecord rec;
-        if(sphere->hit(ray, 0.f, 100.f, rec)) {
-            return 0.5f * (rec.normal + 1.0f);
+        if(sphere->hit(ray, 0.001f, 100.f, rec)) {
+            if(rec.t < finalRec.t) finalRec = rec;
         }
+    }
+
+    // Compute first object touched
+    if(finalRec.t != INFINITY) {
+        glm::vec3 direction = finalRec.normal + randomUnitVec3();
+        return 0.5f * finalRec.material.ambient * rayValue(Ray(finalRec.point, direction), sceneSpheres, depth-1);
     }
 
     // Background
@@ -94,8 +107,9 @@ glm::vec3 RayTracing::rayValue(Ray &ray, const std::vector<Sphere*>& sceneSphere
 
 void RayTracing::writePixel(std::vector<unsigned char>& pixels, const unsigned int x, const unsigned int y, glm::vec4 RGBA)
 {
-    pixels[4 * IMAGE_WIDTH * y + 4 * x + 0] = RGBA.x * 255;
-    pixels[4 * IMAGE_WIDTH * y + 4 * x + 1] = RGBA.y * 255;
-    pixels[4 * IMAGE_WIDTH * y + 4 * x + 2] = RGBA.z * 255;
+    glm::vec4 corrected = glm::sqrt(RGBA);
+    pixels[4 * IMAGE_WIDTH * y + 4 * x + 0] = corrected.x * 255;
+    pixels[4 * IMAGE_WIDTH * y + 4 * x + 1] = corrected.y * 255;
+    pixels[4 * IMAGE_WIDTH * y + 4 * x + 2] = corrected.z * 255;
     pixels[4 * IMAGE_WIDTH * y + 4 * x + 3] = RGBA.w * 255;
 }

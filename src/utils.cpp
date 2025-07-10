@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "lodepng.h"
+#include "Object.hpp"
 
 
 int PascalValue(int i, int n)
@@ -104,14 +105,24 @@ float lengthSquared(glm::vec3 v) {
     return pow(v.x, 2.f) + pow(v.y, 2.f) + pow(v.z, 2.f);
 }
 
-float randomFloat() {
-    // Returns a random real in [0,1).
-    return std::rand() / (RAND_MAX + 1.0f);
-}
-
 float randomFloat(float min, float max) {
     // Returns a random real in [min,max).
-    return min + (max - min) * randomFloat();
+    return min + (max - min) * std::rand() / (RAND_MAX + 1.0f);
+}
+
+glm::vec3 randomUnitVec3(float min, float max)
+{
+    return glm::normalize(glm::vec3(
+        randomFloat(min, max),
+        randomFloat(min, max),
+        randomFloat(min, max)
+    ));
+}
+
+glm::vec3 randomEmisphereVec3(const glm::vec3 &normal)
+{
+    glm::vec3 randomVec = randomUnitVec3();
+    return glm::dot(randomVec, normal) > 0.0 ? randomVec : -randomVec;
 }
 
 glm::vec2 noise2D(const float &x, const float &y, const float &intensity)
