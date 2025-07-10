@@ -12,6 +12,7 @@
 #include "ProjViewMatrix.hpp"
 
 class Object;
+class Sphere;
 
 /**
  * @brief Class representing a Scene which contain objects, lights and Cameras.
@@ -123,6 +124,8 @@ public:
      * @param index index of the element to retrieve
      */
     Object* getObject(unsigned int index) { return m_objects.at(index); }
+
+    std::vector<Sphere*> getSpheresRT() const;
 
 private:
     unsigned int m_activeCamera;

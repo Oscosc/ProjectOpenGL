@@ -11,15 +11,23 @@
 
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600
-#define RAYS_PER_PIXEL 1
+#define RAYS_PER_PIXEL 10
 
 class RayTracing
 {
 public:
     static void computeImage(const std::string& filename, Scene& scene);
-    static void computePixel(const float& x, const float& y, Scene& scene, std::vector<unsigned char>& pixels);
+    static void computePixel(
+        const float& x,
+        const float& y,
+        Scene& scene,
+        const float& radianFOV,
+        const glm::mat4& cameraToWorld,
+        std::vector<unsigned char>& pixels,
+        std::vector<Sphere*> sceneSpheres
+    );
 
-    static glm::vec3 rayValue(Ray& ray, Scene& scene);
+    static glm::vec3 rayValue(Ray& ray, const std::vector<Sphere*>& sceneSpheres);
 
 private:
 
