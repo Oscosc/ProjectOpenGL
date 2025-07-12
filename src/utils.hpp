@@ -72,4 +72,6 @@ glm::vec3 randomEmisphereVec3(const glm::vec3& normal);
 
 glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
 
+glm::vec3 reflectVec3(const glm::vec3& v, const glm::vec3& n);
+
 #endif // UTILS_HPP

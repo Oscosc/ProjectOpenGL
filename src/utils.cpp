@@ -132,3 +132,8 @@ glm::vec2 noise2D(const float &x, const float &y, const float &intensity)
         (randomFloat() - 0.5f + y) * intensity, 
     };
 }
+
+glm::vec3 reflectVec3(const glm::vec3 &v, const glm::vec3 &n)
+{
+    return v - 2 * glm::dot(v, n) * n;
+}

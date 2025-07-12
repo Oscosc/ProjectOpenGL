@@ -96,8 +96,12 @@ glm::vec3 RayTracing::rayValue(const Ray &ray, const std::vector<Sphere*>& scene
 
     // Compute first object touched
     if(finalRec.t != INFINITY) {
-        glm::vec3 direction = finalRec.normal + randomUnitVec3();
-        return 0.5f * finalRec.material.ambient * rayValue(Ray(finalRec.point, direction), sceneSpheres, depth-1);
+        Ray scattered;
+        glm::vec3 attenuation;
+        if(callScatter(finalRec.type, finalRec.material.ambient, ray, finalRec, attenuation, scattered))
+            return attenuation * rayValue(scattered, sceneSpheres, depth-1);
+        
+        return glm::vec3(0.f);
     }
 
     // Background
@@ -112,4 +116,38 @@ void RayTracing::writePixel(std::vector<unsigned char>& pixels, const unsigned i
     pixels[4 * IMAGE_WIDTH * y + 4 * x + 1] = corrected.y * 255;
     pixels[4 * IMAGE_WIDTH * y + 4 * x + 2] = corrected.z * 255;
     pixels[4 * IMAGE_WIDTH * y + 4 * x + 3] = RGBA.w * 255;
+}
+
+bool RayTracing::callScatter(const HitType& type, const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
+    glm::vec3& attenuation, Ray& scattered)
+{
+    switch (type) {
+    case DIFFUSE: return scatterDiffuse(color, rayIn, record, attenuation, scattered);
+    case METAL: return scatterMetal(color, rayIn, record, attenuation, scattered);
+    case GLASS: std::cout << "[ERROR] Not implemented yet..." << std::endl; return false;
+
+    default:
+        std::cout << "[ERROR] Error while reading ray-tracing type" << std::endl;
+        return false;
+    }
+}
+
+bool RayTracing::scatterDiffuse(const glm::vec3 &color, const Ray &rayIn, const HitRecord &record,
+    glm::vec3 &attenuation, Ray &scattered)
+{
+    glm::vec3 direction = record.normal + randomUnitVec3();
+    
+    scattered = Ray(record.point, direction);
+    attenuation = color;
+    return true;
+}
+
+bool RayTracing::scatterMetal(const glm::vec3 &color, const Ray &rayIn, const HitRecord &record,
+    glm::vec3 &attenuation, Ray &scattered)
+{
+    glm::vec3 reflected = reflectVec3(rayIn.direction(), record.normal);
+
+    scattered = Ray(record.point, reflected);
+    attenuation = color;
+    return true;
 }

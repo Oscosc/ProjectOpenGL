@@ -90,6 +90,10 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
     if(item["transform"] != nullptr) {
         if(item["material"] != nullptr) {
             scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+            if(item["ray-tracing.type"] != nullptr) {
+                Sphere* last = dynamic_cast<Sphere*>(scene->getObject(scene->objectsCount() - 1));
+                last->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
+            }
         } else {
             scene->addObject(new Sphere(size, jsonToTransform(item["transform"])));
         }

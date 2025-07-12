@@ -8,10 +8,11 @@
 #include "../includes/camera.hpp"
 #include "Ray.hpp"
 #include "Scene.hpp"
+#include "Hittable.hpp"
 
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600
-#define RAYS_PER_PIXEL 10
+#define RAYS_PER_PIXEL 500
 #define MAX_DEPTH 50
 
 class ShaderMaterial;
@@ -33,6 +34,15 @@ public:
     static glm::vec3 rayValue(const Ray& ray, const std::vector<Sphere*>& sceneSpheres, const unsigned int depth = MAX_DEPTH);
 
 private:
-
     static void writePixel(std::vector<unsigned char>& pixels, const unsigned int x, const unsigned int y, glm::vec4 RGBA);
+
+
+    static bool callScatter(const HitType& type, const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
+        glm::vec3& attenuation, Ray& scattered);
+
+    static bool scatterDiffuse(const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
+        glm::vec3& attenuation, Ray& scattered);
+    
+    static bool scatterMetal(const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
+        glm::vec3& attenuation, Ray& scattered);
 };
