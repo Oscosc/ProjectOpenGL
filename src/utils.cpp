@@ -1,5 +1,9 @@
 #include "utils.hpp"
 
+#include <iostream>
+#include "lodepng.h"
+#include "Object.hpp"
+
 
 int PascalValue(int i, int n)
 {
@@ -85,4 +89,67 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
     tokens.push_back(ss.substr(start));
 
     return tokens;
+}
+
+void savePNG(const std::vector<unsigned char> &pixels, const unsigned int width, const unsigned int height, const std::string &filename)
+{
+    if((width * height * 4) != pixels.size()) {
+        std::cout << "[ERROR] " << width << "x" << height << " do not match pixels number (" << pixels.size() << ")" << std::endl;
+    }
+
+    unsigned error = lodepng::encode(filename, pixels, width, height);
+    if(!error) std::cout << "[INFO] Image saved as '" << filename << "'" << std::endl;
+}
+
+float lengthSquared(glm::vec3 v) {
+    return pow(v.x, 2.f) + pow(v.y, 2.f) + pow(v.z, 2.f);
+}
+
+float randomFloat(float min, float max) {
+    // Returns a random real in [min,max).
+    return min + (max - min) * std::rand() / (RAND_MAX + 1.0f);
+}
+
+glm::vec3 randomUnitVec3(float min, float max)
+{
+    return glm::normalize(glm::vec3(
+        randomFloat(min, max),
+        randomFloat(min, max),
+        randomFloat(min, max)
+    ));
+}
+
+glm::vec3 randomEmisphereVec3(const glm::vec3 &normal)
+{
+    glm::vec3 randomVec = randomUnitVec3();
+    return glm::dot(randomVec, normal) > 0.0 ? randomVec : -randomVec;
+}
+
+glm::vec2 noise2D(const float &x, const float &y, const float &intensity)
+{
+    return {
+        (randomFloat() - 0.5f + x) * intensity,
+        (randomFloat() - 0.5f + y) * intensity, 
+    };
+}
+
+glm::vec3 reflectVec3(const glm::vec3 &v, const glm::vec3 &n)
+{
+    return v - 2 * glm::dot(v, n) * n;
+}
+
+glm::vec3 refractVec3(const glm::vec3 &v, const glm::vec3 &n, float etaCoeff)
+{
+    float cosTheta = std::fmin(dot(-v, n), 1.f);
+    glm::vec3 rayOutPerpendicular = etaCoeff * (v + cosTheta * n);
+    glm::vec3 rayOutParallel = -std::sqrt(std::fabs(1.f - lengthSquared(rayOutPerpendicular))) * n;
+    
+    return rayOutPerpendicular + rayOutParallel;
+}
+
+float reflectance(const float &cosine, const float &refractionIndex)
+{
+    float r0 = (1 - refractionIndex) / (1 + refractionIndex);
+    r0 *= r0; // Squared
+    return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 }

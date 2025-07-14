@@ -55,5 +55,27 @@ std::string trim(const std::string& str);
 
 std::vector<std::string> split(const std::string& s, const std::string& delimiter);
 
+void savePNG(
+    const std::vector<unsigned char>& pixels,
+    const unsigned int width,
+    const unsigned int height,
+    const std::string& filename
+);
+
+float lengthSquared(glm::vec3 v);
+
+float randomFloat(float min = 0, float max = 1);
+
+glm::vec3 randomUnitVec3(float min = -1, float max = 1);
+
+glm::vec3 randomEmisphereVec3(const glm::vec3& normal);
+
+glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
+
+glm::vec3 reflectVec3(const glm::vec3& v, const glm::vec3& n);
+
+glm::vec3 refractVec3(const glm::vec3& v, const glm::vec3& n, float etaCoeff);
+
+float reflectance(const float& cosine, const float& refractionIndex);
 
 #endif // UTILS_HPP

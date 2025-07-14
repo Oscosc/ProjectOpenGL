@@ -14,6 +14,32 @@ Sphere::Sphere(float radius, Transform transform, Material material) : m_radius(
     initGLObject();
 }
 
+bool Sphere::hit(const Ray &ray, float tMin, float tMax, HitRecord &record) const
+{
+    glm::vec3 oc = m_transform.position - ray.origin();
+    
+    float a = lengthSquared(ray.direction());
+    float h = glm::dot(ray.direction(), oc);
+    float c = lengthSquared(oc) - m_radius * m_radius;
+    float discriminant = h*h - a*c;
+
+    if(discriminant < 0) return false;
+
+    float sqrtd = std::sqrt(discriminant);
+    float root = (h - sqrtd) / a;
+    if(root <= tMin || tMax <= root) {
+        root = (h + sqrtd) / a;
+        if(root <= tMin || tMax <= root)
+            return false;
+    }
+
+    record.t = root;
+    record.point = ray.at(record.t);
+    record.setFaceNormal(ray, (record.point - m_transform.position) / m_radius);
+    record.material = this->m_material.matShader;
+    record.type = this->Type;
+    return true;
+}
 
 void Sphere::draw(Scene* scene)
 {

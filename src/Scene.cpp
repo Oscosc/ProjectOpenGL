@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include "Object.hpp"
+#include "Sphere.hpp"
 
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {
@@ -23,7 +24,7 @@ void Scene::render() {
 void Scene::updateActiveCameraPV()
 {
     this->m_activeCameraPV.projection = glm::perspective(
-        glm::radians(getActiveCamera()->Zoom),
+        glm::radians(getActiveCamera()->Fov),
         getActiveCamera()->Ratio,
         0.1f,
         100.0f
@@ -62,6 +63,16 @@ void Scene::addObject(Object *object)
 void Scene::addLight(Light *light)
 {
     this->m_lights.push_back(light);
+}
+
+std::vector<Sphere*> Scene::getSpheresRT() const
+{
+    std::vector<Sphere*> spheres;
+    for(auto obj : m_objects) {
+        Sphere* s = dynamic_cast<Sphere*>(obj);
+        if(s != nullptr) spheres.push_back(s);
+    }
+    return spheres;
 }
 
 Camera *Scene::getActiveCamera()
