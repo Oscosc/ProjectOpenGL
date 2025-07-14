@@ -7,6 +7,7 @@
 #include "Sphere.hpp"
 #include "Object.hpp"
 #include "Light.hpp"
+#include "Logger.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -20,7 +21,7 @@ Scene SceneParser::parseScene(const std::string &file)
     }
 
     if(newScene.camerasCount() == 0)
-        std::cout << "[WARNING] Scene without camera will not display anything" << std::endl;
+        Logger::logWarning("Scene without camera will not display anything");
 
     return newScene;
 }
@@ -28,13 +29,13 @@ Scene SceneParser::parseScene(const std::string &file)
 void SceneParser::addObjectToScene(Scene *scene, json item)
 {
     if(item["type"] == nullptr) {
-        std::cout << "[ERROR] Scene object must have a 'type' defined" << std::endl;
+        Logger::logError("Scene object must have a 'type' defined");
         exit(1);
     }
 
     auto it = s_TypeAliases.find(item["type"]);
     if(it == s_TypeAliases.end()) {
-        std::cout << "[ERROR] Type " << item["type"] << " does not exist" << std::endl;
+        Logger::logError("Type " + (std::string)item["type"] + " does not exist");
         exit(1);
     }
     
@@ -49,11 +50,11 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         break;
 
     case SPOT_LIGHT:
-        std::cout << "[ERROR] 'spot_light' Not implemented yet" << std::endl;
+        Logger::logError("'spot_light' Not implemented yet");
         exit(1);
 
     case DIR_LIGHT:
-        std::cout << "[ERROR] 'dir_light' Not implemented yet" << std::endl;
+        Logger::logError("'dir_light' Not implemented yet");
         exit(1);
         
     case SPHERE:

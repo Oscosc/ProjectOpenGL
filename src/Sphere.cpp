@@ -1,4 +1,5 @@
 #include "Sphere.hpp"
+#include "Logger.hpp"
 
 Sphere::Sphere(float radius, Transform transform, Material material) : m_radius(radius), Object(transform, material)
 {
@@ -71,7 +72,7 @@ void Sphere::draw(Scene* scene)
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)
     {
-        std::cout << "[ERROR] in Sphere : GLError " << err << std::endl;
+        Logger::logError("in Sphere : GLError " + std::to_string(err));
     }
 }
 

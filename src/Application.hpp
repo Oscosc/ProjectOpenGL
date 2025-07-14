@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Logger.hpp"
 #include "Scene.hpp"
 #include "Callbacks.hpp"
 #include "ShaderManager.hpp"
@@ -19,6 +20,7 @@
 #define DEFAULT_SCREEN_HEIGHT 600
 
 #define RAY_TRACING_ON
+// #define LOAD_TEXTURES_ON
 
 /**
  * @brief Application handle OpenGL initialization, as well as Shader loading, Scene loading and

@@ -1,4 +1,5 @@
 #include "ShaderManager.hpp"
+#include "Logger.hpp"
 
 void ShaderManager::loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath)
 {
@@ -11,7 +12,7 @@ Shader* ShaderManager::getShader(const std::string &name)
     if(it != m_shaders.end()) {
         return &it->second;
     }
-    std::cout << "[WARNING] Shader '" + name + "' not found" << std::endl;
+    Logger::logWarning("Shader '" + name + "' not found");
     return nullptr;
 }
 

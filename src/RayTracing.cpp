@@ -3,6 +3,7 @@
 #include "utils.hpp"
 #include "Sphere.hpp"
 #include "../includes/progressbar.hpp"
+#include "Logger.hpp"
 
 #include <omp.h>
 
@@ -15,7 +16,7 @@
 void RayTracing::computeImage(const std::string &filename, Scene& scene)
 {
     auto timerA = timer::now();
-    std::cout << "[PERFORMANCE] Starting Ray-tracing computation..." << std::endl;
+    Logger::logPerf("Starting Ray-tracing computation...");
 
     glm::mat4 cameraToWorld = glm::inverse(scene.getActiveCamera()->GetViewMatrix());
     float tanHalfFOV = tan(glm::radians(scene.getActiveCamera()->Fov) / 2.0);
@@ -38,12 +39,12 @@ void RayTracing::computeImage(const std::string &filename, Scene& scene)
     std::cout << std::endl;
 
     auto timerB = timer::now();
-    std::cout << "[PERFORMANCE] Ray-tracing computation time : " << duration(timerB - timerA).count() << " ms" << std::endl;
+    Logger::logPerf("Ray-tracing computation time : " + std::to_string(duration(timerB - timerA).count()));
 
     savePNG(pixels, IMAGE_WIDTH, IMAGE_HEIGHT, filename);
 
     auto timerC  = timer::now();
-    std::cout << "[PERFORMANCE] File saving computation time : " << duration(timerC - timerB).count() << " ms" << std::endl;
+    Logger::logPerf("File saving computation time : " + std::to_string(duration(timerC - timerB).count()));
 }
 
 void RayTracing::computePixel(
@@ -133,8 +134,8 @@ bool RayTracing::callScatter(const HitType& type, const glm::vec3& color, const 
     case GLASS: return scatterDielectric(color, rayIn, record, attenuation, scattered);
 
     default:
-        std::cout << "[ERROR] Error while reading ray-tracing type" << std::endl;
-        std::cout << "[ERROR] Trace of HitRecord :" << std::endl;
+        Logger::logError("Error while reading ray-tracing type");
+        Logger::logError("Trace of HitRecord :");
         std::cout << "\t|- point : " << glm::to_string(record.point) << std::endl;
         std::cout << "\t|- normal : " << glm::to_string(record.normal) << std::endl;
         std::cout << "\t|- frontFace : " << record.frontFace << std::endl;

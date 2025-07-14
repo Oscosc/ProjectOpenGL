@@ -3,6 +3,7 @@
 #include <iostream>
 #include "lodepng.h"
 #include "Object.hpp"
+#include "Logger.hpp"
 
 
 int PascalValue(int i, int n)
@@ -94,11 +95,11 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
 void savePNG(const std::vector<unsigned char> &pixels, const unsigned int width, const unsigned int height, const std::string &filename)
 {
     if((width * height * 4) != pixels.size()) {
-        std::cout << "[ERROR] " << width << "x" << height << " do not match pixels number (" << pixels.size() << ")" << std::endl;
+        Logger::logError(std::to_string(width) + "x" + std::to_string(height) + " do not match pixels number (" + std::to_string(pixels.size()) + ")");
     }
 
     unsigned error = lodepng::encode(filename, pixels, width, height);
-    if(!error) std::cout << "[INFO] Image saved as '" << filename << "'" << std::endl;
+    if(!error) Logger::logInfo("Image saved as '" + filename + "'");
 }
 
 float lengthSquared(glm::vec3 v) {

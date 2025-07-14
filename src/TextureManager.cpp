@@ -5,6 +5,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "Logger.hpp"
 
 void TextureManager::loadTexture(const std::string& name, const std::string textureFile)
 {
@@ -28,7 +29,7 @@ void TextureManager::loadTexture(const std::string& name, const std::string text
     }
     else
     {
-        std::cout << "[ERROR] Failed to load texture '" << textureFile << "'" << std::endl;
+        Logger::logError("Failed to load texture '" + textureFile + "'");
     }
     stbi_image_free(data);
 }
@@ -39,6 +40,6 @@ const unsigned int* TextureManager::getTexture(const std::string& name)
     if(it != m_textures.end()) {
         return &it->second;
     }
-    std::cout << "[WARNING] Texture '" + name + "' not found" << std::endl;
+    Logger::logWarning("Texture '" + name + "' not found");
     return nullptr;
 }
