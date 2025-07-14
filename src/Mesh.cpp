@@ -1,4 +1,5 @@
 #include "Mesh.hpp"
+#include "Logger.hpp"
 
 Mesh::Mesh(std::string file, Transform transformation, Material material) :
     m_filename(file), Object(transformation, material)
@@ -10,7 +11,7 @@ void Mesh::draw(Scene* scene)
 {
     Shader* shader = this->getMaterial().shader;
     if(shader == nullptr) {
-        std::cout << "[ERROR] No shader instanciated for this object" << std::endl;
+        Logger::logError("No shader instanciated for this object");
     }
     shader->use();
 
@@ -37,7 +38,7 @@ void Mesh::draw(Scene* scene)
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)
     {
-        std::cout << "[ERROR] in Mesh drawing : GLError " << err << std::endl;
+        Logger::logError("in Mesh drawing : GLError "  + std::to_string(err));
     }
 }
 

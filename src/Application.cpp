@@ -1,8 +1,6 @@
 #include "Application.hpp"
 #include "SceneParser.hpp"
 
-// #define LOAD_TEXTURES
-
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight)
 {
@@ -22,7 +20,7 @@ void Application::initWindow()
     this->m_window = glfwCreateWindow(this->m_screenWidth, this->m_screenHeight, "Projet IGAI", NULL, NULL);
     if (m_window == NULL)
     {
-        std::cout << "[ERROR] Failed to create GLFW window" << std::endl;
+        Logger::logError("Failed to create GLFW window");
         glfwTerminate();
         exit(-1);
     }
@@ -36,7 +34,7 @@ void Application::initGLComponents()
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "[ERROR] Failed to initialize GLAD" << std::endl;
+        Logger::logError("Failed to initialize GLAD");
         glfwTerminate();
         exit(-1);
     }
@@ -61,7 +59,7 @@ void Application::initShaders()
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
 
-#ifdef LOAD_TEXTURES
+#ifdef LOAD_TEXTURES_ON
     TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
     TextureManager::getInstance().loadTexture("ceres", "resources/4k_ceres.jpg");
     TextureManager::getInstance().loadTexture("metal", "resources/4k_metal.jpg");
@@ -129,7 +127,7 @@ void Application::initScene(const std::string& file)
 
 #endif
 
-    std::cout << "[INFO] Scene builded with " << m_scene->objectsCount() << " visible objects in it" << std::endl;
+    Logger::logInfo("Scene builded with " + std::to_string(m_scene->objectsCount()) + " visible objects in it");
 }
 
 void Application::initHUD()
@@ -170,34 +168,34 @@ void Application::loop()
 void Application::run(const std::string& sceneFile)
 {
     initWindow();
-    std::cout << "[INFO] OpenGL Window correctly loaded" << std::endl;
+    Logger::logInfo("OpenGL Window correctly loaded");
 
     initGLComponents();
-    std::cout << "[INFO] OpenGL/GLAD components correctly loaded" << std::endl;
+    Logger::logInfo("OpenGL/GLAD components correctly loaded");
 
     initCallbacks();
-    std::cout << "[INFO] Callbacks correctly instancied" << std::endl;
+    Logger::logInfo("Callbacks correctly instancied");
 
     initShaders();
-    std::cout << "[INFO] Shaders correctly loaded and computed" << std::endl;
+    Logger::logInfo("Shaders correctly loaded and computed");
 
     initScene(sceneFile);
-    std::cout << "[INFO] Scene correctly loaded" << std::endl;
+    Logger::logInfo("Scene correctly loaded");
 
     initHUD();
-    std::cout << "[INFO] HUD correctly computed" << std::endl;
+    Logger::logInfo("HUD correctly computed");
     
-    std::cout << "[INFO] Starting application loop" << std::endl;
+    Logger::logInfo("Starting application loop");
     loop();
 
-    std::cout << "[INFO] Application closed" << std::endl;
+    Logger::logInfo("Application closed");
 }
 
 Application *Application::getApplicationFromWindow(GLFWwindow *window)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
     if(!app) {
-        std::cout << "[WARNING] Unable to load application from user pointer" << std::endl;
+        Logger::logWarning("Unable to load application from user pointer");
         return nullptr;
     }
     return app;
