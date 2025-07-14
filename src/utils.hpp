@@ -74,4 +74,8 @@ glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
 
 glm::vec3 reflectVec3(const glm::vec3& v, const glm::vec3& n);
 
+glm::vec3 refractVec3(const glm::vec3& v, const glm::vec3& n, float etaCoeff);
+
+float reflectance(const float& cosine, const float& refractionIndex);
+
 #endif // UTILS_HPP

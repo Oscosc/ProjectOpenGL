@@ -137,3 +137,19 @@ glm::vec3 reflectVec3(const glm::vec3 &v, const glm::vec3 &n)
 {
     return v - 2 * glm::dot(v, n) * n;
 }
+
+glm::vec3 refractVec3(const glm::vec3 &v, const glm::vec3 &n, float etaCoeff)
+{
+    float cosTheta = std::fmin(dot(-v, n), 1.f);
+    glm::vec3 rayOutPerpendicular = etaCoeff * (v + cosTheta * n);
+    glm::vec3 rayOutParallel = -std::sqrt(std::fabs(1.f - lengthSquared(rayOutPerpendicular))) * n;
+    
+    return rayOutPerpendicular + rayOutParallel;
+}
+
+float reflectance(const float &cosine, const float &refractionIndex)
+{
+    float r0 = (1 - refractionIndex) / (1 + refractionIndex);
+    r0 *= r0; // Squared
+    return r0 + (1 - r0) * std::pow((1 - cosine), 5);
+}

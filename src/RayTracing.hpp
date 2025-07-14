@@ -45,4 +45,7 @@ private:
     
     static bool scatterMetal(const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
         glm::vec3& attenuation, Ray& scattered);
+
+    static bool scatterDielectric(const glm::vec3& color, const Ray& rayIn, const HitRecord& record,
+        glm::vec3& attenuation, Ray& scattered);
 };

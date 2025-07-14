@@ -35,7 +35,7 @@ bool Sphere::hit(const Ray &ray, float tMin, float tMax, HitRecord &record) cons
 
     record.t = root;
     record.point = ray.at(record.t);
-    record.normal = (record.point - m_transform.position) / m_radius;
+    record.setFaceNormal(ray, (record.point - m_transform.position) / m_radius);
     record.material = this->m_material.matShader;
     record.type = this->Type;
     return true;

@@ -72,6 +72,64 @@ void Application::initScene(const std::string& file)
 {
     this->m_scene = new Scene(SceneParser::parseScene(file));
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
+
+#ifdef RAY_TRACING_ON
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            float choose_mat = randomFloat();
+            glm::vec3 center(a + 0.9*randomFloat(), 0.2, b + 0.9*randomFloat());
+
+            if ((center - glm::vec3(4, 0.2, 0)).length() > 0.9) {
+
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = glm::vec3(randomFloat(), randomFloat(), randomFloat()) * glm::vec3(randomFloat(), randomFloat(), randomFloat());
+                    this->m_scene->addObject(new Sphere(
+                        0.2,
+                        {center, glm::vec3(0.f), glm::vec3(1.f)},
+                        {ShaderManager::getInstance().getShader("monochrome"), albedo, glm::vec3(0.5f), glm::vec3(0.5f), 32.f}
+                    ));
+                    Sphere* sphere = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    sphere->Type = HitType::DIFFUSE;
+
+                    Sphere* sphere2 = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    assert(sphere2->Type == HitType::DIFFUSE);
+
+                } else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = glm::vec3(randomFloat(), randomFloat(), randomFloat());
+                    this->m_scene->addObject(new Sphere(
+                        0.2,
+                        {center, glm::vec3(0.f), glm::vec3(1.f)},
+                        {ShaderManager::getInstance().getShader("monochrome"), albedo, glm::vec3(0.5f), glm::vec3(0.5f), randomFloat(0.f, 0.5f)}
+                    ));
+                    Sphere* sphere = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    sphere->Type = HitType::METAL;
+                    
+                    Sphere* sphere2 = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    assert(sphere2->Type == HitType::METAL);
+
+                } else {
+                    // glass
+                    this->m_scene->addObject(new Sphere(
+                        0.2,
+                        {center, glm::vec3(0.f), glm::vec3(1.f)},
+                        {ShaderManager::getInstance().getShader("monochrome"), glm::vec3(0.5f), glm::vec3(0.5f), glm::vec3(0.5f), 1.5f}
+                    ));
+                    Sphere* sphere = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    sphere->Type = HitType::GLASS;
+
+                    Sphere* sphere2 = dynamic_cast<Sphere*>(this->m_scene->getObject(this->m_scene->objectsCount() - 1));
+                    assert(sphere2->Type == HitType::GLASS);
+                }
+            }
+        }
+    }
+
+#endif
+
+    std::cout << "[INFO] Scene builded with " << m_scene->objectsCount() << " visible objects in it" << std::endl;
 }
 
 void Application::initHUD()

@@ -18,6 +18,8 @@
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
 
+#define RAY_TRACING_ON
+
 /**
  * @brief Application handle OpenGL initialization, as well as Shader loading, Scene loading and
  * callbacks loading. It provide an "user friendly" interface to just create an application in the

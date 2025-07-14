@@ -1,6 +1,7 @@
 CXX = g++
 CC = gcc
-LDFLAGS = -lglfw -ldl -g -lm
+LDFLAGS = -lglfw -ldl -g -lm -fopenmp
+COMPFLAGS = -fopenmp
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -18,7 +19,7 @@ $(TARGET): $(OBJ_FILES)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	$(CXX) -c $< -o $@
+	$(CXX) -c $< -o $@ $(COMPFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) -c $< -o $@

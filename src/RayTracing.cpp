@@ -4,6 +4,8 @@
 #include "Sphere.hpp"
 #include "../includes/progressbar.hpp"
 
+#include <omp.h>
+
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
 #define duration std::chrono::duration_cast<std::chrono::milliseconds>
@@ -22,13 +24,16 @@ void RayTracing::computeImage(const std::string &filename, Scene& scene)
     pixels.resize(IMAGE_WIDTH * IMAGE_HEIGHT * 4);
     auto sceneSpheres = scene.getSpheresRT();
 
-    progressbar bar(IMAGE_HEIGHT);
+    progressbar bar(IMAGE_HEIGHT * IMAGE_WIDTH);
+
+    #pragma omp parallel for collapse(2)
     for(unsigned int h = 0; h < IMAGE_HEIGHT; ++h) {
         for(unsigned int w = 0; w < IMAGE_WIDTH; ++w) {
             computePixel(w, h, scene, tanHalfFOV, cameraToWorld, pixels, sceneSpheres);
+            
+            #pragma omp critical
+            bar.update();
         }
-
-        bar.update();
     }
     std::cout << std::endl;
 
@@ -105,7 +110,8 @@ glm::vec3 RayTracing::rayValue(const Ray &ray, const std::vector<Sphere*>& scene
     }
 
     // Background
-    float a = 0.5*(ray.direction().y + 1.0);
+    glm::vec3 unitDirection = glm::normalize(ray.direction());
+    float a = 0.5*(unitDirection.y + 1.0);
     return (1.f - a) * glm::vec3(1.f) + a * glm::vec3(0.5, 0.7, 1.0);
 }
 
@@ -124,10 +130,16 @@ bool RayTracing::callScatter(const HitType& type, const glm::vec3& color, const 
     switch (type) {
     case DIFFUSE: return scatterDiffuse(color, rayIn, record, attenuation, scattered);
     case METAL: return scatterMetal(color, rayIn, record, attenuation, scattered);
-    case GLASS: std::cout << "[ERROR] Not implemented yet..." << std::endl; return false;
+    case GLASS: return scatterDielectric(color, rayIn, record, attenuation, scattered);
 
     default:
         std::cout << "[ERROR] Error while reading ray-tracing type" << std::endl;
+        std::cout << "[ERROR] Trace of HitRecord :" << std::endl;
+        std::cout << "\t|- point : " << glm::to_string(record.point) << std::endl;
+        std::cout << "\t|- normal : " << glm::to_string(record.normal) << std::endl;
+        std::cout << "\t|- frontFace : " << record.frontFace << std::endl;
+        std::cout << "\t|- type : " << record.type << std::endl;
+        std::cout << std::endl;
         return false;
     }
 }
@@ -146,8 +158,31 @@ bool RayTracing::scatterMetal(const glm::vec3 &color, const Ray &rayIn, const Hi
     glm::vec3 &attenuation, Ray &scattered)
 {
     glm::vec3 reflected = reflectVec3(rayIn.direction(), record.normal);
+    reflected = glm::normalize(reflected) + (record.material.shininess * randomUnitVec3());
 
     scattered = Ray(record.point, reflected);
     attenuation = color;
+    return (dot(scattered.direction(), record.normal) > 0);
+}
+
+bool RayTracing::scatterDielectric(const glm::vec3 &color, const Ray &rayIn, const HitRecord &record, glm::vec3 &attenuation, Ray &scattered)
+{
+    float ri = record.frontFace ? 1.f / record.material.shininess : record.material.shininess;
+    glm::vec3 unitDirection = glm::normalize(rayIn.direction());
+    glm::vec3 refracted = refractVec3(unitDirection, record.normal, ri);
+
+    double cosTheta = std::fmin(glm::dot(-unitDirection, record.normal), 1.0);
+    double sinTheta = std::sqrt(1.0 - cosTheta*cosTheta);
+
+    bool cannotRefract = ri * sinTheta > 1.0;
+    glm::vec3 direction;
+
+    if (cannotRefract || reflectance(cosTheta, ri) > randomFloat())
+        direction = reflectVec3(unitDirection, record.normal);
+    else
+        direction = refractVec3(unitDirection, record.normal, ri);
+
+    scattered = Ray(record.point, direction);
+    attenuation = glm::vec3(1.f);
     return true;
 }

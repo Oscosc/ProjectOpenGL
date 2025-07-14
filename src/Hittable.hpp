@@ -15,6 +15,12 @@ struct HitRecord {
     ShaderMaterial material;
     HitType type;
     float t;
+    bool frontFace;
+
+    void setFaceNormal(const Ray& r, const glm::vec3& outwardNormal) {
+        frontFace = glm::dot(r.direction(), outwardNormal) < 0;
+        normal = frontFace ? outwardNormal : -outwardNormal;
+    }
 };
 
 class Hittable
