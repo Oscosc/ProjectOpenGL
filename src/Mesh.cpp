@@ -145,7 +145,7 @@ void Mesh::parseAsData(const Mesh::LineType id, const std::vector<std::string> t
     vec3Array &positions, vec3Array &normals, vec2Array &uvs)
 {
     if(tokens.size() != 3 && tokens.size() != 4) {
-        std::cout << "[ERREUR] Le fichier .obj est malformé ou corrompu" << std::endl;
+        Logger::logError("Le fichier .obj est malformé ou corrompu");
         exit(1);
     }
 
@@ -164,7 +164,7 @@ void Mesh::parseAsData(const Mesh::LineType id, const std::vector<std::string> t
         break;
     
     default:
-        std::cout << "[ERREUR] Erreur rencontrée lors du parsing de l'id" << std::endl;
+        Logger::logError("Erreur rencontrée lors du parsing de l'id");
         exit(2);
         break;
     }
@@ -174,9 +174,8 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
     std::vector<VertexIndex> &indexes)
 {
     if(tokens.size() != 4) {
-        std::cout << "[WARNING] Seuls les meshs construits avec des triangles sont supportés"
-            << std::endl;
-        std::cout << "[ERREUR] Le fichier .obj est malformé" << std::endl;
+        Logger::logWarning("Seuls les meshs construits avec des triangles sont supportés");
+        Logger::logError("Le fichier .obj est malformé");
         exit(3);
     }
 
@@ -186,7 +185,7 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
 
         std::vector<std::string> subTokens = split(token, IDX_DELIMITER);
         if(subTokens.size() <= 0 || subTokens.size() > 3) {
-            std::cout << "[ERREUR] Erreur rencontrée lors du parsing des index" << std::endl;
+            Logger::logError("Erreur rencontrée lors du parsing des index");
             exit(4);
         }
 

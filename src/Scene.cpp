@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "Object.hpp"
 #include "Sphere.hpp"
+#include "Logger.hpp"
 
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {
@@ -10,7 +11,7 @@ Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 
 void Scene::render() {
     if(!camerasCount()) {
-        std::cout << "[WARNING] No camera instanciated, scene render will be skipped" << std::endl;
+        Logger::logWarning("No camera instanciated, scene render will be skipped");
         return;
     }
 
@@ -35,7 +36,7 @@ void Scene::updateActiveCameraPV()
 void Scene::updateLigth(Shader *shader)
 {
     if(lightsCount() == 0) {
-        std::cout << "[WARNING] No light source was instanciated, for somes shaders, nothing will be drawn" << std::endl;
+        Logger::logWarning("No light source was instanciated, for somes shaders, nothing will be drawn");
         return;
     }
 
