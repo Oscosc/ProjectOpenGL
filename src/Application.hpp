@@ -19,7 +19,7 @@
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
 
-#define RAY_TRACING_ON
+// #define RAY_TRACING_ON
 // #define LOAD_TEXTURES_ON
 
 /**

@@ -10,7 +10,6 @@
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
 #define duration std::chrono::duration_cast<std::chrono::milliseconds>
-#define micro_duration std::chrono::duration_cast<std::chrono::microseconds>
 
 
 void RayTracing::computeImage(const std::string &filename, Scene& scene)

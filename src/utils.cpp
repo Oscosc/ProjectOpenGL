@@ -92,6 +92,13 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
     return tokens;
 }
 
+unsigned int mean(const std::vector<unsigned int> &values)
+{
+    unsigned int meanValue = 0;
+    for(unsigned int element : values) { meanValue += element; }
+    return meanValue / values.size();
+}
+
 void savePNG(const std::vector<unsigned char> &pixels, const unsigned int width, const unsigned int height, const std::string &filename)
 {
     if((width * height * 4) != pixels.size()) {

@@ -1,6 +1,10 @@
 #include "Application.hpp"
 #include "SceneParser.hpp"
 
+#include <chrono>
+#define timer std::chrono::high_resolution_clock
+#define duration std::chrono::duration_cast<std::chrono::nanoseconds>
+
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight)
 {
@@ -137,29 +141,72 @@ void Application::initHUD()
 
 void Application::loop()
 {
+    std::vector<unsigned int> timeUpdateMeasures;
+    timeUpdateMeasures.resize(100);
+    std::vector<unsigned int> inputProcessMeasures;
+    inputProcessMeasures.resize(100);
+    std::vector<unsigned int> flushingMeasures;
+    flushingMeasures.resize(100);
+    std::vector<unsigned int> sceneRenderMeasures;
+    sceneRenderMeasures.resize(100);
+    std::vector<unsigned int> hudRenderMeasures;
+    hudRenderMeasures.resize(100);
+    std::vector<unsigned int> bufferSwapMeasures;
+    bufferSwapMeasures.resize(100);
+
+    unsigned int counter = 0;
+
     while(!glfwWindowShouldClose(this->m_window)) {
+        auto startTime = timer::now();
+
         /* ---TIME UPDATING---- */
         // TODO : Update to Time class
         float currentFrame = static_cast<float>(glfwGetTime());
         this->m_deltaTime = currentFrame - this->m_lastFrame;
         this->m_lastFrame = currentFrame;
+        auto timeUpdateTimer = timer::now();
 
         /* --INPUT PROCESSING-- */
         Callbacks::processInput(this->m_window);
+        auto inputProcessTimer = timer::now();
 
         /* ----FLUSHING OLD---- */
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        auto flushingTimer = timer::now();
 
         /* --RENDERING SCENE--- */
         this->m_scene->render();
+        auto sceneRenderTimer = timer::now();
 
         /* ---RENDERING HUD---- */
         this->m_HUD->render();
+        auto hudRenderTimer = timer::now();
 
         /* --SWAPPING BUFFERS-- */
         glfwSwapBuffers(this->m_window);
         glfwPollEvents();
+        auto bufferSwapTimer = timer::now();
+
+        /* --MEASUREMENTS UPDATE-- */
+        if(counter < 100) {
+            timeUpdateMeasures[counter] = duration(timeUpdateTimer - startTime).count();
+            inputProcessMeasures[counter] = duration(inputProcessTimer - timeUpdateTimer).count();
+            flushingMeasures[counter] = duration(flushingTimer - inputProcessTimer).count();
+            sceneRenderMeasures[counter] = duration(sceneRenderTimer - flushingTimer).count();
+            hudRenderMeasures[counter] = duration(hudRenderTimer - sceneRenderTimer).count();
+            bufferSwapMeasures[counter] = duration(bufferSwapTimer - hudRenderTimer).count();
+            counter++;
+        }
+        else if(counter == 100) {
+            Logger::logPerf("Average time for time updating : " + std::to_string(mean(timeUpdateMeasures)) + " µs");
+            Logger::logPerf("Average time for input processing : " + std::to_string(mean(inputProcessMeasures)) + " µs");
+            Logger::logPerf("Average time for flushing buffers : " + std::to_string(mean(flushingMeasures)) + " µs");
+            Logger::logPerf("Average time for scene rendering : " + std::to_string(mean(sceneRenderMeasures)) + " µs");
+            Logger::logPerf("Average time for HUD rendering : " + std::to_string(mean(hudRenderMeasures)) + " µs");
+            Logger::logPerf("Average time for bufferSwapping : " + std::to_string(mean(bufferSwapMeasures)) + " µs");
+            counter++;
+        }
     }
 
     glfwTerminate();
