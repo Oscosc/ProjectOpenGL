@@ -6,22 +6,6 @@
 #include "Logger.hpp"
 
 
-int PascalValue(int i, int n)
-{
-    if(i == 0 || i == n)
-        return 1;
-    else
-        return PascalValue(i, n-1) + PascalValue(i-1, n-1);
-}
-
-
-float bersteinValue(float u, int i, int n)
-{
-    int p = PascalValue(i, n);
-    return p * pow(u, i) * pow((1.0f - u), n-i);
-}
-
-
 std::vector<unsigned int> Range(unsigned int n)
 {
     std::vector<unsigned int> rangeVector;

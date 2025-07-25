@@ -5,16 +5,10 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
-#include "Logger.hpp"
 #include "Scene.hpp"
-#include "Callbacks.hpp"
-#include "ShaderManager.hpp"
-#include "TextureManager.hpp"
 #include "HUD.hpp"
-#include "Mesh.hpp"
-#include "Sphere.hpp"
-#include "PointLight.hpp"
 
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600

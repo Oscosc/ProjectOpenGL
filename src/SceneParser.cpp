@@ -8,6 +8,7 @@
 #include "Object.hpp"
 #include "Light.hpp"
 #include "Logger.hpp"
+#include "BezierCurve.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -64,6 +65,10 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
     case MESH:
         parseObjectAs_Mesh(scene, item);
         break;
+
+    case BEZIER:
+        parseObjectAs_BezierCurve(scene, item);
+        break;
     }
 }
 
@@ -113,6 +118,21 @@ void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
     }
 }
 
+void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item)
+{
+    vec3Array controlPoints = jsonToVec3Array(item, "control points");
+
+    if(item["transform"] != nullptr) {
+        if(item["material"] != nullptr) {
+            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+        } else {
+            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"])));
+        }
+    } else {
+        scene->addObject(new BezierCurve(controlPoints));
+    }
+}
+
 glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
 {
     std::vector<float> value = static_cast<std::vector<float>>(json[attribute]);
@@ -159,4 +179,14 @@ LightMaterial SceneParser::jsonToLightMaterial(json json)
         jsonToVec3(json, "diffuse"),
         jsonToVec3(json, "specular")
     };
+}
+
+vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
+{
+    vec3Array value;
+    for(const auto& item : json[attribute]) {
+        value.push_back({item[0].get<float>(), item[1].get<float>(), item[2].get<float>()});
+    }
+
+    return value;
 }

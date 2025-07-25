@@ -1,5 +1,14 @@
 #include "Application.hpp"
+
 #include "SceneParser.hpp"
+#include "Logger.hpp"
+#include "Callbacks.hpp"
+#include "ShaderManager.hpp"
+#include "TextureManager.hpp"
+#include "Mesh.hpp"
+#include "Sphere.hpp"
+#include "PointLight.hpp"
+#include "BezierCurve.hpp"
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock

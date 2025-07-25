@@ -21,9 +21,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "utils.hpp"
-#include "Object.hpp"
+#include "Curve.hpp"
 
-#define MIN_DISCRETE_POINTS 2
+#define NB_CURVE_POINTS 30
+
 #define DISCRETIZATION_STEP 0.01
 #define EQUALY_BASE_SEGMENT 3.0 // Valeur qui semble correspondre après tests
 
@@ -35,26 +36,24 @@
  * Cette classe hérite de la classe Object, ce qui fait qu'elle est affichable via la fonction
  * draw() et son polygone de contrôle aussi.
  */
-class BezierCurve : public Object
+class BezierCurve : public Curve
 {
 public:
 
     /**
      * @brief Constructeur par défaut.
-     * @param control_points Points de contrôle de la courbe de Bézier.
+     * @param controlPoints Points de contrôle de la courbe de Bézier.
      */
-    BezierCurve(vec3Array control_points);
-
-    /**
-     * @brief Affiche les coordonnées des points de contrôle de la courbe dans le terminal.
-     */
-    void debugControlPoints();
+    BezierCurve(vec3Array controlPoints,
+        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Material material = DEFAULT_OBJECT_MATERIAL
+    );
 
     /**
      * @brief Renvoie la valeur de la fonction définissant la courbe de Bézier B(u) pour une
      * valeur de u comprise dans l'intervalle [0;1].
      */
-    glm::vec3 curveValue(float u);
+    glm::vec3 getCurveValue(float u) override;
     
     // ------------------------ FONCTIONS VIRTUELLES DE LA CLASSE "OBJECT" ------------------------
 
@@ -63,20 +62,10 @@ public:
      * 
      * La courbe est dessinée en blanc et le polygone de contrôle est dessiné en rouge.
      * Cette fonction doit être appelée à dans la boucle d'affichage à chaque frame.
-     * 
-     * @param shader Shader utilisé pour faire le rendu de la courbe.
-     * Attention : le shader doit implémenter la valeur uniforme "color" car la fonction y fait
-     * référence pour colorer la courbe et le polygone de contrôle.
      */
     void draw(Scene* scene) override;
 
 private:
-
-    vec3Array m_controlPoints;
-    vec3Array m_curvePoints;
-    unsigned int m_nbCurvePoints;
-
-    GLuint controlVAO, controlVBO;
 
     /**
      * @brief Discrétise la courbe de Bézier avec nbCurvePoints points en prenant des intervalles
