@@ -11,7 +11,7 @@ BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, Material 
 
     for(int i = 0; i < NB_CURVE_POINTS; ++i) {
         this->m_vertices[i] = {
-            getCurveValue((float)i / (NB_CURVE_POINTS - 1)),
+            getValue((float)i / (NB_CURVE_POINTS - 1)),
             glm::vec3(0.f),
             glm::vec2(0.f)
         };
@@ -22,7 +22,7 @@ BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, Material 
     initGLControlPolygon();
 }
 
-glm::vec3 BezierCurve::getCurveValue(float u)
+glm::vec3 BezierCurve::getValue(float u)
 {
     if(0.0f > u || u > 1.0f) {
         return glm::vec3(0.0f);

@@ -3,6 +3,7 @@
 #include "Object.hpp"
 #include "Logger.hpp"
 
+#define NB_CURVE_POINTS 30
 #define DEFAULT_CONTROL_COLOR {1.f, 0.f, 0.f}
 #define DEFAULT_CONTROL_SIZE 5.f
 
@@ -14,11 +15,10 @@ public:
     enum Visibility {OFF, POINTS, LINES};
 
     Curve(Transform transform, Material material) : Object(transform, material) {}
-    virtual glm::vec3 getCurveValue(float u) = 0;
+    virtual glm::vec3 getValue(float u) = 0;
 
 protected:
     void drawControlPolygon();
-
     void initGLControlPolygon();
 
     unsigned int m_controlVAO;

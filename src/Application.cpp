@@ -9,6 +9,7 @@
 #include "Sphere.hpp"
 #include "PointLight.hpp"
 #include "BezierCurve.hpp"
+#include "BezierSurface.hpp"
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock

@@ -11,6 +11,7 @@
 
 using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;
+using vec3Grid = std::vector<std::vector<glm::vec3>>;
 
 /**
  * @brief Complete representation of a vertice in a graphic sense.

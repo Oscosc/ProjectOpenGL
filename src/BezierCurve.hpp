@@ -23,8 +23,6 @@
 #include "utils.hpp"
 #include "Curve.hpp"
 
-#define NB_CURVE_POINTS 30
-
 #define DISCRETIZATION_STEP 0.01
 #define EQUALY_BASE_SEGMENT 3.0 // Valeur qui semble correspondre après tests
 
@@ -53,9 +51,7 @@ public:
      * @brief Renvoie la valeur de la fonction définissant la courbe de Bézier B(u) pour une
      * valeur de u comprise dans l'intervalle [0;1].
      */
-    glm::vec3 getCurveValue(float u) override;
-    
-    // ------------------------ FONCTIONS VIRTUELLES DE LA CLASSE "OBJECT" ------------------------
+    glm::vec3 getValue(float u) override;
 
     /**
      * @brief Dessine la courbe de Bézier et son polygone de contrôle à l'écran avec OpenGL.
@@ -64,33 +60,6 @@ public:
      * Cette fonction doit être appelée à dans la boucle d'affichage à chaque frame.
      */
     void draw(Scene* scene) override;
-
-private:
-
-    /**
-     * @brief Discrétise la courbe de Bézier avec nbCurvePoints points en prenant des intervalles
-     * réguliers sur [0;1].
-     * @return La liste des points qui forment la courbe discrétisée.
-     */
-    vec3Array normalDiscretization();
-
-    /**
-     * @brief Discrétise la courbe de Bézier de manière à avoir des segments de la même taille
-     * graphiquement, cette taille étant de (EQUALY_BASE_SEGMENT / nbCurvePoints). Seul le dernier
-     * segment a une longueur inférieure à cette valeur.
-     * @return La liste des points qui forment la courbe discrétisée.
-     */
-    vec3Array equalDiscretization();
-
-    /**
-     * @brief Met à jour les points de la courbe en recalculant les valeurs discrètes avec la
-     * fonction equalDiscretization() ou normalDiscretization() selon le mode actif (cf. classe
-     * ScalableElement).
-     * 
-     * Cette fonction fait appel à la fonction parente de la classe objet pour mettre à jour le
-     * buffer avec les nouvelles valeurs discrètes.
-     */
-    void updateCurvePoints();
 };
 
 #endif //BEZIER_CURVE_HPP
