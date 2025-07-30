@@ -5,6 +5,7 @@
 
 using json = nlohmann::json;
 using vec3Array = std::vector<glm::vec3>;
+using vec3Grid = std::vector<std::vector<glm::vec3>>;
 
 struct Transform;
 struct Material;
@@ -27,7 +28,7 @@ public:
         POINT_LIGHT, SPOT_LIGHT, DIR_LIGHT,
         SPHERE,
         MESH,
-        BEZIER
+        BEZIER_CURVE, BEZIER_SURFACE
     };
 
     /**
@@ -40,7 +41,8 @@ public:
         {"dir light", DIR_LIGHT},
         {"sphere", SPHERE},
         {"mesh", MESH},
-        {"bezier", BEZIER}
+        {"bezier curve", BEZIER_CURVE},
+        {"bezier surface", BEZIER_SURFACE}
     };
 
     /**
@@ -101,6 +103,14 @@ private:
     static void parseObjectAs_BezierCurve(Scene* scene, json item);
 
     /**
+     * @brief Parse the object as a bezier surface.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_BezierSurface(Scene* scene, json item);
+
+    /**
      * @brief Auxiliary function for casting json element to glm::vec3.
      * 
      * @param json JSON hierarchy containing the attribute
@@ -137,4 +147,6 @@ private:
     static LightMaterial jsonToLightMaterial(json json);
 
     static vec3Array jsonToVec3Array(json json, const std::string& attribute);
+
+    static vec3Grid jsonToVec3Grid(json json, const std::string& attribute);
 };

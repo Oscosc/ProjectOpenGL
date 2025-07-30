@@ -9,6 +9,7 @@
 #include "Light.hpp"
 #include "Logger.hpp"
 #include "BezierCurve.hpp"
+#include "BezierSurface.hpp"
 
 Scene SceneParser::parseScene(const std::string &file)
 {
@@ -66,15 +67,28 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         parseObjectAs_Mesh(scene, item);
         break;
 
-    case BEZIER:
+    case BEZIER_CURVE:
         parseObjectAs_BezierCurve(scene, item);
+        break;
+    
+    case BEZIER_SURFACE:
+        parseObjectAs_BezierSurface(scene, item);
         break;
     }
 }
 
 void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
 {
-    scene->addCamera(new Camera(jsonToVec3(item, "position")));
+    /* Roll(x), Pitch(y), Yaw(z)
+     * Roll is fixed (no camera roll), up vector is (0, 1, 0)
+     */
+    Transform transform = jsonToTransform(item["transform"]);
+    scene->addCamera(new Camera(
+        transform.position,
+        glm::vec3(0.f, 1.f, 0.f),
+        transform.rotation.z,
+        transform.rotation.y
+    ));
 }
 
 void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
@@ -133,6 +147,21 @@ void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item)
     }
 }
 
+void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item)
+{
+    vec3Grid controlPoints = jsonToVec3Grid(item, "control points");
+
+    if(item["transform"] != nullptr) {
+        if(item["material"] != nullptr) {
+            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+        } else {
+            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"])));
+        }
+    } else {
+        scene->addObject(new BezierSurface(controlPoints));
+    }
+}
+
 glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
 {
     std::vector<float> value = static_cast<std::vector<float>>(json[attribute]);
@@ -186,6 +215,22 @@ vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
     vec3Array value;
     for(const auto& item : json[attribute]) {
         value.push_back({item[0].get<float>(), item[1].get<float>(), item[2].get<float>()});
+    }
+
+    return value;
+}
+
+vec3Grid SceneParser::jsonToVec3Grid(json json, const std::string &attribute)
+{
+    vec3Grid value;
+    unsigned int i = 0;
+
+    for(const auto& sub : json[attribute]) {
+        value.push_back(vec3Array());
+        for(const auto& item : sub) {
+            value[i].push_back({item[0].get<float>(), item[1].get<float>(), item[2].get<float>()});
+        }
+        ++i;
     }
 
     return value;

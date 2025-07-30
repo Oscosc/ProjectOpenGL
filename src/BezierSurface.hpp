@@ -1,5 +1,4 @@
-#ifndef BEZIER_SURFACE
-#define BEZIER_SURFACE
+#pragma once
 
 /**
  * @file BezierSurface.hpp
@@ -41,5 +40,3 @@ protected:
     void computeIndexes();
     void computeNormals();
 };
-
-#endif // BEZIER_SURFACE
