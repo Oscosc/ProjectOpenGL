@@ -42,11 +42,16 @@ void Scene::updateLigth(Shader *shader)
 
     shader->use();
 
-    shader->setVec3("light.ambient", getLight(0)->getLightMaterial().ambient);
-    shader->setVec3("light.diffuse", getLight(0)->getLightMaterial().diffuse);
-    shader->setVec3("light.specular", getLight(0)->getLightMaterial().specular);
-    
-    shader->setVec3("light.position", static_cast<PointLight*>(getLight(0))->getPosition());
+    shader->setVec3("pointLights[0].ambient", getLight(0)->getLightMaterial().ambient);
+    shader->setVec3("pointLights[0].diffuse", getLight(0)->getLightMaterial().diffuse);
+    shader->setVec3("pointLights[0].specular", getLight(0)->getLightMaterial().specular);
+    shader->setVec3("pointLights[0].position", static_cast<PointLight*>(getLight(0))->getPosition());
+
+    shader->setVec3("pointLights[1].ambient", getLight(1)->getLightMaterial().ambient);
+    shader->setVec3("pointLights[1].diffuse", getLight(1)->getLightMaterial().diffuse);
+    shader->setVec3("pointLights[1].specular", getLight(1)->getLightMaterial().specular);
+    shader->setVec3("pointLights[1].position", static_cast<PointLight*>(getLight(1))->getPosition());
+
     shader->setVec3("viewPos", this->getActiveCamera()->Position);
 }
 
