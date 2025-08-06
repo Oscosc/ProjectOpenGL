@@ -25,7 +25,7 @@ public:
     /**
      * @brief return the light position.
      */
-    glm::vec3 getPosition() { return m_position; }
+    glm::vec3 getPosition() const { return m_position; }
 
     /**
      * @brief set the ligth to a new position.

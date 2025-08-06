@@ -1,6 +1,6 @@
 #include "Object.hpp"
 
-void Object::debugMaterial()
+void Object::debugMaterial() const
 {
     std::cout << "  |- Ambient   : " << glm::to_string(getMaterial().matShader.ambient) << std::endl;
     std::cout << "  |- Diffuse   : " << glm::to_string(getMaterial().matShader.diffuse) << std::endl;
@@ -43,7 +43,7 @@ void Object::initGLObject()
     glBindVertexArray(0);
 }
 
-void Object::updateMaterial(Shader *shader)
+void Object::updateMaterial(Shader *shader) const
 {
     shader->use();
     

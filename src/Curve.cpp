@@ -1,6 +1,6 @@
 #include "Curve.hpp"
 
-void Curve::drawControlPolygon() {
+void Curve::drawControlPolygon() const {
     glBindVertexArray(this->m_controlVAO);
 
     glPointSize(DEFAULT_CONTROL_SIZE);

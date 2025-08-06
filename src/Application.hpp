@@ -103,19 +103,19 @@ public:
     /**
      * @brief Return screen width.
      */
-    const unsigned int getScreenWidth() { return m_screenWidth; }
+    const unsigned int getScreenWidth() const { return m_screenWidth; }
 
     /**
      * @brief Return screen height.
      */
-    const unsigned int getScreenHeight() { return m_screenHeight; }
+    const unsigned int getScreenHeight() const { return m_screenHeight; }
 
     // TODO : Passer la gestion de la souris dans une classe
 
     /**
      * @brief Return false if mouse is enable (used as quad), true otherwise.
      */
-    const bool isMouseActive() { return m_mouseActive; }
+    const bool isMouseActive() const { return m_mouseActive; }
 
     /**
      * @brief Switch value of mouse disponibility status.
@@ -125,7 +125,7 @@ public:
     /**
      * @brief Return true while mouse hasn't been linked to the quad. False after.
      */
-    const bool isFirstMouse() { return m_firstMouse; }
+    const bool isFirstMouse() const { return m_firstMouse; }
 
     /**
      * @brief Call this function when mouse link to the quad for the first time.
@@ -136,7 +136,7 @@ public:
     /**
      * @brief Give cursor position relatively to the center of the application window. 
      */
-    const glm::vec2 getCursor() { return m_cursor; }
+    const glm::vec2 getCursor() const { return m_cursor; }
 
     /**
      * @brief Set cursor position.
@@ -156,7 +156,7 @@ public:
     /**
      * @brief Gives the delta time between last frame and current frame. 
      */
-    const float getDeltaTime() { return m_deltaTime; }
+    const float getDeltaTime() const { return m_deltaTime; }
 
     /**
      * @brief Set the new delta time for the current frame.
@@ -171,9 +171,9 @@ public:
      * @warning This function need to be removed, there is no justification to get Camera from
      * application context
      */
-    Camera* getActiveCamera() { return this->m_scene->getActiveCamera(); }
+    Camera* getActiveCamera() const { return this->m_scene->getActiveCamera(); }
 
-    Scene* getCurrentScene() { return this->m_scene; }
+    Scene* getCurrentScene() const { return this->m_scene; }
 
     /**
      * @brief static function to retrive an application object linked to the window given in

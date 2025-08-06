@@ -30,7 +30,7 @@ public:
      */
     virtual ~Light() = 0;
 
-    LightMaterial getLightMaterial() { return m_material; }
+    LightMaterial getLightMaterial() const { return m_material; }
     void setLightMaterial(LightMaterial material) { m_material = material; }
 
 private:

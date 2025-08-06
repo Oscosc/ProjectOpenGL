@@ -119,12 +119,12 @@ public:
      * 
      * @param scene Scene where this object will be rendered
      */
-    virtual void draw(Scene* scene) = 0;
+    virtual void draw(Scene* scene) const = 0;
 
     /**
      * @brief Give the material of this object.
      */
-    Material getMaterial() { return m_material; }
+    Material getMaterial() const { return m_material; }
 
     /**
      * @brief Set a new material for this object.
@@ -136,7 +136,7 @@ public:
     /**
      * @brief Give the transformation state of this object.
      */
-    Transform getTransform() { return m_transform; }
+    Transform getTransform() const { return m_transform; }
 
     /**
      * @brief Set a new transformation for this object.
@@ -145,12 +145,12 @@ public:
      */
     void setTransform(Transform transform) { m_transform = transform; }
 
-    void debugMaterial();
+    void debugMaterial() const;
 
 protected:
 
     void initGLObject();
-    void updateMaterial(Shader* shader);
+    void updateMaterial(Shader* shader) const;
 
     Transform m_transform;
     Material m_material;

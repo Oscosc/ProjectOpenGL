@@ -59,27 +59,27 @@ public:
      * 
      * @param scene Scene (and by consequent the window) where the mesh will be drawn
      */
-    void draw(Scene* scene) override;
+    void draw(Scene* scene) const override;
 
     /**
      * @brief Display mesh properties in logs for debug purposes
      */
-    void displayInformations();
+    void displayInformations() const;
 
     /**
      * @brief Give information about the disponibility of the normals for this mesh.
      */
-    bool hasNormals();
+    bool hasNormals() const;
 
     /**
      * @brief Give information about the disponibility of the UVs for this mesh.
      */
-    bool hasUVs();
+    bool hasUVs() const;
 
     /**
      * @brief Return the filename used for this mesh.
      */
-    std::string getName();
+    std::string getName() const;
 
 private:
 
@@ -88,7 +88,7 @@ private:
      * 
      * @param token fisrt token of the line obtained after line parsing
      */
-    LineType identify(std::string token);
+    LineType identify(std::string token) const;
 
     /**
      * @brief Main fuction called while creating a Mesh object to compute vertices and init GL

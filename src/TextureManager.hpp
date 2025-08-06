@@ -13,7 +13,7 @@ class TextureManager : public Singleton<TextureManager>
 public:
 
     void loadTexture(const std::string& name, const std::string textureFile);
-    const unsigned int* getTexture(const std::string& name);
+    const unsigned int* getTexture(const std::string& name) const;
 
 private:
 

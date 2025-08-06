@@ -7,10 +7,10 @@ class Surface : public Object
 {
 public:
     Surface(Transform transform, Material material) : Object(transform, material) {}
-    virtual glm::vec3 getValue(glm::vec2 uv) = 0;
+    virtual glm::vec3 getValue(glm::vec2 uv) const = 0;
 
 protected:
-    void drawControlPolygon();
+    void drawControlPolygon() const;
     void initGLControlPolygon();
 
     unsigned int m_controlVAO;

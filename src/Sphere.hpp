@@ -35,7 +35,7 @@ public:
      * 
      * @param scene scene where the sphere is rendered
      */
-    void draw(Scene* scene) override;
+    void draw(Scene* scene) const override;
 
     /**
      * @brief Gives the radius of the sphere.

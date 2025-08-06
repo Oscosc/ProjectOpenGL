@@ -22,7 +22,7 @@ BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, Material 
     initGLControlPolygon();
 }
 
-glm::vec3 BezierCurve::getValue(float u)
+glm::vec3 BezierCurve::getValue(float u) const
 {
     if(0.0f > u || u > 1.0f) {
         return glm::vec3(0.0f);
@@ -36,7 +36,7 @@ glm::vec3 BezierCurve::getValue(float u)
     return result;
 }
 
-void BezierCurve::draw(Scene* scene)
+void BezierCurve::draw(Scene* scene) const
 {
     Shader* shader = this->getMaterial().shader;
     if(shader == nullptr) {

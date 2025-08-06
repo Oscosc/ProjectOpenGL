@@ -25,7 +25,7 @@ BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, Materi
     initGLObject();
 }
 
-glm::vec3 BezierSurface::getValue(glm::vec2 uv)
+glm::vec3 BezierSurface::getValue(glm::vec2 uv) const
 {
     float u = uv.x;
     float v = uv.y;
@@ -47,7 +47,7 @@ glm::vec3 BezierSurface::getValue(glm::vec2 uv)
     return result;
 }
 
-void BezierSurface::draw(Scene* scene)
+void BezierSurface::draw(Scene* scene) const
 {
     Shader* shader = this->getMaterial().shader;
     if(shader == nullptr) {

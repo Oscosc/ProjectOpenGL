@@ -29,7 +29,7 @@ void HUD::initCursor()
     glBindVertexArray(0);
 }
 
-void HUD::renderCursor()
+void HUD::renderCursor() const
 {
     Shader* sh = ShaderManager::getInstance().getShader("quad");
     sh->use();
@@ -42,7 +42,7 @@ void HUD::renderCursor()
         std::cerr << "[OpenGL Error] Code: " << err << std::endl;
 }
 
-void HUD::render()
+void HUD::render() const
 {
     renderCursor();
 }

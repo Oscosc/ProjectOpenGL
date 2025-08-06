@@ -51,7 +51,7 @@ public:
      * @brief Renvoie la valeur de la fonction définissant la courbe de Bézier B(u) pour une
      * valeur de u comprise dans l'intervalle [0;1].
      */
-    glm::vec3 getValue(float u) override;
+    glm::vec3 getValue(float u) const override;
 
     /**
      * @brief Dessine la courbe de Bézier et son polygone de contrôle à l'écran avec OpenGL.
@@ -59,7 +59,7 @@ public:
      * La courbe est dessinée en blanc et le polygone de contrôle est dessiné en rouge.
      * Cette fonction doit être appelée à dans la boucle d'affichage à chaque frame.
      */
-    void draw(Scene* scene) override;
+    void draw(Scene* scene) const override;
 };
 
 #endif //BEZIER_CURVE_HPP

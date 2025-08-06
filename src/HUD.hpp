@@ -34,13 +34,13 @@ public:
     /**
      * @brief Render the cursor (quad) sub-object of HUD class
      */
-    void renderCursor();
+    void renderCursor() const;
 
     /**
      * @brief Render all HUD components with functions "renderNameOfComponent()".
      * All the shaders used in HUD must be integrated first using the ShaderManager.
      */
-    void render();
+    void render() const;
 
 private:
     unsigned int m_cursorVAO, m_cursorVBO;

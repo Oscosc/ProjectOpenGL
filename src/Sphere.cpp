@@ -42,7 +42,7 @@ bool Sphere::hit(const Ray &ray, float tMin, float tMax, HitRecord &record) cons
     return true;
 }
 
-void Sphere::draw(Scene* scene)
+void Sphere::draw(Scene* scene) const
 {
     Shader* shader = this->getMaterial().shader;
     shader->use();

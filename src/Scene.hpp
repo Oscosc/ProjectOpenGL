@@ -61,12 +61,12 @@ public:
     /**
      * @brief Return a reference to the active Camera of the scene
      */
-    Camera* getActiveCamera();
+    Camera* getActiveCamera() const;
 
     /**
      * @brief Return the active camera point of view matrix
      */
-    ProjViewMatrix getActiveCameraPV();
+    ProjViewMatrix getActiveCameraPV() const;
 
     /**
      * @brief Add a new camera to the scene.
@@ -92,38 +92,38 @@ public:
     /**
      * @brief Return the number of cameras in the scene.
      */
-    const unsigned int camerasCount() { return m_cameras.size(); }
+    const unsigned int camerasCount() const { return m_cameras.size(); }
 
     /**
      * @brief Return the number of lights in the scene.
      */
-    const unsigned int lightsCount() { return m_lights.size(); }
+    const unsigned int lightsCount() const { return m_lights.size(); }
 
     /**
      * @brief Return the number of objects in the scene.
      */
-    const unsigned int objectsCount() { return m_objects.size(); }
+    const unsigned int objectsCount() const { return m_objects.size(); }
 
     /**
      * @brief Return the camera with identifier = index
      * 
      * @param index index of the element to retrieve
      */
-    Camera* getCamera(unsigned int index) { return m_cameras.at(index); }
+    Camera* getCamera(unsigned int index) const { return m_cameras.at(index); }
 
     /**
      * @brief Return the light with identifier = index
      * 
      * @param index index of the element to retrieve
      */
-    Light* getLight(unsigned int index) { return m_lights.at(index); }
+    Light* getLight(unsigned int index) const { return m_lights.at(index); }
 
     /**
      * @brief Return the object with identifier = index
      * 
      * @param index index of the element to retrieve
      */
-    Object* getObject(unsigned int index) { return m_objects.at(index); }
+    Object* getObject(unsigned int index) const { return m_objects.at(index); }
 
     std::vector<Sphere*> getSpheresRT() const;
 

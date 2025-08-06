@@ -76,12 +76,12 @@ std::vector<Sphere*> Scene::getSpheresRT() const
     return spheres;
 }
 
-Camera *Scene::getActiveCamera()
+Camera *Scene::getActiveCamera() const
 {
     return this->m_cameras.at(this->m_activeCamera);
 }
 
-ProjViewMatrix Scene::getActiveCameraPV()
+ProjViewMatrix Scene::getActiveCameraPV() const
 {
     return this->m_activeCameraPV;
 }

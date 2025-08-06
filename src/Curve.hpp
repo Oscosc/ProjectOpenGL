@@ -15,10 +15,10 @@ public:
     enum Visibility {OFF, POINTS, LINES};
 
     Curve(Transform transform, Material material) : Object(transform, material) {}
-    virtual glm::vec3 getValue(float u) = 0;
+    virtual glm::vec3 getValue(float u) const = 0;
 
 protected:
-    void drawControlPolygon();
+    void drawControlPolygon() const;
     void initGLControlPolygon();
 
     unsigned int m_controlVAO;

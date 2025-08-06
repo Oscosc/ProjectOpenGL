@@ -7,7 +7,7 @@ Mesh::Mesh(std::string file, Transform transformation, Material material) :
     loadInitMesh(file);
 }
 
-void Mesh::draw(Scene* scene)
+void Mesh::draw(Scene* scene) const
 {
     Shader* shader = this->getMaterial().shader;
     if(shader == nullptr) {
@@ -42,7 +42,7 @@ void Mesh::draw(Scene* scene)
     }
 }
 
-void Mesh::displayInformations()
+void Mesh::displayInformations() const
 {
     std::string normals = hasNormals() ? "YES" : "NO";
     std::string uvs = hasUVs() ? "YES" : "NO";
@@ -61,22 +61,22 @@ void Mesh::displayInformations()
     std::cout << std::endl;
 }
 
-bool Mesh::hasNormals()
+bool Mesh::hasNormals() const
 {
     return this->m_hasNormals;
 }
 
-bool Mesh::hasUVs()
+bool Mesh::hasUVs() const
 {
     return this->m_hasUVs;
 }
 
-std::string Mesh::getName()
+std::string Mesh::getName() const
 {
     return this->m_filename;
 }
 
-Mesh::LineType Mesh::identify(std::string token)
+Mesh::LineType Mesh::identify(std::string token) const
 {
     if(token.length() == 1) {
         if      (token[0] == '#') return LineType::COMMENT;

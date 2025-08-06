@@ -31,9 +31,9 @@ public:
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 
-    glm::vec3 getValue(glm::vec2 uv) override;
+    glm::vec3 getValue(glm::vec2 uv) const override;
 
-    void draw(Scene* scene) override;
+    void draw(Scene* scene) const override;
 
 protected:
 
