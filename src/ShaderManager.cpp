@@ -3,7 +3,7 @@
 
 void ShaderManager::loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath)
 {
-    this->m_shaders.emplace(name, Shader(vertexPath.c_str(), fragmentPath.c_str()));
+    this->m_shaders.emplace(name, Shader(vertexPath.c_str(), fragmentPath.c_str(), 2, 0, 0));
 }
 
 Shader* ShaderManager::getShader(const std::string &name)

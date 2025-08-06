@@ -1,8 +1,8 @@
 #version 330 core
 
-#define NB_POINT_LIGHTS 2
-#define NB_DIR_LIGHTS   1
-#define NB_SPOT_LIGHTS  1
+#define NB_POINT_LIGHTS POINT_QTE
+#define NB_DIR_LIGHTS   DIR_QTE
+#define NB_SPOT_LIGHTS  SPOT_QTE
 
 #define CONSTANT 1.0
 #define LINEAR 0.09
@@ -59,9 +59,21 @@ in vec3 Normal;
 in vec3 UV;
 
 uniform Material material;
-uniform PointLight pointLights[NB_POINT_LIGHTS];
-uniform DirLight dirLights[NB_DIR_LIGHTS];
-uniform SpotLight spotLights[NB_SPOT_LIGHTS];
+
+#if NB_POINT_LIGHTS > 0
+    #define POINT_LIGHTS
+    uniform PointLight pointLights[NB_POINT_LIGHTS];
+#endif
+
+#if NB_DIR_LIGHTS > 0
+    #define DIR_LIGHTS
+    uniform DirLight dirLights[NB_DIR_LIGHTS];
+#endif
+
+#if NB_SPOT_LIGHTS > 0
+    #define SPOT_LIGHTS
+    uniform SpotLight spotLights[NB_SPOT_LIGHTS];
+#endif
 
 uniform vec3 viewPos;
 
@@ -159,18 +171,23 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 result = vec3(0.0, 0.0, 0.0);
 
-    /*
-    // phase 1: Directional lighting
-    for(int i = 0; i < NB_DIR_LIGHTS; i++)
-        result += CalcDirLight(dirLights[i], norm, viewDir);
-    */
-    // phase 2: Point lights
+#ifdef POINT_LIGHTS
+    // phase 1: Point lights
     for(int i = 0; i < NB_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-    /*
+#endif
+
+#ifdef DIR_LIGHTS
+    // phase 2: Directional lighting
+    for(int i = 0; i < NB_DIR_LIGHTS; i++)
+        result += CalcDirLight(dirLights[i], norm, viewDir);
+#endif
+
+#ifdef SPOT_LIGHTS
     // phase 3: Spot light
     for(int i = 0; i < NB_SPOT_LIGHTS; i++)
         result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
-    */
+#endif
+
     FragColor = vec4(result, 1.0);
 }
