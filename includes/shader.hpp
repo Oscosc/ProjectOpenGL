@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 class Shader
 {
@@ -15,7 +16,11 @@ public:
     unsigned int ID;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath)
+    Shader(const char* vertexPath, const char* fragmentPath,
+        const unsigned int pointLights = 0,
+        const unsigned int dirLights   = 0,
+        const unsigned int spotLights  = 0
+    )
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -45,6 +50,11 @@ public:
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
         }
+
+        preProcessDefine(fragmentCode, "POINT_QTE", pointLights);
+        preProcessDefine(fragmentCode, "DIR_QTE", dirLights);
+        preProcessDefine(fragmentCode, "SPOT_QTE", spotLights);
+
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
         // 2. compile shaders
@@ -159,6 +169,16 @@ private:
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
             }
+        }
+    }
+
+    void preProcessDefine(std::string& codeStr, const std::string& name, unsigned int value)
+    {
+        std::string valStr = std::to_string(value);
+        size_t pos = 0;
+        while ((pos = codeStr.find(name, pos)) != std::string::npos) {
+            codeStr.replace(pos, name.length(), valStr);
+            pos += valStr.length();
         }
     }
 };

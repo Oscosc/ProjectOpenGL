@@ -59,7 +59,7 @@ public:
     /**
      * @brief Load and compile all default shader files into ShaderManager.
      */
-    void initShaders();
+    void initShaders(const std::string& sceneFile);
 
     /**
      * @brief Read scene file to construct scene. Scene files structure is

@@ -11,6 +11,33 @@
 #include "BezierCurve.hpp"
 #include "BezierSurface.hpp"
 
+std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
+{
+    std::ifstream stream(file);
+    json data = json::parse(stream);
+
+    std::unordered_map<ElementType, unsigned int> sceneCounts;
+
+    for(auto& item : data) {
+        if(item["type"] == nullptr) {
+            Logger::logError("Scene object must have a 'type' defined");
+            exit(1);
+        }
+
+        auto it = s_TypeAliases.find(item["type"]);
+        if(it == s_TypeAliases.end()) {
+            Logger::logError("Type " + (std::string)item["type"] + " does not exist");
+            exit(1);
+        }
+
+        ElementType type = it->second;
+        (sceneCounts.find(type) == sceneCounts.end()) ? sceneCounts[type] = 1 : sceneCounts[type]++;
+    }
+
+    // for(auto item : sceneCounts) std::cout << item.second << " occurences of " << item.first << std::endl;
+    return sceneCounts;
+}
+
 Scene SceneParser::parseScene(const std::string &file)
 {
     std::ifstream stream(file);
@@ -52,12 +79,12 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         break;
 
     case SPOT_LIGHT:
-        Logger::logError("'spot_light' Not implemented yet");
-        exit(1);
+        parseObjectAs_SpotLight(scene, item);
+        break;
 
     case DIR_LIGHT:
-        Logger::logError("'dir_light' Not implemented yet");
-        exit(1);
+        parseObjectAs_DirectionalLight(scene, item);
+        break;
         
     case SPHERE:
         parseObjectAs_Sphere(scene, item);
@@ -129,6 +156,30 @@ void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
         scene->addLight(new PointLight(position, jsonToLightMaterial(item["material"])));
     } else {
         scene->addLight(new PointLight(position));
+    }
+}
+
+void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
+{
+    glm::vec3 direction = jsonToVec3(item, "direction");
+    if(item["material"] != nullptr) {
+        scene->addLight(new DirectionalLight(direction, jsonToLightMaterial(item["material"])));
+    } else {
+        scene->addLight(new DirectionalLight(direction));
+    }
+}
+
+void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
+{
+    glm::vec3 direction = jsonToVec3(item, "direction");
+    glm::vec3 position = jsonToVec3(item, "position");
+    float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
+    float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
+
+    if(item["material"] != nullptr) {
+        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
+    } else {
+        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff));
     }
 }
 

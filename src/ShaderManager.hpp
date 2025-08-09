@@ -23,7 +23,8 @@ public:
      * @param vertexPath path of the .vs or .vert associated file
      * @param fragmentPath path of the .fs or .frag associated file
      */
-    void loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+    void loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath,
+        const unsigned int pointLight = 0, const unsigned int dirLight = 0, const unsigned int spotLight = 0);
 
     /**
      * @brief Gives a reference to the shader by it's name (null if not found)

@@ -45,6 +45,8 @@ public:
         {"bezier surface", BEZIER_SURFACE}
     };
 
+    static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const std::string& file);
+
     /**
      * @brief Main function for parsing a Scene file (.json)
      * 
@@ -93,6 +95,22 @@ private:
      * @param item JSON sub-object that contain the element informations.
      */
     static void parseObjectAs_PointLight(Scene* scene, json item);
+
+    /**
+     * @brief Parse the object as a directional light.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_DirectionalLight(Scene* scene, json item);
+
+    /**
+     * @brief Parse the object as a spot light.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_SpotLight(Scene* scene, json item);
 
     /**
      * @brief Parse the object as a bezier curve.
