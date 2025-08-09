@@ -79,8 +79,8 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         break;
 
     case SPOT_LIGHT:
-        Logger::logError("'spot_light' Not implemented yet");
-        exit(1);
+        parseObjectAs_SpotLight(scene, item);
+        break;
 
     case DIR_LIGHT:
         parseObjectAs_DirectionalLight(scene, item);
@@ -166,6 +166,20 @@ void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
         scene->addLight(new DirectionalLight(direction, jsonToLightMaterial(item["material"])));
     } else {
         scene->addLight(new DirectionalLight(direction));
+    }
+}
+
+void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
+{
+    glm::vec3 direction = jsonToVec3(item, "direction");
+    glm::vec3 position = jsonToVec3(item, "position");
+    float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
+    float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
+
+    if(item["material"] != nullptr) {
+        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
+    } else {
+        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff));
     }
 }
 

@@ -107,9 +107,7 @@ public:
     /**
      * @brief Return the number of lights in the scene.
      */
-    const unsigned int lightsCount() const {
-        return m_lights.dirLights.size() + m_lights.pointLights.size() + m_lights.spotLights.size();
-    }
+    const unsigned int lightsCount() const;
 
     /**
      * @brief Return the number of objects in the scene.

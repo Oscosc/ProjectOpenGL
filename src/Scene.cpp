@@ -70,6 +70,8 @@ void Scene::updateLigth(Shader *shader)
         shader->setVec3("spotLights[" + i_str + "].specular", light->getLightMaterial().specular);
         shader->setVec3("spotLights[" + i_str + "].position", light->getPosition());
         shader->setVec3("spotLights[" + i_str + "].direction", light->getDirection());
+        shader->setFloat("spotLights[" + i_str + "].cutOff", light->getCutOff());
+        shader->setFloat("spotLights[" + i_str + "].outerCutOff", light->getOuterCutOff());
         ++i;
     }
 
@@ -85,6 +87,10 @@ void Scene::addCamera(Camera *camera)
 void Scene::addObject(Object *object)
 {
     this->m_objects.push_back(object);
+}
+
+const unsigned int Scene::lightsCount() const {
+    return m_lights.dirLights.size() + m_lights.pointLights.size() + m_lights.spotLights.size();
 }
 
 std::vector<Sphere*> Scene::getSpheresRT() const

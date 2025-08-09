@@ -11,7 +11,8 @@ public:
         float cutOff = 0.0,
         float outerCutOff = 1.0f,
         LightMaterial material = DEFAULT_LIGHT_MATERIAL)
-    : Light(material), m_direction(direction) {}
+    : Light(material), m_direction(direction), m_position(position),
+    m_cutOff(cutOff), m_outerCutOff(outerCutOff) {}
 
     glm::vec3 getDirection() const { return m_direction; }
     glm::vec3 getPosition() const { return m_position; }
