@@ -53,7 +53,7 @@ public:
 
         preProcessDefine(fragmentCode, "POINT_QTE", pointLights);
         preProcessDefine(fragmentCode, "DIR_QTE", dirLights);
-        preProcessDefine(fragmentCode, "SPOT_QTE", dirLights);
+        preProcessDefine(fragmentCode, "SPOT_QTE", spotLights);
 
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
