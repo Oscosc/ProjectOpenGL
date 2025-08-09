@@ -97,6 +97,14 @@ private:
     static void parseObjectAs_PointLight(Scene* scene, json item);
 
     /**
+     * @brief Parse the object as a directional light.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_DirectionalLight(Scene* scene, json item);
+
+    /**
      * @brief Parse the object as a bezier curve.
      * 
      * @param scene Scene where element will be added

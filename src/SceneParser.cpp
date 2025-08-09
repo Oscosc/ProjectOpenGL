@@ -83,8 +83,8 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
         exit(1);
 
     case DIR_LIGHT:
-        Logger::logError("'dir_light' Not implemented yet");
-        exit(1);
+        parseObjectAs_DirectionalLight(scene, item);
+        break;
         
     case SPHERE:
         parseObjectAs_Sphere(scene, item);
@@ -156,6 +156,16 @@ void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
         scene->addLight(new PointLight(position, jsonToLightMaterial(item["material"])));
     } else {
         scene->addLight(new PointLight(position));
+    }
+}
+
+void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
+{
+    glm::vec3 direction = jsonToVec3(item, "direction");
+    if(item["material"] != nullptr) {
+        scene->addLight(new DirectionalLight(direction, jsonToLightMaterial(item["material"])));
+    } else {
+        scene->addLight(new DirectionalLight(direction));
     }
 }
 

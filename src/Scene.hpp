@@ -95,7 +95,9 @@ public:
      * 
      * @param light element to add.
      */
-    void addLight(Light* light);
+    void addLight(PointLight* light) { this->m_lights.pointLights.push_back(light); }
+    void addLight(DirectionalLight* light) { this->m_lights.dirLights.push_back(light); }
+    void addLight(SpotLight* light) { this->m_lights.spotLights.push_back(light); }
 
     /**
      * @brief Return the number of cameras in the scene.
@@ -105,7 +107,9 @@ public:
     /**
      * @brief Return the number of lights in the scene.
      */
-    const unsigned int lightsCount() const { return m_lights.size(); }
+    const unsigned int lightsCount() const {
+        return m_lights.dirLights.size() + m_lights.pointLights.size() + m_lights.spotLights.size();
+    }
 
     /**
      * @brief Return the number of objects in the scene.
@@ -124,7 +128,7 @@ public:
      * 
      * @param index index of the element to retrieve
      */
-    Light* getLight(unsigned int index) const { return m_lights.at(index); }
+    // Light* getLight(unsigned int index) const { return m_lights.at(index); }
 
     /**
      * @brief Return the object with identifier = index
@@ -142,7 +146,6 @@ private:
     std::vector<Camera*> m_cameras;
     std::vector<Object*> m_objects;
 
-    std::vector<Light*> m_lights;
-    LightGroup m_lights2;
+    LightGroup m_lights;
 
 };

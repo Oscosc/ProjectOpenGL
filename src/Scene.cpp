@@ -43,22 +43,33 @@ void Scene::updateLigth(Shader *shader)
     shader->use();
 
     unsigned int i = 0;
-    for(Light* light : m_lights) {
+    for(PointLight* light : m_lights.pointLights) {
         std::string i_str = std::to_string(i);
         shader->setVec3("pointLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
         shader->setVec3("pointLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
         shader->setVec3("pointLights[" + i_str + "].specular", light->getLightMaterial().specular);
+        shader->setVec3("pointLights[" + i_str + "].position", light->getPosition());
+        ++i;
+    }
 
-        PointLight* pointLight = dynamic_cast<PointLight*>(light);
-        if(pointLight != nullptr) {
-            shader->setVec3("pointLights[" + i_str + "].position", pointLight->getPosition());
-        } else {
-            DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(light);
-            if(pointLight != nullptr) {
-                shader->setVec3("pointLights[" + i_str + "].direction", pointLight->getPosition());
-            }
-        }
+    i = 0;
+    for(DirectionalLight* light : m_lights.dirLights) {
+        std::string i_str = std::to_string(i);
+        shader->setVec3("dirLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
+        shader->setVec3("dirLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
+        shader->setVec3("dirLights[" + i_str + "].specular", light->getLightMaterial().specular);
+        shader->setVec3("dirLights[" + i_str + "].direction", light->getDirection());
+        ++i;
+    }
 
+    i = 0;
+    for(SpotLight* light : m_lights.spotLights) {
+        std::string i_str = std::to_string(i);
+        shader->setVec3("spotLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
+        shader->setVec3("spotLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
+        shader->setVec3("spotLights[" + i_str + "].specular", light->getLightMaterial().specular);
+        shader->setVec3("spotLights[" + i_str + "].position", light->getPosition());
+        shader->setVec3("spotLights[" + i_str + "].direction", light->getDirection());
         ++i;
     }
 
@@ -74,11 +85,6 @@ void Scene::addCamera(Camera *camera)
 void Scene::addObject(Object *object)
 {
     this->m_objects.push_back(object);
-}
-
-void Scene::addLight(Light *light)
-{
-    this->m_lights.push_back(light);
 }
 
 std::vector<Sphere*> Scene::getSpheresRT() const
