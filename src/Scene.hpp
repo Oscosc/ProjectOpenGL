@@ -9,10 +9,18 @@
 #include "../includes/shader.hpp"
 #include "Light.hpp"
 #include "PointLight.hpp"
+#include "DirectionalLight.hpp"
+#include "SpotLight.hpp"
 #include "ProjViewMatrix.hpp"
 
 class Object;
 class Sphere;
+
+struct LightGroup {
+    std::vector<PointLight*> pointLights;
+    std::vector<DirectionalLight*> dirLights;
+    std::vector<SpotLight*> spotLights;
+};
 
 /**
  * @brief Class representing a Scene which contain objects, lights and Cameras.
@@ -133,6 +141,8 @@ private:
 
     std::vector<Camera*> m_cameras;
     std::vector<Object*> m_objects;
+
     std::vector<Light*> m_lights;
+    LightGroup m_lights2;
 
 };

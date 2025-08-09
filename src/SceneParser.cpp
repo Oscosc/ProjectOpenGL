@@ -11,6 +11,33 @@
 #include "BezierCurve.hpp"
 #include "BezierSurface.hpp"
 
+std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
+{
+    std::ifstream stream(file);
+    json data = json::parse(stream);
+
+    std::unordered_map<ElementType, unsigned int> sceneCounts;
+
+    for(auto& item : data) {
+        if(item["type"] == nullptr) {
+            Logger::logError("Scene object must have a 'type' defined");
+            exit(1);
+        }
+
+        auto it = s_TypeAliases.find(item["type"]);
+        if(it == s_TypeAliases.end()) {
+            Logger::logError("Type " + (std::string)item["type"] + " does not exist");
+            exit(1);
+        }
+
+        ElementType type = it->second;
+        (sceneCounts.find(type) == sceneCounts.end()) ? sceneCounts[type] = 1 : sceneCounts[type]++;
+    }
+
+    // for(auto item : sceneCounts) std::cout << item.second << " occurences of " << item.first << std::endl;
+    return sceneCounts;
+}
+
 Scene SceneParser::parseScene(const std::string &file)
 {
     std::ifstream stream(file);

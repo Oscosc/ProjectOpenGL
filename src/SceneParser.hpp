@@ -45,6 +45,8 @@ public:
         {"bezier surface", BEZIER_SURFACE}
     };
 
+    static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const std::string& file);
+
     /**
      * @brief Main function for parsing a Scene file (.json)
      * 

@@ -42,15 +42,25 @@ void Scene::updateLigth(Shader *shader)
 
     shader->use();
 
-    shader->setVec3("pointLights[0].ambient", getLight(0)->getLightMaterial().ambient);
-    shader->setVec3("pointLights[0].diffuse", getLight(0)->getLightMaterial().diffuse);
-    shader->setVec3("pointLights[0].specular", getLight(0)->getLightMaterial().specular);
-    shader->setVec3("pointLights[0].position", static_cast<PointLight*>(getLight(0))->getPosition());
+    unsigned int i = 0;
+    for(Light* light : m_lights) {
+        std::string i_str = std::to_string(i);
+        shader->setVec3("pointLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
+        shader->setVec3("pointLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
+        shader->setVec3("pointLights[" + i_str + "].specular", light->getLightMaterial().specular);
 
-    shader->setVec3("pointLights[1].ambient", getLight(1)->getLightMaterial().ambient);
-    shader->setVec3("pointLights[1].diffuse", getLight(1)->getLightMaterial().diffuse);
-    shader->setVec3("pointLights[1].specular", getLight(1)->getLightMaterial().specular);
-    shader->setVec3("pointLights[1].position", static_cast<PointLight*>(getLight(1))->getPosition());
+        PointLight* pointLight = dynamic_cast<PointLight*>(light);
+        if(pointLight != nullptr) {
+            shader->setVec3("pointLights[" + i_str + "].position", pointLight->getPosition());
+        } else {
+            DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(light);
+            if(pointLight != nullptr) {
+                shader->setVec3("pointLights[" + i_str + "].direction", pointLight->getPosition());
+            }
+        }
+
+        ++i;
+    }
 
     shader->setVec3("viewPos", this->getActiveCamera()->Position);
 }

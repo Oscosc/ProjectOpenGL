@@ -66,9 +66,14 @@ void Application::initCallbacks()
     glfwSetMouseButtonCallback(this->m_window, Callbacks::mouse_button_callback);
 }
 
-void Application::initShaders()
+void Application::initShaders(const std::string& sceneFile)
 {
-    ShaderManager::getInstance().loadShader("lighted", "shaders/lighted.vs", "shaders/lighted.fs");
+    auto sceneCount = SceneParser::retrieveSceneCounts(sceneFile);
+    unsigned int pointLights = sceneCount[SceneParser::POINT_LIGHT];
+    unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
+    unsigned int spotLights = sceneCount[SceneParser::SPOT_LIGHT];
+
+    ShaderManager::getInstance().loadShader("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights);
     ShaderManager::getInstance().loadShader("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs");
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
@@ -224,6 +229,7 @@ void Application::loop()
 
 void Application::run(const std::string& sceneFile)
 {
+
     initWindow();
     Logger::logInfo("OpenGL Window correctly loaded");
 
@@ -233,7 +239,7 @@ void Application::run(const std::string& sceneFile)
     initCallbacks();
     Logger::logInfo("Callbacks correctly instancied");
 
-    initShaders();
+    initShaders(sceneFile);
     Logger::logInfo("Shaders correctly loaded and computed");
 
     initScene(sceneFile);
@@ -244,7 +250,6 @@ void Application::run(const std::string& sceneFile)
     
     Logger::logInfo("Starting application loop");
     loop();
-
     Logger::logInfo("Application closed");
 }
 
