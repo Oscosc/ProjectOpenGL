@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
 
     Logger::setColoredMode(true);
-    Logger::setVerbosity(MAX_LOG_LEVEL);
+    Logger::setVerbosity(1);
 
     Application app;
     if(argc < 2) {

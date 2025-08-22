@@ -10,6 +10,7 @@
 #include "PointLight.hpp"
 #include "BezierCurve.hpp"
 #include "BezierSurface.hpp"
+#include "Grid.hpp"
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
@@ -77,6 +78,7 @@ void Application::initShaders(const std::string& sceneFile)
     ShaderManager::getInstance().loadShader("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs");
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
+    ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
 
 #ifdef LOAD_TEXTURES_ON
     TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
@@ -89,6 +91,8 @@ void Application::initScene(const std::string& file)
 {
     this->m_scene = new Scene(SceneParser::parseScene(file));
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
+
+    // this->m_scene->addObject(new Grid());
 
 #ifdef RAY_TRACING_ON
 
