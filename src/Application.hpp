@@ -13,6 +13,8 @@
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
 
+#define MAX_WINDOWS 2
+
 // #define RAY_TRACING_ON
 // #define LOAD_TEXTURES_ON
 
@@ -101,6 +103,11 @@ public:
     void run(const std::string& sceneFile);
 
     /**
+     * @brief Check if the application should close or not
+     */
+    bool applicationShouldClose();
+
+    /**
      * @brief Return screen width.
      */
     const unsigned int getScreenWidth() const { return m_screenWidth; }
@@ -166,6 +173,39 @@ public:
     void setDeltaTime(float value) { m_deltaTime = value; }
 
     /**
+     * @brief Return the main window of the application.
+     */
+    GLFWwindow* getMainWindow() const { return m_windows[0]; }
+
+    /**
+     * @brief Set the Main Window of the application.
+     * 
+     * @param window new main window value
+     */
+    void setMainWindow(GLFWwindow* window) { m_windows[0] = window; }
+
+    /**
+     * @brief Return external window of the application if exists.
+     */
+    GLFWwindow* getExternalWindow(unsigned int windowID) const;
+
+    /**
+     * @brief Set a new external window for this application.
+     * 
+     * @param width width of the window
+     * @param height height of the window
+     * @param windowTitle title of the window
+     * @return ID of the window created
+     */
+    unsigned int createExternalWindow(
+        const unsigned int width = DEFAULT_SCREEN_WIDTH,
+        const unsigned int height = DEFAULT_SCREEN_HEIGHT,
+        const std::string& windowTitle = "New window"
+    );
+
+    void cleanRemoveExternalWindow(unsigned int windowID);
+
+    /**
      * @brief return the active Camera of the current scene managed by this application.
      * 
      * @warning This function need to be removed, there is no justification to get Camera from
@@ -186,9 +226,10 @@ public:
 private:
 
     /* --- WINDOW --- */
-    GLFWwindow* m_window;
+    GLFWwindow* m_windows[MAX_WINDOWS];
     unsigned int m_screenWidth;
     unsigned int m_screenHeight;
+    unsigned int m_activeWindowsCount;
 
     /* --- TIME --- */
     float m_deltaTime;

@@ -52,6 +52,11 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
         app->switchMouseActive();
     }
 
+    // Open a window for ray-tracing
+    if(key == GLFW_KEY_R && action == GLFW_PRESS) {
+        app->createExternalWindow(800, 600, "Ray-tracing");
+    }
+
     /*
     // Switch surface displaying mode
     if (key == GLFW_KEY_B && action == GLFW_PRESS) {

@@ -3,12 +3,13 @@
 #include "RayTracing.hpp"
 #include "Logger.hpp"
 
+
 int main(int argc, char* argv[]) {
 
     Logger::setColoredMode(true);
-    Logger::setVerbosity(1);
+    Logger::setVerbosity(MAX_LOG_LEVEL);
 
-    Application app;
+    Application app(1500, 1000);
     if(argc < 2) {
         Logger::logWarning("No scene file specified for this application, loading default scene");
         app.run("resources/scenes/default_scene.json");
