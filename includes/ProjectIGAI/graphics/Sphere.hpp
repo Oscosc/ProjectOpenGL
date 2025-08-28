@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include <ProjectIGAI/graphics/Object.hpp>
-#include <ProjectIGAI/raytracing/Raytracing/Hittable.hpp>
+#include <ProjectIGAI/raytracing/Hittable.hpp>
 #include <ProjectIGAI/core/utils.hpp>
 
 #define DEFAULT_STACKS 64

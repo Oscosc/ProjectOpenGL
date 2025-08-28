@@ -8,7 +8,7 @@
 #include <extern/camera.hpp>
 #include <ProjectIGAI/raytracing/Ray.hpp>
 #include <ProjectIGAI/core/Scene.hpp>
-#include <ProjectIGAI/raytracing/Raytracing/Hittable.hpp>
+#include <ProjectIGAI/raytracing/Hittable.hpp>
 
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600
