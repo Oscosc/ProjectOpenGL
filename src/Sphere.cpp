@@ -1,5 +1,6 @@
-#include "Sphere.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/Sphere.hpp>
+
+#include <ProjectIGAI/Logger.hpp>
 
 Sphere::Sphere(float radius, Transform transform, Material material) : m_radius(radius), Object(transform, material)
 {

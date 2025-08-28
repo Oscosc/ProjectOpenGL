@@ -5,10 +5,10 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "../includes/camera.hpp"
-#include "Ray.hpp"
-#include "Scene.hpp"
-#include "Hittable.hpp"
+#include <extern/camera.hpp>
+#include <ProjectIGAI/Ray.hpp>
+#include <ProjectIGAI/Scene.hpp>
+#include <ProjectIGAI/Hittable.hpp>
 
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600

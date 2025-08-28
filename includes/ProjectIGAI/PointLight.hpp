@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Light.hpp"
+#include <ProjectIGAI/Light.hpp>
 
 /**
  * @brief This class represents a point light object, which is a positionned light that's diffuse

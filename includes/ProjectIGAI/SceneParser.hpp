@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../includes/json.hpp"
-#include "Scene.hpp"
+#include <extern/json.hpp>
+#include <ProjectIGAI/Scene.hpp>
 
 using json = nlohmann::json;
 using vec3Array = std::vector<glm::vec3>;

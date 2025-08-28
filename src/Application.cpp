@@ -1,16 +1,16 @@
-#include "Application.hpp"
+#include <ProjectIGAI/Application.hpp>
 
-#include "SceneParser.hpp"
-#include "Logger.hpp"
-#include "Callbacks.hpp"
-#include "ShaderManager.hpp"
-#include "TextureManager.hpp"
-#include "Mesh.hpp"
-#include "Sphere.hpp"
-#include "PointLight.hpp"
-#include "BezierCurve.hpp"
-#include "BezierSurface.hpp"
-#include "Grid.hpp"
+#include <ProjectIGAI/SceneParser.hpp>
+#include <ProjectIGAI/Logger.hpp>
+#include <ProjectIGAI/Callbacks.hpp>
+#include <ProjectIGAI/ShaderManager.hpp>
+#include <ProjectIGAI/TextureManager.hpp>
+#include <ProjectIGAI/Mesh.hpp>
+#include <ProjectIGAI/Sphere.hpp>
+#include <ProjectIGAI/PointLight.hpp>
+#include <ProjectIGAI/BezierCurve.hpp>
+#include <ProjectIGAI/BezierSurface.hpp>
+#include <ProjectIGAI/Grid.hpp>
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock

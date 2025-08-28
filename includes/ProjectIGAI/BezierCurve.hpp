@@ -20,8 +20,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "utils.hpp"
-#include "Curve.hpp"
+#include <ProjectIGAI/utils.hpp>
+#include <ProjectIGAI/Curve.hpp>
 
 #define DISCRETIZATION_STEP 0.01
 #define EQUALY_BASE_SEGMENT 3.0 // Valeur qui semble correspondre après tests

@@ -1,15 +1,15 @@
-#include "SceneParser.hpp"
+#include <ProjectIGAI/SceneParser.hpp>
 
 #include <fstream>
 #include <iostream>
 
-#include "Mesh.hpp"
-#include "Sphere.hpp"
-#include "Object.hpp"
-#include "Light.hpp"
-#include "Logger.hpp"
-#include "BezierCurve.hpp"
-#include "BezierSurface.hpp"
+#include <ProjectIGAI/Mesh.hpp>
+#include <ProjectIGAI/Sphere.hpp>
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Light.hpp>
+#include <ProjectIGAI/Logger.hpp>
+#include <ProjectIGAI/BezierCurve.hpp>
+#include <ProjectIGAI/BezierSurface.hpp>
 
 std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
 {

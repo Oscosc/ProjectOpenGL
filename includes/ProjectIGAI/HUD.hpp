@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "ShaderManager.hpp"
+#include <ProjectIGAI/ShaderManager.hpp>
 
 /**
  * @brief This class contain functions to render a custom HUD.

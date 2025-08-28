@@ -1,5 +1,6 @@
-#include "ShaderManager.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/ShaderManager.hpp>
+
+#include <ProjectIGAI/Logger.hpp>
 
 void ShaderManager::loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath,
     const unsigned int pointLight, const unsigned int dirLight, const unsigned int spotLight)

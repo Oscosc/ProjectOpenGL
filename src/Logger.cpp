@@ -1,4 +1,4 @@
-#include "Logger.hpp"
+#include <ProjectIGAI/Logger.hpp>
 
 bool Logger::setVerbosity(const unsigned int &level)
 {

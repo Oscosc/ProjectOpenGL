@@ -1,4 +1,4 @@
-#include "Callbacks.hpp"
+#include <ProjectIGAI/Callbacks.hpp>
 
 
 void Callbacks::framebuffer_size_callback(GLFWwindow* window, int width, int height)

@@ -1,9 +1,10 @@
-#include "utils.hpp"
+#include <ProjectIGAI/utils.hpp>
 
 #include <iostream>
+
 #include "lodepng.h"
-#include "Object.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Logger.hpp>
 
 
 std::vector<unsigned int> Range(unsigned int n)

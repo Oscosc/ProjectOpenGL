@@ -1,4 +1,4 @@
-#include "Curve.hpp"
+#include <ProjectIGAI/Curve.hpp>
 
 void Curve::drawControlPolygon() const {
     glBindVertexArray(this->m_controlVAO);

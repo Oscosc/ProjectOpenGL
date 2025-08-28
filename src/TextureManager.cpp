@@ -1,11 +1,11 @@
-#include "TextureManager.hpp"
+#include <ProjectIGAI/TextureManager.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "Logger.hpp"
+#include <ProjectIGAI/Logger.hpp>
 
 void TextureManager::loadTexture(const std::string& name, const std::string textureFile)
 {

@@ -7,9 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "Scene.hpp"
-#include "HUD.hpp"
-#include "RayTracer.hpp"
+#include <ProjectIGAI/Scene.hpp>
+#include <ProjectIGAI/HUD.hpp>
+#include <ProjectIGAI/RayTracer.hpp>
 
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600

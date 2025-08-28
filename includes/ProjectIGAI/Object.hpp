@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../includes/shader.hpp"
-#include "Scene.hpp"
-#include "ProjViewMatrix.hpp"
-#include "ShaderManager.hpp"
-#include "TextureManager.hpp"
+#include <extern/shader.hpp>
+#include <ProjectIGAI/Scene.hpp>
+#include <ProjectIGAI/ProjViewMatrix.hpp>
+#include <ProjectIGAI/ShaderManager.hpp>
+#include <ProjectIGAI/TextureManager.hpp>
 
 #define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), glm::vec3(0.5), glm::vec3(0.5), 32.f}}

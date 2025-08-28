@@ -1,5 +1,6 @@
-#include "BezierSurface.hpp"
-#include "Curve.hpp"
+#include <ProjectIGAI/BezierSurface.hpp>
+
+#include <ProjectIGAI/Curve.hpp>
 
 BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, Material material) :
     Surface(transform, material)

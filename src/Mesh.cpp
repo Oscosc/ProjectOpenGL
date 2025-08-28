@@ -1,5 +1,6 @@
-#include "Mesh.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/Mesh.hpp>
+
+#include <ProjectIGAI/Logger.hpp>
 
 Mesh::Mesh(std::string file, Transform transformation, Material material) :
     m_filename(file), Object(transformation, material)

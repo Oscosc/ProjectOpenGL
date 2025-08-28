@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Ray.hpp"
-#include "Object.hpp"
+#include <ProjectIGAI/Ray.hpp>
+#include <ProjectIGAI/Object.hpp>
 
 enum HitType {
     DIFFUSE,

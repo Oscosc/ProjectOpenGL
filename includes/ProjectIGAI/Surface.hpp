@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Object.hpp"
-#include "utils.hpp"
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/utils.hpp>
 
 class Surface : public Object
 {

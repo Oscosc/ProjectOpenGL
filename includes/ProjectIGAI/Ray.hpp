@@ -5,7 +5,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "../includes/camera.hpp"
+#include <extern/camera.hpp>
 
 class Ray
 {

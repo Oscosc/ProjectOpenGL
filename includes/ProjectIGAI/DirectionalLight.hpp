@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Light.hpp"
+#include <ProjectIGAI/Light.hpp>
 
 class DirectionalLight : public Light
 {

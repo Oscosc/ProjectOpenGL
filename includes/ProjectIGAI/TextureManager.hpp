@@ -3,7 +3,8 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
-#include "Singleton.hpp"
+
+#include <ProjectIGAI/Singleton.hpp>
 
 class TextureManager : public Singleton<TextureManager>
 {

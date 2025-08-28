@@ -4,7 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-#include "Singleton.hpp"
+
+#include <ProjectIGAI/Singleton.hpp>
 
 #define DEFAULT_VERBOSITY_LEVEL 1
 #define MAX_LOG_LEVEL 3

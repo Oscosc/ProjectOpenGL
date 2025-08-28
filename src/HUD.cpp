@@ -1,4 +1,4 @@
-#include "HUD.hpp"
+#include <ProjectIGAI/HUD.hpp>
 
 HUD::HUD(const unsigned int screenWidth, const unsigned int screenHeight) : m_screenWidth(screenWidth), m_screenHeight(screenHeight)
 {

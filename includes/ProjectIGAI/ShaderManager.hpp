@@ -3,8 +3,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "Singleton.hpp"
-#include "../includes/shader.hpp"
+#include <ProjectIGAI/Singleton.hpp>
+#include <extern/shader.hpp>
 
 /**
  * @brief Singleton class for shaders management in an application.

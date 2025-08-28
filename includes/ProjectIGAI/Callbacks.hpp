@@ -4,8 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Application.hpp"
-// #include "Intersections.hpp"
+#include <ProjectIGAI/Application.hpp>
 
 namespace Callbacks {
     /**

@@ -1,7 +1,7 @@
-#include "Scene.hpp"
-#include "Object.hpp"
-#include "Sphere.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/Scene.hpp>
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Sphere.hpp>
+#include <ProjectIGAI/Logger.hpp>
 
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {

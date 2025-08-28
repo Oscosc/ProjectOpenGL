@@ -1,10 +1,11 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
-#include "Object.hpp"
-#include "Hittable.hpp"
-#include "utils.hpp"
 #include <math.h>
+
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Hittable.hpp>
+#include <ProjectIGAI/utils.hpp>
 
 #define DEFAULT_STACKS 64
 #define DEFAULT_SECTORS 64

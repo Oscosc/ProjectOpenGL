@@ -1,15 +1,14 @@
-#include "RayTracing.hpp"
-
-#include "utils.hpp"
-#include "Sphere.hpp"
-#include "../includes/progressbar.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/RayTracing.hpp>
 
 #include <omp.h>
-
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
 #define duration std::chrono::duration_cast<std::chrono::milliseconds>
+
+#include <extern/progressbar.hpp>
+#include <ProjectIGAI/utils.hpp>
+#include <ProjectIGAI/Sphere.hpp>
+#include <ProjectIGAI/Logger.hpp>
 
 
 void RayTracing::computeImage(const std::string &filename, Scene& scene)

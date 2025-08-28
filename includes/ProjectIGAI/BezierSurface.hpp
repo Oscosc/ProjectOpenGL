@@ -11,8 +11,8 @@
  * @date 2025-03-01
  */
 
-#include "Surface.hpp"
-#include "utils.hpp"
+#include <ProjectIGAI/Surface.hpp>
+#include <ProjectIGAI/utils.hpp>
 
 /**
  * @class BezierSurface

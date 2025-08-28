@@ -1,4 +1,4 @@
-#include "Ray.hpp"
+#include <ProjectIGAI/Ray.hpp>
 
 Ray::Ray(const float& x, const float& y, const float& width, const float& height, const float& tanHalfFOV, const glm::mat4& cameraToWorld, const glm::vec3& origin) {
     float aspect = width / height;

@@ -1,5 +1,6 @@
-#include "BezierCurve.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/BezierCurve.hpp>
+
+#include <ProjectIGAI/Logger.hpp>
 
 BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, Material material) : Curve(transform, material)
 {

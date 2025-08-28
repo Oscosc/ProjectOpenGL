@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Object.hpp"
-#include "Logger.hpp"
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Logger.hpp>
 
 #define NB_CURVE_POINTS 30
 #define DEFAULT_CONTROL_COLOR {1.f, 0.f, 0.f}

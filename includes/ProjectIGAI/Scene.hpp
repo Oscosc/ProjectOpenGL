@@ -5,13 +5,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "../includes/camera.hpp"
-#include "../includes/shader.hpp"
-#include "Light.hpp"
-#include "PointLight.hpp"
-#include "DirectionalLight.hpp"
-#include "SpotLight.hpp"
-#include "ProjViewMatrix.hpp"
+#include <extern/camera.hpp>
+#include <extern/shader.hpp>
+#include <ProjectIGAI/Light.hpp>
+#include <ProjectIGAI/PointLight.hpp>
+#include <ProjectIGAI/DirectionalLight.hpp>
+#include <ProjectIGAI/SpotLight.hpp>
+#include <ProjectIGAI/ProjViewMatrix.hpp>
 
 class Object;
 class Sphere;

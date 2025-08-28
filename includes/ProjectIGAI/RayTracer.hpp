@@ -3,8 +3,8 @@
 #include <iostream>
 #include <vector>
 
-#include "../includes/shader.hpp"
-#include "ShaderManager.hpp"
+#include <extern/shader.hpp>
+#include <ProjectIGAI/ShaderManager.hpp>
 
 class RayTracer
 {

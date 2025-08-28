@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Object.hpp"
-#include "Logger.hpp"
-#include "ShaderManager.hpp"
+#include <ProjectIGAI/Object.hpp>
+#include <ProjectIGAI/Logger.hpp>
+#include <ProjectIGAI/ShaderManager.hpp>
 
 class Grid : public Object
 {

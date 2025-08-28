@@ -12,9 +12,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "utils.hpp"
-#include "Object.hpp"
-#include "../includes/shader.hpp"
+#include <ProjectIGAI/utils.hpp>
+#include <ProjectIGAI/Object.hpp>
 
 #define STD_DELIMITER " "
 #define IDX_DELIMITER "/"

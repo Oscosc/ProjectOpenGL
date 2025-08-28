@@ -1,4 +1,4 @@
-#include "Object.hpp"
+#include <ProjectIGAI/Object.hpp>
 
 void Object::debugMaterial() const
 {
