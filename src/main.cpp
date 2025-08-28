@@ -1,7 +1,7 @@
-#include <ProjectIGAI/Application.hpp>
-#include <ProjectIGAI/SceneParser.hpp>
-#include <ProjectIGAI/RayTracing.hpp>
-#include <ProjectIGAI/Logger.hpp>
+#include <ProjectIGAI/core/Application.hpp>
+#include <ProjectIGAI/core/SceneParser.hpp>
+#include <ProjectIGAI/raytracing/RayTracing.hpp>
+#include <ProjectIGAI/core/Logger.hpp>
 
 
 int main(int argc, char* argv[]) {
