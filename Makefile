@@ -1,34 +1,61 @@
+# ==============================
+# Compiler et flags
+# ==============================
 CXX = g++
-CC = gcc
+CC  = gcc
 LDFLAGS = -lglfw -ldl -g -lm -fopenmp
-COMPFLAGS = -fopenmp
+COMPFLAGS = -fopenmp -Iincludes -MMD -MP -fdiagnostics-color=always
 
+# ==============================
+# Dossiers
+# ==============================
 SRC_DIR = src
 OBJ_DIR = obj
+TARGET  = igai_exe
 
-SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
-C_SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
-OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES)) \
-            $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRC_FILES))
+# ==============================
+# Fichiers source et objets
+# ==============================
+SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
+C_SRC_FILES = $(shell find $(SRC_DIR) -name "*.c")
 
-TARGET = igai_exe
+OBJ_FILES_CPP = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
+OBJ_FILES_C   = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRC_FILES))
+OBJ_FILES = $(OBJ_FILES_CPP) $(OBJ_FILES_C)
+
+# Nombre total de fichiers pour calcul du pourcentage
+COUNT = $(words $(OBJ_FILES))
+
+# ==============================
+# Règles
+# ==============================
 
 all: $(TARGET)
 
+# Build de l’exécutable (sans afficher la ligne de commande)
 $(TARGET): $(OBJ_FILES)
-	$(CXX) $^ -o $@ $(LDFLAGS)
+	@echo "\033[0;35m[LINKS] '$@' executable linked\033[0m"
+	@$(CXX) $^ -o $@ $(LDFLAGS)
+	@echo "\033[0;32m[BUILD] Build finished successfully !\033[0m"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	$(CXX) -c $< -o $@ $(COMPFLAGS)
+# Compilation des .cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@echo "\033[0;34m[BUILD] Compiled $<\033[0m"
+	@$(CXX) $(COMPFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) -c $< -o $@
+# Compilation des .c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	@echo "\033[0;34m[BUILD] Compiled $<\033[0m"
+	@$(CC) -c $< -o $@
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+# Inclure les fichiers .d pour dépendances automatiques
+-include $(OBJ_FILES:.o=.d)
 
+# Nettoyage
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	@echo "\033[0;31m[CLEAN] Cleaning objects and executable\033[0m"
+	@rm -rf $(OBJ_DIR) $(TARGET)
 
 .PHONY: all clean
-
