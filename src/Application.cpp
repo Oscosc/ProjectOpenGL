@@ -82,6 +82,7 @@ void Application::initShaders(const std::string& sceneFile)
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
     ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
+    ShaderManager::getInstance().loadShader("ray-tracing", "shaders/ray-tracing.vs", "shaders/ray-tracing.fs");
 
 #ifdef LOAD_TEXTURES_ON
     TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
@@ -240,10 +241,11 @@ void Application::loop()
         //---------------------------------------------------------------------
         for(unsigned int i = 1; i < m_activeWindowsCount; i++) {
             glfwMakeContextCurrent(getExternalWindow(i));
-            glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            m_rt->draw();
             glfwSwapBuffers(getExternalWindow(i));
-            // Rendering external windows
+            glfwPollEvents();
         }
     }
 
@@ -270,6 +272,11 @@ void Application::run(const std::string& sceneFile)
 
     initHUD();
     Logger::logInfo("HUD correctly computed");
+
+    createExternalWindow();
+    m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));
+    // TODO : Changer pour quelque chose de plus propre
+    // Par exemple : chaque fenêtre est un objet "Window" abstrait et les différentes fenetres gèrent différement les choses
     
     Logger::logInfo("Starting application loop");
     loop();
@@ -315,7 +322,7 @@ unsigned int Application::createExternalWindow(const unsigned int width, const u
     // Create window
     unsigned int windowID = m_activeWindowsCount;
     m_activeWindowsCount++;
-    this->m_windows[windowID] = glfwCreateWindow(width, height, windowTitle.c_str(), NULL, NULL);
+    this->m_windows[windowID] = glfwCreateWindow(width, height, windowTitle.c_str(), NULL, getMainWindow());
     if (getExternalWindow(windowID) == NULL)
     {
         Logger::logError("Failed to create GLFW external window");

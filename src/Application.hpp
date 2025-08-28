@@ -9,6 +9,7 @@
 
 #include "Scene.hpp"
 #include "HUD.hpp"
+#include "RayTracer.hpp"
 
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
@@ -230,6 +231,9 @@ private:
     unsigned int m_screenWidth;
     unsigned int m_screenHeight;
     unsigned int m_activeWindowsCount;
+
+    /* -- RAY-TRACING -- */
+    RayTracer* m_rt;
 
     /* --- TIME --- */
     float m_deltaTime;
