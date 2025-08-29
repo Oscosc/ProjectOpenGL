@@ -1,7 +1,6 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
-#include "BaseWindow.hpp"
 
-BaseWindow::BaseWindow(const unsigned int width, const unsigned int height = DEFAULT_WINDOW_HEIGHT,
+BaseWindow::BaseWindow(const unsigned int width, const unsigned int height,
     const std::string& title, GLFWwindow* rootWindow)
 {
     // Creating the OpenGL window object

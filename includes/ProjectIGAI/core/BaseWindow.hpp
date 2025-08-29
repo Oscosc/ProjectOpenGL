@@ -1,7 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/core/Application.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
