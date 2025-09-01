@@ -1,6 +1,10 @@
 # Projet OpenGL IGAI
 3D Engine project for Master IAFA (Artificial Intelligence, Fundamentals and Applications), speciality Graphic Computations at "Université de Toulouse, France" writted in C++.
 
+## Rendering pipeline structure
+
+![Rendering pipeline structure](images/structure.png)
+
 ## JSON Scene files system
 Scenes files writted in *.json* are readed at the beggining of the program. The scene file to load need to be given as an argument.
 Scene elements can be defined as follow.
