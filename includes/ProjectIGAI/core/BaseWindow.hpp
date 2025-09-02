@@ -53,23 +53,104 @@ public:
      */
     GLFWwindow* getGLFWwindow() const { return m_window; }
 
+    /**
+     * @brief Return the scene
+     */
+    Scene* getScene() const { return m_scene; }
+
+    /**
+     * @brief Return screen width.
+     */
+    const unsigned int getScreenWidth() const { return m_screenWidth; }
+
+    /**
+     * @brief Return screen height.
+     */
+    const unsigned int getScreenHeight() const { return m_screenHeight; }
+
+    // TODO : Passer la gestion de la souris dans une classe
+
+    /**
+     * @brief Return false if mouse is enable (used as quad), true otherwise.
+     */
+    const bool isMouseActive() const { return m_mouseActive; }
+
+    /**
+     * @brief Switch value of mouse disponibility status.
+     */
+    void switchMouseActive() { m_mouseActive = !m_mouseActive; }
+
+    /**
+     * @brief Return true while mouse hasn't been linked to the quad. False after.
+     */
+    const bool isFirstMouse() const { return m_firstMouse; }
+
+    /**
+     * @brief Call this function when mouse link to the quad for the first time.
+     * This function switch the status of the firstMouse variable to false.
+     */
+    void firstMouseDone() { m_firstMouse = false; }
+
+    /**
+     * @brief Give cursor position relatively to the center of the application window. 
+     */
+    const glm::vec2 getCursor() const { return m_cursor; }
+
+    /**
+     * @brief Set cursor position.
+     * 
+     * @param pos new position of the cursor.
+     */
+    void setCursor(glm::vec2 pos) { m_cursor = pos; }
+
+    /**
+     * @brief Set cursor position.
+     * 
+     * @param x new position on X-axis of the cursor.
+     * @param y new position on Y-axis of the cursor.
+     */
+    void setCursor(float x, float y) { m_cursor = glm::vec2(x, y); }
+
+    /**
+     * @brief Gives the delta time between last frame and current frame. 
+     */
+    const float getDeltaTime() const { return m_deltaTime; }
+
+    /**
+     * @brief Set the new delta time for the current frame.
+     * 
+     * @param value new delta time value.
+     */
+    void setDeltaTime(float value) { m_deltaTime = value; }
+
     bool isRoot() { return m_isRoot; }
 
     void setSceneRef(Scene* sceneRef) { m_scene = sceneRef; }
     
     virtual void onResize(int width, int height);
     virtual void onKey(int key, int scancode, int action, int mods);
+    virtual void onScroll(double xOffset, double yOffset);
+    virtual void onCursorPos(double xPos, double yPos);
     
     virtual void onMouseButton(int button, int action, int mods) {} // No default behavior
-    virtual void onCursorPos(double xpos, double ypos) {}           // No default behavior
-    virtual void onScroll(double xOffset, double yOffset) {}        // No default behavior
 
 protected:
     
     virtual void subClassRendering() = 0;
     
     Scene* m_scene;
+
     GLFWwindow* m_window;
+
+    glm::vec2 m_cursor;
+
+    unsigned int m_screenWidth;
+    unsigned int m_screenHeight;
+
     float m_lastFrame;
+    float m_deltaTime;
+
     bool m_isRoot;
+    bool m_mouseActive;
+    bool m_firstMouse;
 };

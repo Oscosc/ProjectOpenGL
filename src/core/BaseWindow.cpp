@@ -1,7 +1,8 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
 BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned int height,
-    const std::string& title, GLFWwindow* rootWindow) : m_scene(refScene)
+    const std::string& title, GLFWwindow* rootWindow) :
+    m_scene(refScene), m_mouseActive(true), m_firstMouse(true), m_screenWidth(width), m_screenHeight(height)
 {
     // Setting up root status
     m_isRoot = rootWindow == NULL;
@@ -19,6 +20,7 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
     // Creating local pointer
     glfwSetWindowUserPointer(m_window, this);
 
+    // Init callback for this window
     initCallbacks();
 }
 
@@ -60,6 +62,11 @@ void BaseWindow::render()
     // Making current window the active one
     glfwMakeContextCurrent(this->getGLFWwindow());
 
+    // Updating frame time
+    float currentFrame = static_cast<float>(glfwGetTime());
+    this->m_deltaTime = currentFrame - this->m_lastFrame;
+    this->m_lastFrame = currentFrame;
+
     // Clearing buffer before drawing
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -82,4 +89,52 @@ void BaseWindow::onKey(int key, int scancode, int action, int mods)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(m_window, true);
     }
+
+    // ----------------------------------------------------
+    // ROOTS COMMANDS ONLY
+    // ----------------------------------------------------
+    if(!isRoot()) return;
+
+    // Switch mouse status
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if(isMouseActive()) glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        switchMouseActive();
+    }
+}
+
+void BaseWindow::onScroll(double xOffset, double yOffset)
+{
+    // ----------------------------------------------------
+    // ROOTS COMMANDS ONLY
+    // ----------------------------------------------------
+    if(!isRoot()) return;
+
+    this->getScene()->getActiveCamera()->ProcessMouseScroll(static_cast<float>(yOffset));
+}
+
+void BaseWindow::onCursorPos(double xPos, double yPos)
+{
+    // ----------------------------------------------------
+    // ROOTS COMMANDS ONLY
+    // ----------------------------------------------------
+    if(!isRoot()) return;
+
+    if(this->isMouseActive()) return;
+
+    float xpos = static_cast<float>(xPos);
+    float ypos = static_cast<float>(yPos);
+
+    if (this->isFirstMouse())
+    {
+        this->setCursor(xpos, ypos);
+        this->firstMouseDone();
+    }
+
+    float xoffset = xpos - this->getCursor().x;
+    float yoffset = this->getCursor().y - ypos; // reversed since y-coordinates go from bottom to top
+
+    this->setCursor(xpos, ypos);
+
+    this->getScene()->getActiveCamera()->ProcessMouseMovement(xoffset, yoffset);
 }
