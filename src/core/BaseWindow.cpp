@@ -1,8 +1,11 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
-BaseWindow::BaseWindow(const unsigned int width, const unsigned int height,
-    const std::string& title, GLFWwindow* rootWindow)
+BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned int height,
+    const std::string& title, GLFWwindow* rootWindow) : m_scene(refScene)
 {
+    // Setting up root status
+    m_isRoot = rootWindow == NULL;
+
     // Creating the OpenGL window object
     m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, rootWindow);
     glfwSetWindowUserPointer(m_window, this);
@@ -52,7 +55,7 @@ void BaseWindow::initCallbacks()
     });
 }
 
-void BaseWindow::render(Scene* scene)
+void BaseWindow::render()
 {
     // Making current window the active one
     glfwMakeContextCurrent(this->getGLFWwindow());
@@ -62,7 +65,7 @@ void BaseWindow::render(Scene* scene)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calling window-specific rendering logic
-    subClassRendering(scene);
+    subClassRendering();
 
     // Swaping buffers to render new frame
     glfwSwapBuffers(this->getGLFWwindow());

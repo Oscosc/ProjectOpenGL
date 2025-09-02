@@ -22,7 +22,7 @@ Application::Application(const unsigned int screenWidth, const unsigned int scre
 {
 }
 
-void Application::initWindow()
+void Application::initGLContext()
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -32,8 +32,11 @@ void Application::initWindow()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+}
 
-    this->setMainWindow(new RasterWindow(this->m_screenWidth, this->m_screenHeight, "Projet IGAI", NULL));
+void Application::initMainWindow()
+{
+    this->setMainWindow(new RasterWindow(m_scene, this->m_screenWidth, this->m_screenHeight, "Projet IGAI", NULL));
     if (getMainWindow() == NULL)
     {
         Logger::logError("Failed to create GLFW window");
@@ -85,7 +88,12 @@ void Application::initShaders(const std::string& sceneFile)
 
 void Application::initScene(const std::string& file)
 {
+    // Loading scene
     this->m_scene = new Scene(SceneParser::parseScene(file));
+
+    // Associating scene to main window
+    this->getMainWindow()->setSceneRef(m_scene);
+
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
 
     // this->m_scene->addObject(new Grid());
@@ -165,7 +173,7 @@ void Application::loop()
 
         // Rendering each window
         for(unsigned int i = 0; i < m_activeWindowsCount; i++) {
-            m_windows[i]->render(m_scene);
+            m_windows[i]->render();
         }
 
         // Poolling callbacks events
@@ -175,15 +183,14 @@ void Application::loop()
 
 void Application::run(const std::string& sceneFile)
 {
+    initGLContext();
+    Logger::logInfo("OpenGL correctly loaded");
 
-    initWindow();
-    Logger::logInfo("OpenGL Window correctly loaded");
+    initMainWindow();
+    Logger::logInfo("Main window correctly created");
 
     initGLComponents();
     Logger::logInfo("OpenGL/GLAD components correctly loaded");
-
-    // initCallbacks();
-    // Logger::logInfo("Callbacks correctly instancied");
 
     initShaders(sceneFile);
     Logger::logInfo("Shaders correctly loaded and computed");
@@ -244,7 +251,7 @@ unsigned int Application::createExternalWindow(const unsigned int width, const u
     // Create window
     unsigned int windowID = m_activeWindowsCount;
     m_activeWindowsCount++;
-    this->m_windows[windowID] = new RasterWindow(width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow());
+    this->m_windows[windowID] = new RasterWindow(m_scene, width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow());
     if (getExternalWindow(windowID) == NULL)
     {
         Logger::logError("Failed to create GLFW external window");

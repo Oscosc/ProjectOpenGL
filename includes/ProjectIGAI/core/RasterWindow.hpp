@@ -14,11 +14,12 @@ public:
      * @param title title of the window
      * @param rootWindow root window to share context with
      */
-    RasterWindow(const unsigned int width = DEFAULT_WINDOW_WIDTH,
+    RasterWindow(Scene* refScene,
+        const unsigned int width = DEFAULT_WINDOW_WIDTH,
         const unsigned int height = DEFAULT_WINDOW_HEIGHT,
         const std::string& title = DEFAULT_WINDOW_NAME,
         GLFWwindow* rootWindow = nullptr) :
-        BaseWindow(width, height, title, rootWindow) {}
+        BaseWindow(refScene, width, height, title, rootWindow) {}
     
 private:
     
@@ -27,5 +28,5 @@ private:
      * 
      * @param scene scene to render
      */
-    void subClassRendering(Scene* scene) override;
+    void subClassRendering() override;
 };

@@ -48,9 +48,14 @@ public:
     ~Application() = default;
 
     /**
-     * @brief Initialize OpenGL context and create window.
+     * @brief Initialize OpenGL context.
      */
-    void initWindow();
+    void initGLContext();
+
+     /**
+      * @brief Create main window.
+      */
+    void initMainWindow();
 
     /**
      * @brief Initialize GLAD and GL options/components.

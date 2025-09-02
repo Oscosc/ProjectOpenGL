@@ -24,7 +24,8 @@ public:
      * @param title title of the window
      * @param rootWindow root window to share context with
      */
-    BaseWindow(const unsigned int width = DEFAULT_WINDOW_WIDTH,
+    BaseWindow(Scene* refScene,
+        const unsigned int width = DEFAULT_WINDOW_WIDTH,
         const unsigned int height = DEFAULT_WINDOW_HEIGHT,
         const std::string& title = DEFAULT_WINDOW_NAME,
         GLFWwindow* rootWindow = nullptr);
@@ -43,7 +44,7 @@ public:
      * 
      * @param scene scene to render
      */
-    void render(Scene* scene);
+    void render();
     
     /**
      * @brief Retrieve the GLFWwindow object reference associated with this window.
@@ -51,6 +52,10 @@ public:
      * @return GLFWwindow of this window
      */
     GLFWwindow* getGLFWwindow() const { return m_window; }
+
+    bool isRoot() { return m_isRoot; }
+
+    void setSceneRef(Scene* sceneRef) { m_scene = sceneRef; }
     
     virtual void onResize(int width, int height);
     virtual void onKey(int key, int scancode, int action, int mods);
@@ -61,8 +66,10 @@ public:
 
 protected:
     
-    virtual void subClassRendering(Scene* scene) = 0;
-
+    virtual void subClassRendering() = 0;
+    
+    Scene* m_scene;
     GLFWwindow* m_window;
     float m_lastFrame;
+    bool m_isRoot;
 };

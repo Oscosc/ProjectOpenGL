@@ -1,8 +1,8 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
-void RasterWindow::subClassRendering(Scene *scene)
+void RasterWindow::subClassRendering()
 {
-    for(Object* object : scene->getAllObjects()) {
-        object->draw(scene);
+    for(Object* object : m_scene->getAllObjects()) {
+        object->draw(m_scene);
     }
 }
