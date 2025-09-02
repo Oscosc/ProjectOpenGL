@@ -3,6 +3,7 @@
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/core/Application.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/graphics/Object.hpp>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -43,15 +44,20 @@ public:
      * @param scene scene to render
      */
     void render(Scene* scene);
-
+    
+    /**
+     * @brief Retrieve the GLFWwindow object reference associated with this window.
+     * 
+     * @return GLFWwindow of this window
+     */
     GLFWwindow* getGLFWwindow() const { return m_window; }
     
     virtual void onResize(int width, int height);
     virtual void onKey(int key, int scancode, int action, int mods);
     
-    virtual void onMouseButton(int button, int action, int mods) = 0;
-    virtual void onCursorPos(double xpos, double ypos) = 0;
-    virtual void onScroll(double xOffset, double yOffset) = 0;
+    virtual void onMouseButton(int button, int action, int mods) {} // No default behavior
+    virtual void onCursorPos(double xpos, double ypos) {}           // No default behavior
+    virtual void onScroll(double xOffset, double yOffset) {}        // No default behavior
 
 protected:
     

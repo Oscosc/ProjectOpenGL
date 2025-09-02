@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include <ProjectIGAI/core/Scene.hpp>
+#include <ProjectIGAI/core/BaseWindow.hpp>
 #include <ProjectIGAI/graphics/HUD.hpp>
 #include <ProjectIGAI/raytracing/RayTracer.hpp>
 
@@ -18,6 +19,8 @@
 
 // #define RAY_TRACING_ON
 // #define LOAD_TEXTURES_ON
+
+class BaseWindow; // For includes error
 
 /**
  * @brief Application handle OpenGL initialization, as well as Shader loading, Scene loading and
@@ -176,19 +179,19 @@ public:
     /**
      * @brief Return the main window of the application.
      */
-    GLFWwindow* getMainWindow() const { return m_windows[0]; }
+    BaseWindow* getMainWindow() const { return m_windows[0]; }
 
     /**
      * @brief Set the Main Window of the application.
      * 
      * @param window new main window value
      */
-    void setMainWindow(GLFWwindow* window) { m_windows[0] = window; }
+    void setMainWindow(BaseWindow* window) { m_windows[0] = window; }
 
     /**
      * @brief Return external window of the application if exists.
      */
-    GLFWwindow* getExternalWindow(unsigned int windowID) const;
+    BaseWindow* getExternalWindow(unsigned int windowID) const;
 
     /**
      * @brief Set a new external window for this application.
@@ -227,7 +230,7 @@ public:
 private:
 
     /* --- WINDOW --- */
-    GLFWwindow* m_windows[MAX_WINDOWS];
+    BaseWindow* m_windows[MAX_WINDOWS];
     unsigned int m_screenWidth;
     unsigned int m_screenHeight;
     unsigned int m_activeWindowsCount;

@@ -11,6 +11,7 @@
 #include <ProjectIGAI/geometry/BezierCurve.hpp>
 #include <ProjectIGAI/geometry/BezierSurface.hpp>
 #include <ProjectIGAI/geometry/Grid.hpp>
+#include <ProjectIGAI/core/RasterWindow.hpp>
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
@@ -32,14 +33,14 @@ void Application::initWindow()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    this->setMainWindow(glfwCreateWindow(this->m_screenWidth, this->m_screenHeight, "Projet IGAI", NULL, NULL));
+    this->setMainWindow(new RasterWindow(this->m_screenWidth, this->m_screenHeight, "Projet IGAI", NULL));
     if (getMainWindow() == NULL)
     {
         Logger::logError("Failed to create GLFW window");
         glfwTerminate();
         exit(-1);
     }
-    glfwMakeContextCurrent(this->getMainWindow());
+    glfwMakeContextCurrent(this->getMainWindow()->getGLFWwindow());
 
     // If no main window is already defined, update the counter
     if(m_activeWindowsCount == 0) m_activeWindowsCount++;
@@ -47,8 +48,8 @@ void Application::initWindow()
 
 void Application::initGLComponents()
 {
-    glfwSetWindowUserPointer(this->getMainWindow(), this);
-    glfwSetInputMode(this->getMainWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    // glfwSetWindowUserPointer(this->getMainWindow(), this);
+    glfwSetInputMode(this->getMainWindow()->getGLFWwindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -59,15 +60,6 @@ void Application::initGLComponents()
 
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, this->m_screenWidth, this->m_screenHeight);
-}
-
-void Application::initCallbacks()
-{
-    glfwSetFramebufferSizeCallback(this->getMainWindow(), Callbacks::framebuffer_size_callback);
-    glfwSetCursorPosCallback(this->getMainWindow(), Callbacks::mouse_callback);
-    glfwSetScrollCallback(this->getMainWindow(), Callbacks::scroll_callback);
-    glfwSetKeyCallback(this->getMainWindow(), Callbacks::key_callback);
-    glfwSetMouseButtonCallback(this->getMainWindow(), Callbacks::mouse_button_callback);
 }
 
 void Application::initShaders(const std::string& sceneFile)
@@ -164,92 +156,21 @@ void Application::initHUD()
 
 void Application::loop()
 {
-    std::vector<unsigned int> timeUpdateMeasures;
-    timeUpdateMeasures.resize(100);
-    std::vector<unsigned int> inputProcessMeasures;
-    inputProcessMeasures.resize(100);
-    std::vector<unsigned int> flushingMeasures;
-    flushingMeasures.resize(100);
-    std::vector<unsigned int> sceneRenderMeasures;
-    sceneRenderMeasures.resize(100);
-    std::vector<unsigned int> hudRenderMeasures;
-    hudRenderMeasures.resize(100);
-    std::vector<unsigned int> bufferSwapMeasures;
-    bufferSwapMeasures.resize(100);
-
-    unsigned int counter = 0;
-
     while(!applicationShouldClose()) {
-        //---------------------------------------------------------------------
-        // MAIN WINDOW PART
-        //---------------------------------------------------------------------
-        glfwMakeContextCurrent(getMainWindow());
+        // Processing inputs
+        Callbacks::processInput(getMainWindow()->getGLFWwindow());
 
-        auto startTime = timer::now();
+        // Updating scene camera PV
+        m_scene->updateActiveCameraPV();
 
-        /* ---TIME UPDATING---- */
-        // TODO : Update to Time class
-        float currentFrame = static_cast<float>(glfwGetTime());
-        this->m_deltaTime = currentFrame - this->m_lastFrame;
-        this->m_lastFrame = currentFrame;
-        auto timeUpdateTimer = timer::now();
+        // Rendering each window
+        for(unsigned int i = 0; i < m_activeWindowsCount; i++) {
+            m_windows[i]->render(m_scene);
+        }
 
-        /* --INPUT PROCESSING-- */
-        Callbacks::processInput(this->getMainWindow());
-        auto inputProcessTimer = timer::now();
-
-        /* ----FLUSHING OLD---- */
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        auto flushingTimer = timer::now();
-
-        /* --RENDERING SCENE--- */
-        this->m_scene->render();
-        auto sceneRenderTimer = timer::now();
-
-        /* ---RENDERING HUD---- */
-        this->m_HUD->render();
-        auto hudRenderTimer = timer::now();
-
-        /* --SWAPPING BUFFERS-- */
-        glfwSwapBuffers(this->getMainWindow());
+        // Poolling callbacks events
         glfwPollEvents();
-        auto bufferSwapTimer = timer::now();
-
-        /* --MEASUREMENTS UPDATE-- */
-        if(counter < 100) {
-            timeUpdateMeasures[counter] = duration(timeUpdateTimer - startTime).count();
-            inputProcessMeasures[counter] = duration(inputProcessTimer - timeUpdateTimer).count();
-            flushingMeasures[counter] = duration(flushingTimer - inputProcessTimer).count();
-            sceneRenderMeasures[counter] = duration(sceneRenderTimer - flushingTimer).count();
-            hudRenderMeasures[counter] = duration(hudRenderTimer - sceneRenderTimer).count();
-            bufferSwapMeasures[counter] = duration(bufferSwapTimer - hudRenderTimer).count();
-            counter++;
-        }
-        else if(counter == 100) {
-            Logger::logPerf("Average time for time updating : " + std::to_string(mean(timeUpdateMeasures)) + " µs");
-            Logger::logPerf("Average time for input processing : " + std::to_string(mean(inputProcessMeasures)) + " µs");
-            Logger::logPerf("Average time for flushing buffers : " + std::to_string(mean(flushingMeasures)) + " µs");
-            Logger::logPerf("Average time for scene rendering : " + std::to_string(mean(sceneRenderMeasures)) + " µs");
-            Logger::logPerf("Average time for HUD rendering : " + std::to_string(mean(hudRenderMeasures)) + " µs");
-            Logger::logPerf("Average time for bufferSwapping : " + std::to_string(mean(bufferSwapMeasures)) + " µs");
-            counter++;
-        }
-
-        //---------------------------------------------------------------------
-        // EXTERNAL WINDOWS PART
-        //---------------------------------------------------------------------
-        for(unsigned int i = 1; i < m_activeWindowsCount; i++) {
-            glfwMakeContextCurrent(getExternalWindow(i));
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            m_rt->draw();
-            glfwSwapBuffers(getExternalWindow(i));
-            glfwPollEvents();
-        }
     }
-
-    glfwTerminate();
 }
 
 void Application::run(const std::string& sceneFile)
@@ -261,8 +182,8 @@ void Application::run(const std::string& sceneFile)
     initGLComponents();
     Logger::logInfo("OpenGL/GLAD components correctly loaded");
 
-    initCallbacks();
-    Logger::logInfo("Callbacks correctly instancied");
+    // initCallbacks();
+    // Logger::logInfo("Callbacks correctly instancied");
 
     initShaders(sceneFile);
     Logger::logInfo("Shaders correctly loaded and computed");
@@ -273,8 +194,8 @@ void Application::run(const std::string& sceneFile)
     initHUD();
     Logger::logInfo("HUD correctly computed");
 
-    createExternalWindow();
-    m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));
+    // createExternalWindow();
+    // m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));
     // TODO : Changer pour quelque chose de plus propre
     // Par exemple : chaque fenêtre est un objet "Window" abstrait et les différentes fenetres gèrent différement les choses
     
@@ -288,17 +209,18 @@ bool Application::applicationShouldClose()
 
     // Check external windows calls
     for(unsigned int i = 1; i < m_activeWindowsCount; i++) {
-        if(glfwWindowShouldClose(getExternalWindow(i))) {
+        if(glfwWindowShouldClose(getExternalWindow(i)->getGLFWwindow())) {
             this->cleanRemoveExternalWindow(i);
             Logger::logInfo("External window " + std::to_string(i) + " correctly closed");
         }
     }
     
     // Main window
-    return glfwWindowShouldClose(getMainWindow());
+    return glfwWindowShouldClose(getMainWindow()->getGLFWwindow());
 }
 
-GLFWwindow *Application::getExternalWindow(unsigned int windowID) const
+
+BaseWindow* Application::getExternalWindow(unsigned int windowID) const
 {
     if(windowID <= 0 || windowID >= m_activeWindowsCount) {
         Logger::logWarning("Window ID doesn't exist or is 0. Returning main window by default");
@@ -322,7 +244,7 @@ unsigned int Application::createExternalWindow(const unsigned int width, const u
     // Create window
     unsigned int windowID = m_activeWindowsCount;
     m_activeWindowsCount++;
-    this->m_windows[windowID] = glfwCreateWindow(width, height, windowTitle.c_str(), NULL, getMainWindow());
+    this->m_windows[windowID] = new RasterWindow(width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow());
     if (getExternalWindow(windowID) == NULL)
     {
         Logger::logError("Failed to create GLFW external window");
@@ -337,7 +259,7 @@ unsigned int Application::createExternalWindow(const unsigned int width, const u
 
 void Application::cleanRemoveExternalWindow(unsigned int windowID)
 {
-    glfwDestroyWindow(getExternalWindow(windowID));
+    glfwDestroyWindow(getExternalWindow(windowID)->getGLFWwindow());
     for(int i = windowID; i < m_activeWindowsCount - 1; i++) {
         m_windows[i] = m_windows[i + 1];
     }
