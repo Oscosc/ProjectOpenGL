@@ -52,6 +52,22 @@ void BaseWindow::initCallbacks()
     });
 }
 
+void BaseWindow::render(Scene* scene)
+{
+    // Making current window the active one
+    glfwMakeContextCurrent(this->getGLFWwindow());
+    
+    // Clearing buffer before drawing
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Calling window-specific rendering logic
+    subClassRendering(scene);
+
+    // Swaping buffers to render new frame
+    glfwSwapBuffers(this->getGLFWwindow());
+}
+
 void BaseWindow::onResize(int width, int height)
 {
     glViewport(0, 0, width, height);

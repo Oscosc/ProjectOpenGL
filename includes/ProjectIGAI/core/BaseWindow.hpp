@@ -31,10 +31,20 @@ public:
     virtual ~BaseWindow() {}
     
     /**
-     * @brief Link all standard callbacks to abstracts "onX" functions for this window
+     * @brief Link all standard callbacks to abstracts "onX()" functions for this window
      * 
      */
     void initCallbacks();
+
+    /**
+     * @brief Render the scene using the specific subClassRendering() function that's defined
+     * in each class extending BaseWindow.
+     * 
+     * @param scene scene to render
+     */
+    void render(Scene* scene);
+
+    GLFWwindow* getGLFWwindow() const { return m_window; }
     
     virtual void onResize(int width, int height);
     virtual void onKey(int key, int scancode, int action, int mods);
@@ -43,11 +53,10 @@ public:
     virtual void onCursorPos(double xpos, double ypos) = 0;
     virtual void onScroll(double xOffset, double yOffset) = 0;
 
-    virtual void render(Scene* scene) = 0;
-
-    GLFWwindow* getGLFWwindow() const { return m_window; }
-
 protected:
+    
+    virtual void subClassRendering(Scene* scene) = 0;
+
     GLFWwindow* m_window;
     float m_lastFrame;
 };
