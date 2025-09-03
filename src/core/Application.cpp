@@ -157,9 +157,9 @@ void Application::initScene(const std::string& file)
     Logger::logInfo("Scene builded with " + std::to_string(m_scene->objectsCount()) + " visible objects in it");
 }
 
-void Application::initHUD()
+void Application::postInitComponents()
 {
-    this->m_HUD = new HUD(getScreenWidth(), getScreenHeight());
+    getMainWindow()->postInitProcess();
 }
 
 void Application::loop()
@@ -198,8 +198,8 @@ void Application::run(const std::string& sceneFile)
     initScene(sceneFile);
     Logger::logInfo("Scene correctly loaded");
 
-    initHUD();
-    Logger::logInfo("HUD correctly computed");
+    postInitComponents();
+    Logger::logInfo("Components are all fully initialized");
 
     // createExternalWindow();
     // m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));

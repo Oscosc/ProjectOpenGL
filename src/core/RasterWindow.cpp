@@ -3,7 +3,7 @@
 RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsigned int height,
     const std::string &title, GLFWwindow *rootWindow) : BaseWindow(refScene, width, height, title, rootWindow)
 {
-    // initHUD();
+
 }
 
 void RasterWindow::subClassRendering()
@@ -12,7 +12,12 @@ void RasterWindow::subClassRendering()
         object->draw(m_scene);
     }
 
-    // m_HUD->render();
+    m_HUD->render();
+}
+
+void RasterWindow::postInitProcess()
+{
+    initHUD();
 }
 
 void RasterWindow::initHUD()

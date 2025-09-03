@@ -38,6 +38,8 @@ public:
      */
     void initCallbacks();
 
+    virtual void postInitProcess() {}
+
     /**
      * @brief Render the scene using the specific subClassRendering() function that's defined
      * in each class extending BaseWindow.

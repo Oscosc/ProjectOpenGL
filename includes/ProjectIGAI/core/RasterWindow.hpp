@@ -20,6 +20,7 @@ public:
         const std::string& title = DEFAULT_WINDOW_NAME,
         GLFWwindow* rootWindow = nullptr);
 
+    void postInitProcess() override;
     void initHUD();
     
 private:

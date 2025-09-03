@@ -22,6 +22,9 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
 
     // Init callback for this window
     initCallbacks();
+
+    // If not root, post init is immediate
+    if(!m_isRoot) postInitProcess();
 }
 
 void BaseWindow::initCallbacks()

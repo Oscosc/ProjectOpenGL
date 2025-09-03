@@ -80,11 +80,7 @@ public:
      */
     void initScene(const std::string& file);
 
-    /**
-     * @brief Instanciate all HUD components to be able to render them during
-     * the application loop.
-     */
-    void initHUD();
+    void postInitComponents();
 
     /**
      * @brief main loop of the application. This function is called in the run
