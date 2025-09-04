@@ -3,7 +3,8 @@
 RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsigned int height,
     const std::string &title, GLFWwindow *rootWindow) : BaseWindow(refScene, width, height, title, rootWindow)
 {
-
+    // If not root, post init is immediate
+    if(!m_isRoot) postInitProcess();
 }
 
 void RasterWindow::subClassRendering()

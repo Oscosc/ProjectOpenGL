@@ -38,7 +38,7 @@ public:
      */
     void initCallbacks();
 
-    virtual void postInitProcess() {}
+    virtual void postInitProcess() = 0;
 
     /**
      * @brief Render the scene using the specific subClassRendering() function that's defined

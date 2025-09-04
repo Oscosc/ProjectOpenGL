@@ -5,7 +5,7 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
     m_scene(refScene), m_mouseActive(true), m_firstMouse(true), m_screenWidth(width), m_screenHeight(height)
 {
     // Setting up root status
-    m_isRoot = rootWindow == NULL;
+    m_isRoot = (rootWindow == NULL);
 
     // Creating the OpenGL window object
     m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, rootWindow);
@@ -22,9 +22,6 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
 
     // Init callback for this window
     initCallbacks();
-
-    // If not root, post init is immediate
-    if(!m_isRoot) postInitProcess();
 }
 
 void BaseWindow::initCallbacks()

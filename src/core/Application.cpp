@@ -12,6 +12,7 @@
 #include <ProjectIGAI/geometry/BezierSurface.hpp>
 #include <ProjectIGAI/geometry/Grid.hpp>
 #include <ProjectIGAI/core/RasterWindow.hpp>
+#include <ProjectIGAI/core/RaytracingWindow.hpp>
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
@@ -201,7 +202,7 @@ void Application::run(const std::string& sceneFile)
     postInitComponents();
     Logger::logInfo("Components are all fully initialized");
 
-    // createExternalWindow();
+    createExternalWindow();
     // m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));
     // TODO : Changer pour quelque chose de plus propre
     // Par exemple : chaque fenêtre est un objet "Window" abstrait et les différentes fenetres gèrent différement les choses
@@ -251,7 +252,10 @@ unsigned int Application::createExternalWindow(const unsigned int width, const u
     // Create window
     unsigned int windowID = m_activeWindowsCount;
     m_activeWindowsCount++;
-    this->m_windows[windowID] = new RasterWindow(m_scene, width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow());
+    this->m_windows[windowID] = new RaytracingWindow(
+        m_scene, width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow()
+    );
+
     if (getExternalWindow(windowID) == NULL)
     {
         Logger::logError("Failed to create GLFW external window");
