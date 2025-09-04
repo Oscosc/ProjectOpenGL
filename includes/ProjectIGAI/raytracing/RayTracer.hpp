@@ -5,6 +5,7 @@
 
 #include <extern/shader.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
+#include <ProjectIGAI/graphics/Sphere.hpp>
 
 class RayTracer
 {
@@ -16,8 +17,26 @@ public:
         m_shader->setVec2("u_resolution", width, height);
     }
 
-    void draw() {
+    void draw(Scene* scene) {
+        Camera* cameraRef = scene->getActiveCamera();
+
         m_shader->use();
+
+        // Camera setting
+        m_shader->setVec3("camera.position", cameraRef->Position);
+        m_shader->setVec3("camera.forward", cameraRef->Front);
+        m_shader->setVec3("camera.up", cameraRef->Up);
+        m_shader->setFloat("camera.fov", glm::radians(cameraRef->Fov));
+
+        // Objects setting
+        Sphere* obj = static_cast<Sphere*>(scene->getObject(0));
+        m_shader->setVec3("sphere.position", obj->getTransform().position);
+        m_shader->setFloat("sphere.radius", obj->getRadius());
+        m_shader->setVec3("sphere.material.ambient", obj->getMaterial().matShader.ambient);
+        m_shader->setVec3("sphere.material.diffuse", obj->getMaterial().matShader.diffuse);
+        m_shader->setVec3("sphere.material.specular", obj->getMaterial().matShader.specular);
+        m_shader->setFloat("sphere.material.shininess", obj->getMaterial().matShader.shininess);
+
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

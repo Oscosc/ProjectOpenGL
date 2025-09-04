@@ -1,6 +1,22 @@
 # Projet OpenGL IGAI
 3D Engine project for Master IAFA (Artificial Intelligence, Fundamentals and Applications), speciality Graphic Computations at "Université de Toulouse, France" writted in C++.
 
+## Rendering pipeline structure
+
+### Application
+Application class handle global loop of application. It's role is to process inputs and callbacks, call each window rendering process, and check for application end.
+
+### Window
+Window class (and sub-classes) handle scene rendering. Depending on the sub-class, it use scene informations (objects, lights) to produce a visible result on the screen. The standard approach, *BaseWindow*, is to call the draw() function of each object in the scene.
+
+### Scene
+Scene class stores static informations about the scene (objects, lights, camera) and dynamic informations (active camera, Projection-View matrix).
+
+### Object
+Object class (and sub-classes) is used to store informations about objects, such as transform, reference shader and material. During the rendering loop, it's update shader's uniforms (about material, transform and camera), and draw it's verticises.
+
+![Rendering pipeline structure](images/structure.png)
+
 ## JSON Scene files system
 Scenes files writted in *.json* are readed at the beggining of the program. The scene file to load need to be given as an argument.
 Scene elements can be defined as follow.

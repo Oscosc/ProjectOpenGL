@@ -135,6 +135,13 @@ public:
      */
     Object* getObject(unsigned int index) const { return m_objects.at(index); }
 
+    /**
+     * @brief Return all the scene objects
+     * 
+     * @return all scene objects
+     */
+    std::vector<Object*> getAllObjects() { return m_objects; }
+
     std::vector<Sphere*> getSpheresRT() const;
 
 private:

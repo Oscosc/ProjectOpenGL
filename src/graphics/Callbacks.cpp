@@ -131,45 +131,20 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
     */
 }
 
-
-void Callbacks::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    /*
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        // Récupération du contexte
-        Application* app = Application::getApplicationFromWindow(window);
-
-        // Récupération du point cliqué
-        double mouseX, mouseY;
-        if(app->isMouseActive()) {glfwGetCursorPos(window, &mouseX, &mouseY);}
-        else {mouseX = app->getScreenWidth()/2.0f; mouseY = app->getScreenHeight()/2.0f;}
-
-        // Calcul du rayon initial
-        Ray original;
-        Intersection::cameraRay(*app, mouseX, mouseY, original);
-        
-        // Calcul d'intersections
-        ptsTab intersections;
-        glm::vec3 reflexion;
-        Intersection::rayContextPath(*app, original, intersections, reflexion);
-        app->addObject(std::make_unique<Ray>(original.getOrigin(), original.getDirection(), intersections, reflexion));
-    }
-    */
-}
-
 void Callbacks::processInput(GLFWwindow *window)
 {
 
-    Application* app = Application::getApplicationFromWindow(window);
+    BaseWindow* windowObject = static_cast<BaseWindow*>(glfwGetWindowUserPointer(window));
 
-    if(app->isMouseActive()) return;
+    // Only main window without visible mouse can process inputs
+    if(!windowObject->isRoot() || windowObject->isMouseActive()) return;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        app->getActiveCamera()->ProcessKeyboard(FORWARD, app->getDeltaTime());
+        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(FORWARD, windowObject->getDeltaTime());
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        app->getActiveCamera()->ProcessKeyboard(BACKWARD, app->getDeltaTime());
+        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(BACKWARD, windowObject->getDeltaTime());
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        app->getActiveCamera()->ProcessKeyboard(LEFT, app->getDeltaTime());
+        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(LEFT, windowObject->getDeltaTime());
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        app->getActiveCamera()->ProcessKeyboard(RIGHT, app->getDeltaTime());
+        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(RIGHT, windowObject->getDeltaTime());
 }

@@ -55,6 +55,8 @@ out vec4 FragColor;
 // ------------------------------------------------------------------------------------------------
 
 uniform vec2 u_resolution;
+uniform Camera camera;
+uniform Sphere sphere;
 
 // ------------------------------------------------------------------------------------------------
 // FUNCTIONS
@@ -106,18 +108,6 @@ Ray generateRay(Camera cam, vec2 uv) {
 }
 
 /*
- * Construit une caméra par défaut pour visualiser la scène
- */
-Camera defaultCamera() {
-    return Camera(
-        vec3(0.0, 0.0, 2.0),
-        vec3(0.0, 0.0, -1.0),
-        vec3(0.0, 1.0, 0.0),
-        radians(60.0)
-    );
-}
-
-/*
  * Vérifie si le rayon touche la sphère
  */
 float rayHitSphere(Ray ray, Sphere sphere) {
@@ -150,11 +140,11 @@ vec3 colorAt(Sphere sphere, vec3 normal, vec3 hitPoint, Light light) {
     
     // Diffuse shading
     vec3 lightDir = normalize(hitPoint - light.position);
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, -lightDir), 0.0);
 
     // Specular shading
-    vec3 reflectDir = reflect(lightDir, normal);
-    float spec = pow(max(dot(vec3(0.0, 0.0, -1.0), reflectDir), 0.0), sphere.material.shininess);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(camera.forward, reflectDir), 0.0), sphere.material.shininess);
 
     vec3 ambient = sphere.material.ambient * light.material.ambient;
     vec3 diffuse = sphere.material.diffuse * diff * light.material.diffuse;
@@ -197,9 +187,8 @@ void main()
     vec2 coord = normalizedCenteredCoord();
 
     // Création de caméra pour la vue, de la sphère de test et de la lumière
-    Sphere sphere = Sphere(vec3(0.0f), 0.5f, Material(vec3(0.2, 0.2, 0.2), vec3(1.0, 0.2, 0.2), vec3(1.0), 32.0));
-    Light light = Light(vec3(0.0, -5.0, 0.0), Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0), 0.0));
-    Camera camera = defaultCamera();
+    // Sphere sphere = Sphere(vec3(0.0f), 0.5f, Material(vec3(0.2, 0.2, 0.2), vec3(0.2, 0.1, 0.2), vec3(1.0), 32.0));
+    Light light = Light(vec3(0.0, 5.0, 0.0), Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0), 0.0));
 
     // Création du rayon pour ce fragment
     Ray ray = generateRay(camera, coord);
