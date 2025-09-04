@@ -203,9 +203,6 @@ void Application::run(const std::string& sceneFile)
     Logger::logInfo("Components are all fully initialized");
 
     createExternalWindow();
-    // m_rt = new RayTracer(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, getExternalWindow(1));
-    // TODO : Changer pour quelque chose de plus propre
-    // Par exemple : chaque fenêtre est un objet "Window" abstrait et les différentes fenetres gèrent différement les choses
     
     Logger::logInfo("Starting application loop");
     loop();

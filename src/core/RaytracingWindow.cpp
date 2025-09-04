@@ -9,12 +9,10 @@ RaytracingWindow::RaytracingWindow(Scene *refScene, const unsigned int width, co
 
 void RaytracingWindow::postInitProcess()
 {
-    Logger::logPerf("Entering post process init of RayTracer");
     m_rayTracer = new RayTracer(getScreenWidth(), getScreenHeight(), m_window);
-    Logger::logPerf("Exiting post process init of RayTracer");
 }
 
 void RaytracingWindow::subClassRendering()
 {
-    m_rayTracer->draw();
+    m_rayTracer->draw(m_scene);
 }
