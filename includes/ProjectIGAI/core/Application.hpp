@@ -236,9 +236,6 @@ private:
     unsigned int m_screenHeight;
     unsigned int m_activeWindowsCount;
 
-    /* -- RAY-TRACING -- */
-    RayTracer* m_rt;
-
     /* --- TIME --- */
     float m_deltaTime;
     float m_lastFrame;
