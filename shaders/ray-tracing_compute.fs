@@ -196,18 +196,18 @@ vec2 normalizedCenteredCoord() {
 }
 
 /**
- * Construit un rayon partant de la caméra et allant vers le fragment cible
+ * Construct a ray coming from the camera and directed to the active pixel
  */
 Ray generateRay(Camera cam, vec2 uv, float seed) {
 
-    // Repère caméra
+    // Camera
     vec3 right = normalize(cross(cam.forward, cam.up));
     vec3 up    = normalize(cross(right, cam.forward));
 
     // Antialiasing
     vec3 offset = randomVec3(vec3(uv, seed));
-    float xOffset = 0.0; // (offset.x - 0.5) / u_resolution.x;
-    float yOffset = 0.0; // (offset.y - 0.5) / u_resolution.y;
+    float xOffset = (offset.x - 0.5) / u_resolution.x;
+    float yOffset = (offset.y - 0.5) / u_resolution.y;
 
     // Projection avec FOV
     float scale = tan(cam.fov * 0.5);
