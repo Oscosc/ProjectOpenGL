@@ -15,7 +15,7 @@ public:
 
     void postInitProcess() override;
 
-    void onScroll(double xOffset, double yOffset) override;
+    RayTracer* getRayTracer() { return m_rayTracer; }
 
 private:
     

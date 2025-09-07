@@ -194,6 +194,8 @@ public:
      */
     BaseWindow* getExternalWindow(unsigned int windowID) const;
 
+    const unsigned int getActiveWindowCount() { return m_activeWindowsCount; }
+
     /**
      * @brief Set a new external window for this application.
      * 

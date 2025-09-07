@@ -64,7 +64,7 @@ namespace Callbacks {
      * un effet "lisse" dans les déplacements par exemple.
      * @param window Fenêtre à laquelle on veut assigner le traitement des saisies clavier.
      */
-    void processInput(GLFWwindow *window);
+    void processInput(Application* app);
 }
 
 #endif // CALLBACKS_HPP

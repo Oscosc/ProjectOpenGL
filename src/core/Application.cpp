@@ -169,7 +169,7 @@ void Application::loop()
 {
     while(!applicationShouldClose()) {
         // Processing inputs
-        Callbacks::processInput(getMainWindow()->getGLFWwindow());
+        Callbacks::processInput(this);
 
         // Updating scene camera PV
         m_scene->updateActiveCameraPV();

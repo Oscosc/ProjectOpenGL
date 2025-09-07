@@ -1,5 +1,6 @@
 #include <ProjectIGAI/graphics/Callbacks.hpp>
 
+#include <ProjectIGAI/core/RaytracingWindow.hpp>
 
 void Callbacks::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -131,20 +132,35 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
     */
 }
 
-void Callbacks::processInput(GLFWwindow *window)
+void Callbacks::processInput(Application *app)
 {
+    // Retrieve main window to check for inputs
+    BaseWindow* mainWindow = app->getMainWindow();
 
-    BaseWindow* windowObject = static_cast<BaseWindow*>(glfwGetWindowUserPointer(window));
+    bool movement = false;
+    if (glfwGetKey(mainWindow->getGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS) {
+        mainWindow->getScene()->getActiveCamera()->ProcessKeyboard(FORWARD, mainWindow->getDeltaTime());
+        movement = true;
+    }
+    if (glfwGetKey(mainWindow->getGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS) {
+        mainWindow->getScene()->getActiveCamera()->ProcessKeyboard(BACKWARD, mainWindow->getDeltaTime());
+        movement = true;
+    }
+    if (glfwGetKey(mainWindow->getGLFWwindow(), GLFW_KEY_A) == GLFW_PRESS) {
+        mainWindow->getScene()->getActiveCamera()->ProcessKeyboard(LEFT, mainWindow->getDeltaTime());
+        movement = true;
+    }
+    if (glfwGetKey(mainWindow->getGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS) {
+        mainWindow->getScene()->getActiveCamera()->ProcessKeyboard(RIGHT, mainWindow->getDeltaTime());
+        movement = true;
+    }
 
-    // Only main window without visible mouse can process inputs
-    if(!windowObject->isRoot() || windowObject->isMouseActive()) return;
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(FORWARD, windowObject->getDeltaTime());
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(BACKWARD, windowObject->getDeltaTime());
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(LEFT, windowObject->getDeltaTime());
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        windowObject->getScene()->getActiveCamera()->ProcessKeyboard(RIGHT, windowObject->getDeltaTime());
+    // If a movement has been recorded, ray-tracers needs to be reset
+    if(movement) {
+        for(unsigned int i = 1; i < app->getActiveWindowCount(); i++) {
+            RaytracingWindow* rtWin = dynamic_cast<RaytracingWindow*>(app->getExternalWindow(i));
+            if(rtWin != nullptr)
+                rtWin->getRayTracer()->resetAccumulation();
+        }
+    }
 }
