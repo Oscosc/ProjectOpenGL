@@ -12,6 +12,11 @@ void RaytracingWindow::postInitProcess()
     m_rayTracer = new RayTracer(getScreenWidth(), getScreenHeight(), m_window);
 }
 
+void RaytracingWindow::onScroll(double xOffset, double yOffset)
+{
+    BaseWindow::onScroll(xOffset, yOffset);
+}
+
 void RaytracingWindow::subClassRendering()
 {
     m_rayTracer->draw(m_scene);

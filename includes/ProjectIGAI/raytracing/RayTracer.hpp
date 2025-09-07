@@ -15,11 +15,22 @@ public:
 
     void draw(Scene* scene);
 
+    void resetAccumulation();
+
 private:
     void initFullScreenQuad(GLFWwindow* window);
 
+    GLuint createAccumulationTexture(int width, int height);
+    GLuint createFBO(GLuint texture);
+
+    GLuint m_textureA, m_textureB;
+    GLuint m_fboA, m_fboB;
+    int m_frameCount;
+
     GLuint m_VAO;
     GLuint m_VBO;
-    Shader* m_shader;
+
+    Shader* m_shader_compute;
+    Shader* m_shader_display;
     GLFWwindow* m_window;
 };

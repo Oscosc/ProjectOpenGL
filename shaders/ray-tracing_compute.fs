@@ -131,6 +131,9 @@ struct Camera {
 uniform vec2 u_resolution;
 uniform float u_time;
 
+uniform sampler2D u_previousFrame;
+uniform int u_frameCount;
+
 uniform Camera camera;
 uniform Sphere spheres[SCENE_OBJ];
 
@@ -138,7 +141,8 @@ uniform Sphere spheres[SCENE_OBJ];
 // IN/OUT PARAMETERS
 // ------------------------------------------------------------------------------------------------
 
-in vec2 UV;
+in vec2 TexCoords; // Défini sur [ 0 ;  1] pour le mapping des textures
+in vec2 RayUV;     // Défini sur [-1 ; +1]
 out vec4 FragColor;
 
 // VARIOUS FUNCTIONS ------------------------------------------------------------------------------
@@ -186,7 +190,7 @@ vec2 rand2D(float seed) {
  * @return coordonnées normalisées
  */
 vec2 normalizedCenteredCoord() {
-    vec2 coord = UV;
+    vec2 coord = RayUV;
     coord.x *= u_resolution.x/u_resolution.y;
     return coord;
 }
@@ -261,16 +265,16 @@ vec4 rayColor(Ray ray, Sphere spheres[SCENE_OBJ], Light light) {
         if (World_hit(spheres, ray, 0.001, 100.0, rec)) {
             // scatter direction
             vec2 rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
-            vec3 direction = cosineWeightedHemisphere(rec.normal, rand);
+            vec3 direction = rec.normal + cosineWeightedHemisphere(rec.normal, rand);
 
             // Atténuation
-            accumulatedColor *= 0.5;
+            accumulatedColor *= colorAt(rec.material, rec.normal, rec.position, light);
 
             // Mettre à jour le rayon pour le prochain tour
             ray = Ray(rec.position, direction);
         } else {
             // Si pas de hit → couleur background * contribution
-            finalColor = accumulatedColor * backgroundColor(ray);
+            finalColor = accumulatedColor *= backgroundColor(ray);
             break;
         }
     }
@@ -294,7 +298,6 @@ void main()
     vec4 finalColor = vec4(0.0);
     for(int i = 0; i < RAY_PER_PIXEL; i++) {
         // Création du rayon pour ce fragment
-        float seed = i;
         Ray ray = generateRay(camera, coord, u_time); // u_time for randomness
 
         // Calcul de la couleur du rayon lancé
@@ -302,5 +305,15 @@ void main()
     }
 
     // Couleur finale
-    FragColor = finalColor / RAY_PER_PIXEL;
+    vec3 newColor = (finalColor / RAY_PER_PIXEL).xyz; // TODO : repasser en vec4
+
+    // Mélange avec l'image précédente
+    vec3 previousColor = texture(u_previousFrame, TexCoords).xyz;
+    float alpha = 1.0 / float(u_frameCount);
+    vec3 accumulatedColor = (u_frameCount <= 1)
+        ? newColor
+        : mix(previousColor, newColor, alpha);
+
+    // output
+    FragColor = vec4(accumulatedColor, 1.0);
 } 

@@ -78,7 +78,9 @@ void Application::initShaders(const std::string& sceneFile)
     ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
     ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
-    ShaderManager::getInstance().loadShader("ray-tracing", "shaders/ray-tracing.vs", "shaders/ray-tracing.fs");
+
+    ShaderManager::getInstance().loadShader("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs");
+    ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
 
 #ifdef LOAD_TEXTURES_ON
     TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
