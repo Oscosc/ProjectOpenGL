@@ -8,12 +8,18 @@
 // DATA STRUCTURES
 // ------------------------------------------------------------------------------------------------
 
+// MATERIAL ---------------------------------------------------------------------------------------
+
 struct Material {
     vec3 ambient;       // propriété ambiente du materiel
     vec3 diffuse;       // propriété diffuse du materiel
     vec3 specular;      // propriété speculaire du materiel
     float shininess;    // proriété brillante du materiel
 };
+
+float Material_getSpecularRatio(const Material material) {
+    return length(material.specular) / (length(material.specular) + length(material.diffuse));
+}
 
 // RAY --------------------------------------------------------------------------------------------
 
@@ -228,7 +234,7 @@ Ray generateRay(Camera cam, vec2 uv, float seed) {
  * lumière
  */
 vec3 colorAt(const in Material material, const in vec3 normal, const in vec3 hitPoint, const in Light light) {
-    
+
     // Diffuse shading
     vec3 lightDir = normalize(hitPoint - light.position);
     float diff = max(dot(normal, -lightDir), 0.0);
@@ -248,9 +254,14 @@ vec3 colorAt(const in Material material, const in vec3 normal, const in vec3 hit
  * Renvoie la couleur du background pour obtenir un dégradé type "ciel"
  */
 vec3 backgroundColor(Ray ray) {
+
     vec3 unit_direction = ray.direction;
     float a = 0.5 * (unit_direction.y + 1.0);
     return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+}
+
+vec3 gammaCorrection(const vec3 color) {
+    return pow(color, vec3(1.0/2.2));
 }
 
 /**
@@ -262,19 +273,28 @@ vec4 rayColor(Ray ray, Sphere spheres[SCENE_OBJ], Light light) {
 
     for (int bounce = 0; bounce < MAX_BOUNCES; ++bounce) {
         HitRecord rec;
+
         if (World_hit(spheres, ray, 0.001, 100.0, rec)) {
-            // scatter direction
-            vec2 rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
-            vec3 direction = rec.normal + cosineWeightedHemisphere(rec.normal, rand);
+            vec3 direction;
 
-            // Atténuation
-            accumulatedColor *= colorAt(rec.material, rec.normal, rec.position, light);
+            float specularCoeff = Material_getSpecularRatio(rec.material);
+            float rand = random(vec3(rec.position.xy, u_time));
 
-            // Mettre à jour le rayon pour le prochain tour
+            if(rand <= specularCoeff) {
+                direction = reflect(ray.direction, rec.normal);
+                accumulatedColor *= rec.material.specular;
+            }
+            else {
+                vec2 rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
+                direction = rec.normal + cosineWeightedHemisphere(rec.normal, rand);
+                accumulatedColor *= rec.material.diffuse;
+            }
+            
             ray = Ray(rec.position, direction);
+
         } else {
-            // Si pas de hit → couleur background * contribution
-            finalColor = accumulatedColor *= backgroundColor(ray);
+            // Si pas de hit → couleur background
+            finalColor = (bounce <= 0) ? backgroundColor(ray) : accumulatedColor *= 0.7;
             break;
         }
     }
