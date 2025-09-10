@@ -46,7 +46,7 @@ void RayTracer::draw(Scene* scene) {
     m_shader_compute->setFloat("camera.fov", glm::radians(cameraRef->Fov));
 
     // Objects setting
-    for(int i = 0; i < 2; i++) {
+    for(int i = 0; i < 5; i++) {
         Sphere* obj = static_cast<Sphere*>(scene->getObject(i));
         m_shader_compute->setVec3("spheres[" + std::to_string(i) + "].position", obj->getTransform().position);
         m_shader_compute->setFloat("spheres[" + std::to_string(i) + "].radius", obj->getRadius());

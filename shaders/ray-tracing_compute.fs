@@ -1,8 +1,9 @@
 #version 330 core
 
-#define SCENE_OBJ 2
-#define RAY_PER_PIXEL 10
-#define MAX_BOUNCES 10
+#define SCENE_OBJ 5
+#define RAY_PER_PIXEL 1
+#define MAX_BOUNCES 100
+#define MAX_FUZZ_LEVEL 100
 
 // ------------------------------------------------------------------------------------------------
 // DATA STRUCTURES
@@ -19,6 +20,10 @@ struct Material {
 
 float Material_getSpecularRatio(const Material material) {
     return length(material.specular) / (length(material.specular) + length(material.diffuse));
+}
+
+float Material_getFuzz(const Material material) {
+    return material.shininess / MAX_FUZZ_LEVEL;
 }
 
 // RAY --------------------------------------------------------------------------------------------
@@ -281,7 +286,8 @@ vec4 rayColor(Ray ray, Sphere spheres[SCENE_OBJ], Light light) {
             float rand = random(vec3(rec.position.xy, u_time));
 
             if(rand <= specularCoeff) {
-                direction = reflect(ray.direction, rec.normal);
+                vec3 fuzz = Material_getFuzz(rec.material) * randomVec3(vec3(rec.position.xy, u_time));
+                direction = reflect(ray.direction, rec.normal) + fuzz;
                 accumulatedColor *= rec.material.specular;
             }
             else {
