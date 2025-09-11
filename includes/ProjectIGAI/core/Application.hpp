@@ -16,8 +16,6 @@
 #define DEFAULT_SCREEN_HEIGHT 600
 
 #define MAX_WINDOWS 2
-
-// #define RAY_TRACING_ON
 // #define LOAD_TEXTURES_ON
 
 class BaseWindow; // For includes error

@@ -1,7 +1,7 @@
-#version 330 core
+#version 460 core
 
 #define SCENE_SPHERES 5
-#define SCENE_TRIANGLES 1
+#define SCENE_TRIANGLES 10
 
 #define RAY_PER_PIXEL 1
 #define MAX_BOUNCES 100
@@ -205,7 +205,7 @@ uniform int u_frameCount;
 
 uniform Camera camera;
 uniform Sphere u_spheres[SCENE_SPHERES];
-Triangle u_triangles[SCENE_TRIANGLES]; // TODO : set to uniform
+uniform Triangle u_triangles[SCENE_TRIANGLES];
 
 // ------------------------------------------------------------------------------------------------
 // IN/OUT PARAMETERS
@@ -358,21 +358,6 @@ void main()
 {
     // Préparation des coordonnées du fragment
     vec2 coord = normalizedCenteredCoord();
-
-    // TEMPORARY : création du triangle
-    Material matTri = Material(
-        vec3(0.0),
-        vec3(1.0, 0.0, 0.0),
-        vec3(0.0),
-        0.0
-    );
-    Triangle tri = Triangle(
-        vec3(0.0, 5.0, 3.0),
-        vec3(2.0, 3.0, 0.0),
-        vec3(-2.0, 1.0, 0.0),
-        matTri
-    );
-    u_triangles[0] = tri;
 
     // Boucle de lancer de rayon pour un pixel
     vec4 finalColor = vec4(0.0);

@@ -1,6 +1,5 @@
 #include <ProjectIGAI/core/Application.hpp>
 #include <ProjectIGAI/core/SceneParser.hpp>
-#include <ProjectIGAI/raytracing/RayTracing.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
 
 

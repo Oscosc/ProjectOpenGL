@@ -1,4 +1,4 @@
-#version 330 core
+#version 460 core
 
 #define NB_POINT_LIGHTS POINT_QTE
 #define NB_DIR_LIGHTS   DIR_QTE
