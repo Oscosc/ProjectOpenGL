@@ -48,12 +48,12 @@ void RayTracer::draw(Scene* scene) {
     // Objects setting
     for(int i = 0; i < 5; i++) {
         Sphere* obj = static_cast<Sphere*>(scene->getObject(i));
-        m_shader_compute->setVec3("spheres[" + std::to_string(i) + "].position", obj->getTransform().position);
-        m_shader_compute->setFloat("spheres[" + std::to_string(i) + "].radius", obj->getRadius());
-        m_shader_compute->setVec3("spheres[" + std::to_string(i) + "].material.ambient", obj->getMaterial().matShader.ambient);
-        m_shader_compute->setVec3("spheres[" + std::to_string(i) + "].material.diffuse", obj->getMaterial().matShader.diffuse);
-        m_shader_compute->setVec3("spheres[" + std::to_string(i) + "].material.specular", obj->getMaterial().matShader.specular);
-        m_shader_compute->setFloat("spheres[" + std::to_string(i) + "].material.shininess", obj->getMaterial().matShader.shininess);
+        m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].position", obj->getTransform().position);
+        m_shader_compute->setFloat("u_spheres[" + std::to_string(i) + "].radius", obj->getRadius());
+        m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.ambient", obj->getMaterial().matShader.ambient);
+        m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.diffuse", obj->getMaterial().matShader.diffuse);
+        m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.specular", obj->getMaterial().matShader.specular);
+        m_shader_compute->setFloat("u_spheres[" + std::to_string(i) + "].material.shininess", obj->getMaterial().matShader.shininess);
     }
 
     glBindVertexArray(m_VAO);

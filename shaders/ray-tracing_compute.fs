@@ -1,6 +1,8 @@
 #version 330 core
 
-#define SCENE_OBJ 5
+#define SCENE_SPHERES 5
+#define SCENE_TRIANGLES 1
+
 #define RAY_PER_PIXEL 1
 #define MAX_BOUNCES 100
 #define MAX_FUZZ_LEVEL 100
@@ -9,19 +11,29 @@
 // DATA STRUCTURES
 // ------------------------------------------------------------------------------------------------
 
+// INTERVAL ---------------------------------------------------------------------------------------
+
+struct Interval {
+    float min;
+    float max;
+};
+
 // MATERIAL ---------------------------------------------------------------------------------------
 
 struct Material {
-    vec3 ambient;       // propriété ambiente du materiel
-    vec3 diffuse;       // propriété diffuse du materiel
-    vec3 specular;      // propriété speculaire du materiel
-    float shininess;    // proriété brillante du materiel
+    vec3 ambient;       // propriété ambiente du materiel   -> inutilisé
+    vec3 diffuse;       // propriété diffuse du materiel    -> normalisée vers albedo
+    vec3 specular;      // propriété speculaire du materiel -> normalisée vers metalness (reflet)
+
+    float shininess;    // proriété brillante du materiel   -> normalisée vers fuzz (granularité)
 };
 
+// Donne la part de rayons spéculaires (reflets) du matériel
 float Material_getSpecularRatio(const Material material) {
     return length(material.specular) / (length(material.specular) + length(material.diffuse));
 }
 
+// Donne le niveau de granularité du matériel
 float Material_getFuzz(const Material material) {
     return material.shininess / MAX_FUZZ_LEVEL;
 }
@@ -33,11 +45,8 @@ struct Ray {
     vec3 direction;     // direction du rayon (normalisée)
 };
 
-/**
- * Renvoi la valeur d'un rayon pour une valeur de t tel que
- * R(t) = origin + t * direction
- */
-vec3 Ray_at(Ray r, float t) {
+// Donne le point qui correspond à la direction du rayon multipliée par un pas de t
+vec3 Ray_at(const Ray r, const float t) {
     return r.origin + r.direction * t;
 }
 
@@ -52,12 +61,50 @@ struct HitRecord {
     Material material;  // Material of the hitted surface
 };
 
-/**
- * Compute the normal and the side of the face hitted by the ray
- */
-void HitRecord_setFaceNormal(inout HitRecord rec, const in Ray r, const in vec3 outwardNormal) {
+// Définit la normale du point touché sur la sphere
+void HitRecord_setFaceNormal(inout HitRecord rec, const Ray r, const vec3 outwardNormal) {
     rec.frontFace = dot(r.direction, outwardNormal) < 0;
     rec.normal = rec.frontFace ? outwardNormal : -outwardNormal;
+}
+
+// TRIANGLE ---------------------------------------------------------------------------------------
+
+struct Triangle {
+    vec3 a;
+    vec3 b;
+    vec3 c;
+
+    Material material;
+};
+
+// From : https://iquilezles.org/articles/intersectors/ (adapted)
+// triangle degined by vertices v0, v1 and  v2
+bool Triangle_hit(const Triangle triangle, const Ray ray, const Interval rayInterval, out HitRecord rec) {
+
+    // Calcul de la position de l'intersection
+    vec3 ba = triangle.b - triangle.a;
+    vec3 ca = triangle.c - triangle.a;
+    vec3 oa = ray.origin - triangle.a;
+
+    vec3  n = cross(ba, ca);
+    vec3  q = cross(oa, ray.direction);
+    float d = 1.0 / dot(ray.direction, n);
+
+    float u = d*dot(-q, ca);
+    float v = d*dot( q, ba);
+    float t = d*dot(-n, oa);
+
+    // Pas d'intersection
+    if(u < 0.0 || v < 0.0 || (u+v) > 1.0) return false;
+    if(t <= rayInterval.min || t >= rayInterval.max) return false;
+
+    // Setup du record
+    rec.t = t;
+    rec.position = Ray_at(ray, rec.t);
+    HitRecord_setFaceNormal(rec, ray, normalize(n));
+    rec.material = triangle.material;
+
+    return true;
 }
 
 // SPHERE -----------------------------------------------------------------------------------------
@@ -69,29 +116,31 @@ struct Sphere {
     Material material;  // materiel de la sphere
 };
 
-bool Sphere_hit(in Sphere sphere, const in Ray ray, const in float ray_tMin, const in float ray_tMax, out HitRecord rec) {
+// Calcule l'intersection rayon-sphère et sauvegarde les données en cas d'intersection dans un rec
+bool Sphere_hit(const Sphere sphere, const Ray ray, const Interval rayInterval, out HitRecord rec) {
     
-    // Compute the discriminant
+    // Calcul du discriminant
     vec3 oc = sphere.position - ray.origin;
     float a = dot(ray.direction, ray.direction);
     float h = dot(ray.direction, oc);
     float c = dot(oc, oc) - sphere.radius*sphere.radius;
 
+    // Discriminant < 0 : pas d'intersection
     float discriminant = h*h - a*c;
     if(discriminant < 0)
         return false;
     
     float sqrtd = sqrt(discriminant);
 
-    // Find the nearest root that's lies in the acceptable range
+    // Vérifie que la racine soit bien dans l'interval d'action du rayon
     float root = (h - sqrtd) / a;
-    if (root <= ray_tMin || ray_tMax <= root) {
+    if (root <= rayInterval.min || rayInterval.max <= root) {
         root = (h + sqrtd) / a;
-        if (root <= ray_tMin || ray_tMax <= root)
+        if (root <= rayInterval.min || rayInterval.max <= root)
             return false;
     }
 
-    // Setup the record
+    // Intersection correcte : setup du record
     rec.t = root;
     rec.position = Ray_at(ray, rec.t);
     vec3 outwardNormal = (rec.position - sphere.position) / sphere.radius;
@@ -101,14 +150,29 @@ bool Sphere_hit(in Sphere sphere, const in Ray ray, const in float ray_tMin, con
     return true;
 }
 
-bool World_hit(in Sphere spheres[SCENE_OBJ], const in Ray ray, const in float ray_tMin, const in float ray_tMax, out HitRecord rec) {
+// Calcule une intersection entre un rayon et l'environnement (appelle l'intersection avec chaque
+// objet)
+bool World_hit(const Sphere spheres[SCENE_SPHERES], const Triangle triangles[SCENE_TRIANGLES],
+    const Ray ray, const Interval rayInterval, out HitRecord rec) {
+
     HitRecord tmpRec;
     bool hitAnything = false;
-    float closestSoFar = ray_tMax;
+    float closestSoFar = rayInterval.max;
+    
+    // Boucle sur les sphères de l'environnement
+    for(int i = 0; i < SCENE_SPHERES; i++) {
+        if(Sphere_hit(spheres[i], ray, rayInterval, tmpRec)) {
+            if(tmpRec.t < closestSoFar) {
+                hitAnything = true;
+                closestSoFar = tmpRec.t;
+                rec = tmpRec;
+            }
+        }
+    }
 
-    // Loop over world objects
-    for(int i = 0; i < SCENE_OBJ; i++) {
-        if(Sphere_hit(spheres[i], ray, ray_tMin, ray_tMax, tmpRec)) {
+    // Boucle sur les triangles de l'environnement
+    for(int i = 0; i < SCENE_TRIANGLES; i++) {
+        if(Triangle_hit(triangles[i], ray, rayInterval, tmpRec)) {
             if(tmpRec.t < closestSoFar) {
                 hitAnything = true;
                 closestSoFar = tmpRec.t;
@@ -119,12 +183,6 @@ bool World_hit(in Sphere spheres[SCENE_OBJ], const in Ray ray, const in float ra
 
     return hitAnything;
 }
-
-struct Light {
-    vec3 position;      // position de la lumière
-
-    Material material;  // materiel de la lumière
-};
 
 // CAMERA -----------------------------------------------------------------------------------------
 
@@ -146,7 +204,8 @@ uniform sampler2D u_previousFrame;
 uniform int u_frameCount;
 
 uniform Camera camera;
-uniform Sphere spheres[SCENE_OBJ];
+uniform Sphere u_spheres[SCENE_SPHERES];
+Triangle u_triangles[SCENE_TRIANGLES]; // TODO : set to uniform
 
 // ------------------------------------------------------------------------------------------------
 // IN/OUT PARAMETERS
@@ -158,15 +217,18 @@ out vec4 FragColor;
 
 // VARIOUS FUNCTIONS ------------------------------------------------------------------------------
 
+// Calcule un nombre aléatoire entre 0 et 1 à partir d'une seed vec3
 float random(const vec3 coord) {
     return fract(sin(dot(coord, vec3(64.25375463, 23.27536534, 86.29678483))) * 59482.7542);
 }
 
+// Calcule un vecteur normalisé aléatoire à partir d'une seed vec3
 vec3 randomVec3(const vec3 coord) {
     return normalize(vec3(random(coord.xyz), random(coord.yzx), random(coord.zxy)));
 }
 
-vec3 cosineWeightedHemisphere(vec3 normal, vec2 rand) {
+// Calcule un vecteur normalisé aléatoire dans l'émismphere de la normale
+vec3 randomEmisphereVec3(const vec3 normal, const vec2 rand) {
     float r = sqrt(rand.x);
     float theta = 2.0 * 3.14159265359 * rand.y;
 
@@ -184,7 +246,7 @@ vec3 cosineWeightedHemisphere(vec3 normal, vec2 rand) {
     return tangent * localDir.x + bitangent * localDir.y + normal * localDir.z;
 }
 
-vec2 rand2D(float seed) {
+vec2 rand2D(const float seed) {
     return vec2(
         random(vec3(seed, u_time, 1.23)),
         random(vec3(seed, u_time, 4.56))
@@ -209,7 +271,7 @@ vec2 normalizedCenteredCoord() {
 /**
  * Construct a ray coming from the camera and directed to the active pixel
  */
-Ray generateRay(Camera cam, vec2 uv, float seed) {
+Ray generateRay(const Camera cam, const vec2 uv, const float seed) {
 
     // Camera
     vec3 right = normalize(cross(cam.forward, cam.up));
@@ -234,31 +296,8 @@ Ray generateRay(Camera cam, vec2 uv, float seed) {
     return ray;
 }
 
-/**
- * Donne la couleur à un point précis de la sphere en fonction de son matériaux et celui de la
- * lumière
- */
-vec3 colorAt(const in Material material, const in vec3 normal, const in vec3 hitPoint, const in Light light) {
-
-    // Diffuse shading
-    vec3 lightDir = normalize(hitPoint - light.position);
-    float diff = max(dot(normal, -lightDir), 0.0);
-
-    // Specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(camera.forward, reflectDir), 0.0), material.shininess);
-
-    vec3 ambient = material.ambient * light.material.ambient;
-    vec3 diffuse = material.diffuse * diff * light.material.diffuse;
-    vec3 specular = material.specular * spec * light.material.specular;
-
-    return (ambient + diffuse + specular);
-}
-
-/**
- * Renvoie la couleur du background pour obtenir un dégradé type "ciel"
- */
-vec3 backgroundColor(Ray ray) {
+// Couleur du ciel (simulé pour avoir un rendu plus sympathique)
+vec3 backgroundColor(const Ray ray) {
 
     vec3 unit_direction = ray.direction;
     float a = 0.5 * (unit_direction.y + 1.0);
@@ -272,14 +311,17 @@ vec3 gammaCorrection(const vec3 color) {
 /**
  * Calcule la couleur du rayon en fonction de l'élément qu'il rencontre en premier (sphere ou bg)
  */
-vec4 rayColor(Ray ray, Sphere spheres[SCENE_OBJ], Light light) {
+vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES], const Triangle triangles[SCENE_TRIANGLES]) {
+    
+    Interval rayInterval = Interval(0.001, 100.0);
+    
     vec3 accumulatedColor = vec3(1.0);
     vec3 finalColor = vec3(0.0);
 
     for (int bounce = 0; bounce < MAX_BOUNCES; ++bounce) {
         HitRecord rec;
 
-        if (World_hit(spheres, ray, 0.001, 100.0, rec)) {
+        if (World_hit(spheres, triangles, ray, rayInterval, rec)) {
             vec3 direction;
 
             float specularCoeff = Material_getSpecularRatio(rec.material);
@@ -291,16 +333,16 @@ vec4 rayColor(Ray ray, Sphere spheres[SCENE_OBJ], Light light) {
                 accumulatedColor *= rec.material.specular;
             }
             else {
-                vec2 rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
-                direction = rec.normal + cosineWeightedHemisphere(rec.normal, rand);
+                vec2 sub_rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
+                direction = rec.normal + randomEmisphereVec3(rec.normal, sub_rand);
                 accumulatedColor *= rec.material.diffuse;
             }
             
             ray = Ray(rec.position, direction);
 
         } else {
-            // Si pas de hit → couleur background
-            finalColor = (bounce <= 0) ? backgroundColor(ray) : accumulatedColor *= 0.7;
+            // finalColor = (bounce <= 0) ? backgroundColor(ray) : accumulatedColor *= 0.7;
+            finalColor = accumulatedColor * backgroundColor(ray);
             break;
         }
     }
@@ -317,8 +359,20 @@ void main()
     // Préparation des coordonnées du fragment
     vec2 coord = normalizedCenteredCoord();
 
-    // Création de la source de lumière (pas de lien avec l'app : TODO)
-    Light light = Light(vec3(0.0, 5.0, 0.0), Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0), 0.0));
+    // TEMPORARY : création du triangle
+    Material matTri = Material(
+        vec3(0.0),
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0),
+        0.0
+    );
+    Triangle tri = Triangle(
+        vec3(0.0, 5.0, 3.0),
+        vec3(2.0, 3.0, 0.0),
+        vec3(-2.0, 1.0, 0.0),
+        matTri
+    );
+    u_triangles[0] = tri;
 
     // Boucle de lancer de rayon pour un pixel
     vec4 finalColor = vec4(0.0);
@@ -327,7 +381,7 @@ void main()
         Ray ray = generateRay(camera, coord, u_time); // u_time for randomness
 
         // Calcul de la couleur du rayon lancé
-        finalColor += rayColor(ray, spheres, light);
+        finalColor += rayColor(ray, u_spheres, u_triangles);
     }
 
     // Couleur finale
