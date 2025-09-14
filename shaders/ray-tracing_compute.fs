@@ -1,10 +1,9 @@
 #version 460 core
 
 #define SCENE_SPHERES 5
-#define SCENE_TRIANGLES 10
 
 #define RAY_PER_PIXEL 1
-#define MAX_BOUNCES 100
+#define MAX_BOUNCES 50
 #define MAX_FUZZ_LEVEL 100
 
 // ------------------------------------------------------------------------------------------------
@@ -16,6 +15,14 @@
 struct Interval {
     float min;
     float max;
+};
+
+// VERTEX -----------------------------------------------------------------------------------------
+
+struct Vertex {
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
 };
 
 // MATERIAL ---------------------------------------------------------------------------------------
@@ -37,6 +44,32 @@ float Material_getSpecularRatio(const Material material) {
 float Material_getFuzz(const Material material) {
     return material.shininess / MAX_FUZZ_LEVEL;
 }
+
+// INDEX ------------------------------------------------------------------------------------------
+
+struct Index {
+    int vertPos;
+    int matPos;
+};
+
+// ------------------------------------------------------------------------------------------------
+// LAYOUT VALUES (SSBO)
+// ------------------------------------------------------------------------------------------------
+
+// Contient l'ensemble des vertex de la scene
+layout(std430, binding = 0) buffer VertexBuffer {
+    Vertex l_vertices[];
+};
+
+// Contient l'ordre des index à lire : 3 index = 1 triangle
+layout(std430, binding = 1) buffer IndexBuffer {
+    Index l_indexes[];
+};
+
+// Contient l'ensemble des matériaux des objets de la scène
+layout(std430, binding = 2) buffer MaterialBuffer {
+    Material l_materials[];
+};
 
 // RAY --------------------------------------------------------------------------------------------
 
@@ -74,37 +107,74 @@ struct Triangle {
     vec3 b;
     vec3 c;
 
+    vec3 normal;
+
     Material material;
 };
 
 // From : https://iquilezles.org/articles/intersectors/ (adapted)
-// triangle degined by vertices v0, v1 and  v2
-bool Triangle_hit(const Triangle triangle, const Ray ray, const Interval rayInterval, out HitRecord rec) {
+// triangle designed by vertices v0, v1 and  v2
+bool Triangle_hit(const Triangle tri, const Ray ray, const Interval rayInterval, out HitRecord rec) {
+    const float EPS = 1e-6;
 
-    // Calcul de la position de l'intersection
-    vec3 ba = triangle.b - triangle.a;
-    vec3 ca = triangle.c - triangle.a;
-    vec3 oa = ray.origin - triangle.a;
+    vec3 v0 = tri.a;
+    vec3 v1 = tri.b;
+    vec3 v2 = tri.c;
 
-    vec3  n = cross(ba, ca);
-    vec3  q = cross(oa, ray.direction);
-    float d = 1.0 / dot(ray.direction, n);
+    vec3 edge1 = v1 - v0;
+    vec3 edge2 = v2 - v0;
 
-    float u = d*dot(-q, ca);
-    float v = d*dot( q, ba);
-    float t = d*dot(-n, oa);
+    // h = cross(ray.dir, edge2)
+    vec3 h = cross(ray.direction, edge2);
+    float a = dot(edge1, h);
+    if (abs(a) < EPS) return false; // rayon parallèle ou triangle dégénéré
 
-    // Pas d'intersection
-    if(u < 0.0 || v < 0.0 || (u+v) > 1.0) return false;
-    if(t <= rayInterval.min || t >= rayInterval.max) return false;
+    float f = 1.0 / a;
+    vec3 s = ray.origin - v0;
+    float u = f * dot(s, h);
+    if (u < 0.0 || u > 1.0) return false;
 
-    // Setup du record
+    vec3 q = cross(s, edge1);
+    float v = f * dot(ray.direction, q);
+    if (v < 0.0 || (u + v) > 1.0) return false;
+
+    float t = f * dot(edge2, q);
+    if (t <= rayInterval.min || t >= rayInterval.max) return false;
+
+    // On a une intersection valide
     rec.t = t;
     rec.position = Ray_at(ray, rec.t);
-    HitRecord_setFaceNormal(rec, ray, normalize(n));
-    rec.material = triangle.material;
 
+    // calculer la normale de face (unit)
+    vec3 faceNormal = normalize(cross(edge1, edge2));
+    HitRecord_setFaceNormal(rec, ray, faceNormal);
+
+    rec.material = tri.material;
     return true;
+}
+
+void Index_getVertex(const int indexID, out Vertex vertex, out Material material) {
+    Index index = l_indexes[indexID];
+
+    vertex   = l_vertices[index.vertPos];
+    material = l_materials[index.matPos];
+}
+
+Triangle Index_getTriangle(const int startIndex) {
+    Index i0 = l_indexes[startIndex + 0];
+    Index i1 = l_indexes[startIndex + 1];
+    Index i2 = l_indexes[startIndex + 2];
+
+    Vertex a = l_vertices[i0.vertPos];
+    Vertex b = l_vertices[i1.vertPos];
+    Vertex c = l_vertices[i2.vertPos];
+
+    Material material = l_materials[i0.matPos];
+    material.specular = vec3(startIndex / 36.0);
+
+    vec3 normal = normalize(cross(b.position - a.position, c.position - a.position));
+
+    return Triangle(a.position, b.position, c.position, normal, material);
 }
 
 // SPHERE -----------------------------------------------------------------------------------------
@@ -152,8 +222,8 @@ bool Sphere_hit(const Sphere sphere, const Ray ray, const Interval rayInterval, 
 
 // Calcule une intersection entre un rayon et l'environnement (appelle l'intersection avec chaque
 // objet)
-bool World_hit(const Sphere spheres[SCENE_SPHERES], const Triangle triangles[SCENE_TRIANGLES],
-    const Ray ray, const Interval rayInterval, out HitRecord rec) {
+bool World_hit(const Sphere spheres[SCENE_SPHERES], const Ray ray, const Interval rayInterval,
+    out HitRecord rec) {
 
     HitRecord tmpRec;
     bool hitAnything = false;
@@ -171,8 +241,12 @@ bool World_hit(const Sphere spheres[SCENE_SPHERES], const Triangle triangles[SCE
     }
 
     // Boucle sur les triangles de l'environnement
-    for(int i = 0; i < SCENE_TRIANGLES; i++) {
-        if(Triangle_hit(triangles[i], ray, rayInterval, tmpRec)) {
+    for(int i = 0; i < l_indexes.length(); i+=3) {
+        // Creation du triangle
+        Triangle tri = Index_getTriangle(i);
+
+        // Intersection rayon-triangle généré
+        if(Triangle_hit(tri, ray, rayInterval, tmpRec)) {
             if(tmpRec.t < closestSoFar) {
                 hitAnything = true;
                 closestSoFar = tmpRec.t;
@@ -205,7 +279,6 @@ uniform int u_frameCount;
 
 uniform Camera camera;
 uniform Sphere u_spheres[SCENE_SPHERES];
-uniform Triangle u_triangles[SCENE_TRIANGLES];
 
 // ------------------------------------------------------------------------------------------------
 // IN/OUT PARAMETERS
@@ -311,7 +384,7 @@ vec3 gammaCorrection(const vec3 color) {
 /**
  * Calcule la couleur du rayon en fonction de l'élément qu'il rencontre en premier (sphere ou bg)
  */
-vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES], const Triangle triangles[SCENE_TRIANGLES]) {
+vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES]) {
     
     Interval rayInterval = Interval(0.001, 100.0);
     
@@ -321,7 +394,7 @@ vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES], const Triangle trian
     for (int bounce = 0; bounce < MAX_BOUNCES; ++bounce) {
         HitRecord rec;
 
-        if (World_hit(spheres, triangles, ray, rayInterval, rec)) {
+        if (World_hit(spheres, ray, rayInterval, rec)) {
             vec3 direction;
 
             float specularCoeff = Material_getSpecularRatio(rec.material);
@@ -329,16 +402,19 @@ vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES], const Triangle trian
 
             if(rand <= specularCoeff) {
                 vec3 fuzz = Material_getFuzz(rec.material) * randomVec3(vec3(rec.position.xy, u_time));
-                direction = reflect(ray.direction, rec.normal) + fuzz;
+                direction = normalize(reflect(ray.direction, rec.normal) + fuzz);
                 accumulatedColor *= rec.material.specular;
             }
             else {
                 vec2 sub_rand = rand2D(float(bounce) + dot(rec.position, vec3(12.9898,78.233,45.164)));
-                direction = rec.normal + randomEmisphereVec3(rec.normal, sub_rand);
+                direction = normalize(rec.normal + randomEmisphereVec3(rec.normal, sub_rand));
                 accumulatedColor *= rec.material.diffuse;
             }
             
-            ray = Ray(rec.position, direction);
+            // ray = Ray(rec.position, direction);
+            vec3 newDir = normalize(direction);
+            vec3 originOffset = rec.position + rec.normal * 1e-4; // petit epsilon le long de la normale
+            ray = Ray(originOffset, newDir);
 
         } else {
             // finalColor = (bounce <= 0) ? backgroundColor(ray) : accumulatedColor *= 0.7;
@@ -366,7 +442,7 @@ void main()
         Ray ray = generateRay(camera, coord, u_time); // u_time for randomness
 
         // Calcul de la couleur du rayon lancé
-        finalColor += rayColor(ray, u_spheres, u_triangles);
+        finalColor += rayColor(ray, u_spheres);
     }
 
     // Couleur finale
@@ -381,4 +457,4 @@ void main()
 
     // output
     FragColor = vec4(accumulatedColor, 1.0);
-} 
+}

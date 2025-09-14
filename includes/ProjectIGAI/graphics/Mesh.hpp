@@ -80,6 +80,10 @@ public:
      */
     std::string getName() const;
 
+    std::vector<Vertex> getVertices() const;
+
+    std::vector<unsigned int> getIndexes() const;
+
 private:
 
     /**

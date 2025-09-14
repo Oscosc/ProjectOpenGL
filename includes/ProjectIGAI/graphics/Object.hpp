@@ -147,6 +147,8 @@ public:
 
     void debugMaterial() const;
 
+    glm::mat4 getModelMatrix() const;
+
 protected:
 
     void initGLObject();

@@ -9,7 +9,7 @@ RaytracingWindow::RaytracingWindow(Scene *refScene, const unsigned int width, co
 
 void RaytracingWindow::postInitProcess()
 {
-    m_rayTracer = new RayTracer(getScreenWidth(), getScreenHeight(), m_window);
+    m_rayTracer = new RayTracer(getScreenWidth(), getScreenHeight(), m_window, m_scene);
 }
 
 void RaytracingWindow::subClassRendering()

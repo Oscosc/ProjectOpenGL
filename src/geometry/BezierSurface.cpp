@@ -56,12 +56,7 @@ void BezierSurface::draw(Scene* scene) const
     }
     shader->use();
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(glm::mat4(1.0f), this->m_transform.position);
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
-    model = glm::scale(model, this->m_transform.scale);
+    glm::mat4 model = getModelMatrix();
 
     shader->setMat4("model", model);
     shader->setMat4("view", scene->getActiveCameraPV().view);
