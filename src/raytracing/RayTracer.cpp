@@ -24,7 +24,7 @@ RayTracer::RayTracer(unsigned int width, unsigned int height, GLFWwindow* window
     m_shader_display = ShaderManager::getInstance().getShader("ray-tracing-display");
 
     // Load data to GPU
-    createAndLoadSSBO(scene);
+    passSceneToGPU(scene);
 
 }
 
@@ -160,106 +160,85 @@ GLuint RayTracer::createFBO(GLuint texture)
     return fbo;
 }
 
-void RayTracer::createAndLoadSSBO(Scene *scene)
+void RayTracer::passSceneToGPU(Scene *scene)
 {
-    struct Index {
-        int vertPos;
-        int matPos;
-    };
-
-    struct GPUVertex {
-        // Structure correspondant à l'alignement du standard 430 pour les layouts GLSL
-        alignas(16) glm::vec3 position; // 16 octets
-        alignas(16) glm::vec3 normal;   // 16 octets
-        alignas(8)  glm::vec2 uv;       //  8 octets
-        float _padding[2];              //  8 octets
-                                // TOTAL : 48 octets
-    };
-
-    struct GPUMaterial {
-        // Structure correspondant à l'alignement du standard 430 pour les layouts GLSL
-        alignas(16) glm::vec3 ambient;  // 16 octets
-        alignas(16) glm::vec3 diffuse;  // 16 octets
-        alignas(16) glm::vec3 specular; // 16 octets
-        float shininess;                //  4 octets
-        float _padding[3];              // 12 octets
-                                // TOTAL : 64 octets
-    };
-
+    // Setup shader target
     m_shader_compute->use();
 
-    Mesh* refMesh = dynamic_cast<Mesh*>(scene->getObject(0));
-    if(refMesh == nullptr) return;
+    // Create each buffers for layouts
+    std::vector<GPUVertex>   vertices  = std::vector<GPUVertex>();
+    std::vector<GPUMaterial> materials = std::vector<GPUMaterial>();
+    std::vector<GPUIndex>    indexes   = std::vector<GPUIndex>();
 
-    // VERTICES BUFFER SETUP
-    glm::mat4 modelMatrix = refMesh->getModelMatrix();
+    // Add each mesh informations to the buffer
+    // (NE FONCTIONNE PAS DANS LA BOUCLE)
+    for(unsigned int i = 0; i < scene->objectsCount(); ++i) {
+        Mesh* refMesh = dynamic_cast<Mesh*>(scene->getObject(i));
+        if(refMesh != nullptr) {
+            addMeshToData(vertices, materials, indexes, refMesh);
+            std::cout << "Object " << i << " specular color : " << glm::to_string(refMesh->getMaterial().matShader.specular) << std::endl;
+        }
+    }
+
+    // Bind data of each layout to GPU
+    createSSBO<GPUVertex>(m_verticesSSBO, 0, vertices);
+    createSSBO<GPUMaterial>(m_materialsSSBO, 1, materials);
+    createSSBO<GPUIndex>(m_indexesSSBO, 2, indexes);
+}
+
+template <typename T>
+void RayTracer::createSSBO(GLuint &SSBO, const GLuint binding, const std::vector<T> &data)
+{
+    glGenBuffers(1, &SSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+
+    glBufferData(GL_SHADER_STORAGE_BUFFER,
+                 data.size() * sizeof(T),
+                 data.data(),
+                 GL_DYNAMIC_DRAW
+    );
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, SSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void RayTracer::addMeshToData(std::vector<GPUVertex> &vertices,
+                              std::vector<GPUMaterial> &materials,
+                              std::vector<GPUIndex> &indexes,
+                              const Mesh* mesh)
+{
+    // Save index offset of the layouts
+    unsigned int verticesLayout = vertices.size();
+    unsigned int materialsLayout = materials.size();
+
+    // Compute usefull values for the nex steps
+    glm::mat4 modelMatrix = mesh->getModelMatrix();
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
 
-    std::vector<Vertex> tmp = refMesh->getVertices();
-    std::vector<GPUVertex> vertices = std::vector<GPUVertex>();
+    // Vertices part
+    std::vector<Vertex> tmp = mesh->getVertices();
     for(Vertex vert : tmp) {
+        // Swap to GPUVertex object
         GPUVertex tmpGPU = {vert.position, vert.normal, vert.uv};
         tmpGPU.position = glm::vec3(modelMatrix * glm::vec4(tmpGPU.position, 1.f));
         tmpGPU.normal = glm::normalize(normalMatrix * vert.normal);
 
+        // Add to vertices tab
         vertices.push_back(tmpGPU);
     }
 
-    glGenBuffers(1, &m_verticesSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_verticesSSBO);
-
-    glBufferData(GL_SHADER_STORAGE_BUFFER,
-                 vertices.size() * sizeof(GPUVertex),
-                 vertices.data(),
-                 GL_DYNAMIC_DRAW
-    );
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_verticesSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-
-    // INDEXES BUFFER SETUP
-    std::vector<unsigned int> indVertex = refMesh->getIndexes();
-    std::vector<Index> indexes = std::vector<Index>();
-    for(unsigned int e : indVertex) {
-        indexes.push_back({static_cast<int>(e), 0});
-    }
-
-    glGenBuffers(1, &m_indexesSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_indexesSSBO);
-
-    glBufferData(GL_SHADER_STORAGE_BUFFER,
-                 indexes.size() * sizeof(Index),
-                 indexes.data(),
-                 GL_DYNAMIC_DRAW
-    );
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indexesSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-
-    // MATERIAL BUFFER SETUP
-    std::vector<GPUMaterial> materials = std::vector<GPUMaterial>();
-    ShaderMaterial mat = refMesh->getMaterial().matShader;
+    // Materials part
+    ShaderMaterial mat = mesh->getMaterial().matShader;
+    // Swap to GPUMaterial object
     GPUMaterial matGPU = {mat.ambient, mat.diffuse, mat.specular, mat.shininess};
+    // Add to materials tab
     materials.push_back(matGPU);
 
-    glGenBuffers(1, &m_materialsSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_materialsSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,
-                 materials.size() * sizeof(GPUMaterial),
-                 materials.data(),
-                 GL_DYNAMIC_DRAW
-    );
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_materialsSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    /*
-    std::cout << "Nb indexes : " << indexes.size() << std::endl;
-    for(int i = 0; i < indexes.size(); i+=3) {
-        std::cout << "TRIANGLE " << i / 3 << std::endl;
-        std::cout << "  - Vertice A : " << glm::to_string(vertices.at(indexes.at(i+0).vertPos).position) << std::endl;
-        std::cout << "  - Vertice B : " << glm::to_string(vertices.at(indexes.at(i+1).vertPos).position) << std::endl;
-        std::cout << "  - Vertice C : " << glm::to_string(vertices.at(indexes.at(i+2).vertPos).position) << std::endl;
-        std::cout << std::endl;
+    // Indexes part
+    std::vector<unsigned int> indVertex = mesh->getIndexes();
+    for(unsigned int e : indVertex) {
+        indexes.push_back({
+            static_cast<int>(e + verticesLayout),
+            static_cast<int>(materialsLayout)
+        });
     }
-    */
 }

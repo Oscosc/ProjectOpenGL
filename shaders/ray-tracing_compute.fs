@@ -61,14 +61,14 @@ layout(std430, binding = 0) buffer VertexBuffer {
     Vertex l_vertices[];
 };
 
-// Contient l'ordre des index à lire : 3 index = 1 triangle
-layout(std430, binding = 1) buffer IndexBuffer {
-    Index l_indexes[];
+// Contient l'ensemble des matériaux des objets de la scène
+layout(std430, binding = 1) buffer MaterialBuffer {
+    Material l_materials[];
 };
 
-// Contient l'ensemble des matériaux des objets de la scène
-layout(std430, binding = 2) buffer MaterialBuffer {
-    Material l_materials[];
+// Contient l'ordre des index à lire : 3 index = 1 triangle
+layout(std430, binding = 2) buffer IndexBuffer {
+    Index l_indexes[];
 };
 
 // RAY --------------------------------------------------------------------------------------------
