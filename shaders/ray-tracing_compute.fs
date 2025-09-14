@@ -170,7 +170,6 @@ Triangle Index_getTriangle(const int startIndex) {
     Vertex c = l_vertices[i2.vertPos];
 
     Material material = l_materials[i0.matPos];
-    material.specular = vec3(startIndex / 36.0);
 
     vec3 normal = normalize(cross(b.position - a.position, c.position - a.position));
 
@@ -228,14 +227,16 @@ bool World_hit(const Sphere spheres[SCENE_SPHERES], const Ray ray, const Interva
     HitRecord tmpRec;
     bool hitAnything = false;
     float closestSoFar = rayInterval.max;
+    Interval interval = rayInterval;
     
     // Boucle sur les sphères de l'environnement
     for(int i = 0; i < SCENE_SPHERES; i++) {
-        if(Sphere_hit(spheres[i], ray, rayInterval, tmpRec)) {
+        if(Sphere_hit(spheres[i], ray, interval, tmpRec)) {
             if(tmpRec.t < closestSoFar) {
                 hitAnything = true;
                 closestSoFar = tmpRec.t;
                 rec = tmpRec;
+                interval.max = closestSoFar;
             }
         }
     }
@@ -246,11 +247,12 @@ bool World_hit(const Sphere spheres[SCENE_SPHERES], const Ray ray, const Interva
         Triangle tri = Index_getTriangle(i);
 
         // Intersection rayon-triangle généré
-        if(Triangle_hit(tri, ray, rayInterval, tmpRec)) {
+        if(Triangle_hit(tri, ray, interval, tmpRec)) {
             if(tmpRec.t < closestSoFar) {
                 hitAnything = true;
                 closestSoFar = tmpRec.t;
                 rec = tmpRec;
+                interval.max = closestSoFar;
             }
         }
     }
@@ -419,6 +421,7 @@ vec4 rayColor(Ray ray, const Sphere spheres[SCENE_SPHERES]) {
         } else {
             // finalColor = (bounce <= 0) ? backgroundColor(ray) : accumulatedColor *= 0.7;
             finalColor = accumulatedColor * backgroundColor(ray);
+            // DEBUG : finalColor = float(bounce) < 10 ? vec3(float(bounce) / 10) : vec3(1.0, 0.0, 0.0);
             break;
         }
     }

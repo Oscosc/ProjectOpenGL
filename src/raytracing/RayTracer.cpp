@@ -52,14 +52,17 @@ void RayTracer::draw(Scene* scene) {
     m_shader_compute->setFloat("camera.fov", glm::radians(cameraRef->Fov));
 
     // Objects setting
-    for(int i = 0; i < 5; i++) {
-        Sphere* obj = static_cast<Sphere*>(scene->getObject(i));
+    std::vector<Sphere*> spheres = scene->getSpheresRT();
+    unsigned int i = 0;
+    for(Sphere* obj : spheres) {
         m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].position", obj->getTransform().position);
         m_shader_compute->setFloat("u_spheres[" + std::to_string(i) + "].radius", obj->getRadius());
         m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.ambient", obj->getMaterial().matShader.ambient);
         m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.diffuse", obj->getMaterial().matShader.diffuse);
         m_shader_compute->setVec3("u_spheres[" + std::to_string(i) + "].material.specular", obj->getMaterial().matShader.specular);
         m_shader_compute->setFloat("u_spheres[" + std::to_string(i) + "].material.shininess", obj->getMaterial().matShader.shininess);
+
+        ++i;
     }
 
     glBindVertexArray(m_VAO);
@@ -173,18 +176,31 @@ void RayTracer::createAndLoadSSBO(Scene *scene)
                                 // TOTAL : 48 octets
     };
 
+    struct GPUMaterial {
+        // Structure correspondant à l'alignement du standard 430 pour les layouts GLSL
+        alignas(16) glm::vec3 ambient;  // 16 octets
+        alignas(16) glm::vec3 diffuse;  // 16 octets
+        alignas(16) glm::vec3 specular; // 16 octets
+        float shininess;                //  4 octets
+        float _padding[3];              // 12 octets
+                                // TOTAL : 64 octets
+    };
+
     m_shader_compute->use();
 
     Mesh* refMesh = dynamic_cast<Mesh*>(scene->getObject(0));
     if(refMesh == nullptr) return;
 
     // VERTICES BUFFER SETUP
-    std::vector<Vertex> tmp = refMesh->getVertices();
     glm::mat4 modelMatrix = refMesh->getModelMatrix();
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
+
+    std::vector<Vertex> tmp = refMesh->getVertices();
     std::vector<GPUVertex> vertices = std::vector<GPUVertex>();
     for(Vertex vert : tmp) {
         GPUVertex tmpGPU = {vert.position, vert.normal, vert.uv};
-        tmpGPU.position = modelMatrix * glm::vec4(tmpGPU.position, 1.f);
+        tmpGPU.position = glm::vec3(modelMatrix * glm::vec4(tmpGPU.position, 1.f));
+        tmpGPU.normal = glm::normalize(normalMatrix * vert.normal);
 
         vertices.push_back(tmpGPU);
     }
@@ -221,19 +237,22 @@ void RayTracer::createAndLoadSSBO(Scene *scene)
 
 
     // MATERIAL BUFFER SETUP
-    std::vector<ShaderMaterial> materials = std::vector<ShaderMaterial>();
-    materials.push_back(refMesh->getMaterial().matShader);
+    std::vector<GPUMaterial> materials = std::vector<GPUMaterial>();
+    ShaderMaterial mat = refMesh->getMaterial().matShader;
+    GPUMaterial matGPU = {mat.ambient, mat.diffuse, mat.specular, mat.shininess};
+    materials.push_back(matGPU);
 
     glGenBuffers(1, &m_materialsSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_materialsSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER,
-                 materials.size() * sizeof(ShaderMaterial),
+                 materials.size() * sizeof(GPUMaterial),
                  materials.data(),
                  GL_DYNAMIC_DRAW
     );
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_materialsSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+    /*
     std::cout << "Nb indexes : " << indexes.size() << std::endl;
     for(int i = 0; i < indexes.size(); i+=3) {
         std::cout << "TRIANGLE " << i / 3 << std::endl;
@@ -242,4 +261,5 @@ void RayTracer::createAndLoadSSBO(Scene *scene)
         std::cout << "  - Vertice C : " << glm::to_string(vertices.at(indexes.at(i+2).vertPos).position) << std::endl;
         std::cout << std::endl;
     }
+    */
 }
