@@ -176,9 +176,18 @@ void RayTracer::passSceneToGPU(Scene *scene)
         Mesh* refMesh = dynamic_cast<Mesh*>(scene->getObject(i));
         if(refMesh != nullptr) {
             addMeshToData(vertices, materials, indexes, refMesh);
-            std::cout << "Object " << i << " specular color : " << glm::to_string(refMesh->getMaterial().matShader.specular) << std::endl;
         }
     }
+    
+    // DEBUG : GPU usage
+    GLint maxSize;
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxSize);
+    GLuint usedMemory = vertices.size()  * sizeof(GPUVertex)
+                      + materials.size() * sizeof(GPUMaterial)
+                      + indexes.size()   * sizeof(GPUIndex);
+    float memoryRatio = usedMemory / (float)maxSize;
+    Logger::logPerf("GPU memory usage : " + std::to_string(memoryRatio) + "% ("
+                + std::to_string(usedMemory) + " / " + std::to_string(maxSize) + ")");
 
     // Bind data of each layout to GPU
     createSSBO<GPUVertex>(m_verticesSSBO, 0, vertices);
