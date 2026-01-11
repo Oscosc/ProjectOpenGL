@@ -55,7 +55,7 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
 
     // Open a window for ray-tracing
     if(key == GLFW_KEY_R && action == GLFW_PRESS) {
-        app->createExternalWindow(800, 600, "Ray-tracing");
+        app->createExternalRTWindow(800, 600, "Ray-tracing");
     }
 
     /*

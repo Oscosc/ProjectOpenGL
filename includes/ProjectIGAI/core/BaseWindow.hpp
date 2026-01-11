@@ -29,15 +29,20 @@ public:
         const unsigned int height = DEFAULT_WINDOW_HEIGHT,
         const std::string& title = DEFAULT_WINDOW_NAME,
         GLFWwindow* rootWindow = nullptr);
-
+    
+    /**
+     * @brief Virtual destructor for abstract class
+     */
     virtual ~BaseWindow() {}
     
     /**
      * @brief Link all standard callbacks to abstracts "onX()" functions for this window
-     * 
      */
     void initCallbacks();
 
+    /**
+     * @brief Call various functions that needs to be called after object/window creation.
+     */
     virtual void postInitProcess() = 0;
 
     /**
@@ -125,33 +130,86 @@ public:
      */
     void setDeltaTime(float value) { m_deltaTime = value; }
 
+    /**
+     * @brief Return true if this window is the main (i.e. root) window, false otherwise.
+     */
     bool isRoot() { return m_isRoot; }
 
+    /**
+     * @brief Set the scene to display in the loop.
+     * 
+     * @param sceneRef 
+     */
     void setSceneRef(Scene* sceneRef) { m_scene = sceneRef; }
     
+    /**
+     * @brief Callback for window resizing.
+     * 
+     * @param width new window width
+     * @param height new window height
+     */
     virtual void onResize(int width, int height);
+
+    /**
+     * @brief Callback when a key is pressed.
+     * 
+     * @param key id of the pressed key
+     * @param scancode scancode of the pressed key
+     * @param action action done on this key (pressed, released, etc...)
+     * @param mods mods for this key (unused)
+     */
     virtual void onKey(int key, int scancode, int action, int mods);
+
+    /**
+     * @brief Callback when scrolling.
+     * 
+     * @param xOffset X scroll movement
+     * @param yOffset Y scroll movement
+     */
     virtual void onScroll(double xOffset, double yOffset);
+
+    /**
+     * @brief Callback when cursor moves.
+     * 
+     * @param xPos new cursor X pos
+     * @param yPos new cursor Y pos
+     */
     virtual void onCursorPos(double xPos, double yPos);
     
-    virtual void onMouseButton(int button, int action, int mods) {} // No default behavior
+    /**
+     * @brief Callback when mouse button is clicked.
+     * 
+     * @param button button id (left, right, etc)
+     * @param action action done on this key (pressed, released, etc...)
+     * @param mods mods for this button (unused)
+     */
+    virtual void onMouseButton(int button, int action, int mods) {}
 
 protected:
     
+    /** Subclass rendering function to define in each child */
     virtual void subClassRendering() = 0;
     
+    /** Scene displayed by this window */
     Scene* m_scene;
 
+    /** GLFWwindow object wrapped in this Window object */
     GLFWwindow* m_window;
-
+    
+    /** Cursor position in this window */
     glm::vec2 m_cursor;
-
+    
+    /** Window width */
     unsigned int m_screenWidth;
+
+    /** Window height */
     unsigned int m_screenHeight;
 
+    /*--- Various attributes for FPS coherence ---*/
     float m_lastFrame;
     float m_deltaTime;
-
+    
+    /*--- Various attributes to determine window focus ---*/
     bool m_isRoot;
     bool m_mouseActive;
     bool m_firstMouse;

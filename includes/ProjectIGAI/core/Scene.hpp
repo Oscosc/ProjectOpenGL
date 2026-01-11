@@ -91,12 +91,24 @@ public:
     void addObject(Object* object);
 
     /**
-     * @brief Add a new light to the scene.
+     * @brief Add a new point light to the scene.
      * 
      * @param light element to add.
      */
     void addLight(PointLight* light) { this->m_lights.pointLights.push_back(light); }
+
+    /**
+     * @brief Add a new directional light to the scene.
+     * 
+     * @param light element to add.
+     */
     void addLight(DirectionalLight* light) { this->m_lights.dirLights.push_back(light); }
+
+    /**
+     * @brief Add a new spot light to the scene.
+     * 
+     * @param light element to add.
+     */
     void addLight(SpotLight* light) { this->m_lights.spotLights.push_back(light); }
 
     /**
@@ -125,6 +137,7 @@ public:
      * @brief Return the light with identifier = index
      * 
      * @param index index of the element to retrieve
+     * @warning DEPRECATED - UNUSED
      */
     // Light* getLight(unsigned int index) const { return m_lights.at(index); }
 
@@ -142,15 +155,29 @@ public:
      */
     std::vector<Object*> getAllObjects() { return m_objects; }
 
+    /**
+     * @brief Return the list of spheres in the scene for ray tracing purpose
+     * 
+     * @warning Function need to be removed when BVH and ray/triangle intersection
+     * will be implemented.
+     */
     std::vector<Sphere*> getSpheresRT() const;
 
 private:
+
+    /** ID of active camera */
     unsigned int m_activeCamera;
+
+    /** Projection/view matrix of the active camera */
     ProjViewMatrix m_activeCameraPV;
 
+    /** List of cameras in the scene */
     std::vector<Camera*> m_cameras;
+
+    /** List of objects in the scene */
     std::vector<Object*> m_objects;
 
+    /** Tuple of lists of lights in the scene */
     LightGroup m_lights;
 
 };

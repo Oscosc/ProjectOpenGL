@@ -39,13 +39,36 @@ std::vector<unsigned int> combine(std::vector<unsigned int> vecA, std::vector<un
  */
 bool solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1);
 
+/**
+ * @brief Raccourci une chaine de caractere qui contiendrai des espaces ou des tabulations inutiles
+ * 
+ * @param str chaîne a réduire
+ * @return chaine sans espaces et tabulations inutiles
+ */
 std::string trim(const std::string& str);
 
+/**
+ * @brief Coupe une chaine de caractères en plusieurs sous-chaînes, selon un delimiter
+ * 
+ * @param s chaine a decouper
+ * @param delimiter delimiter pour les différents segments
+ * @return Liste de chaines découpées
+ */
 std::vector<std::string> split(const std::string& s, const std::string& delimiter);
 
+/**
+ * @brief Calcule la moyenne d'un vecteur d'éléments
+ * 
+ * @param values vecteur d'elements
+ * @return moyenne
+ */
 unsigned int mean(const std::vector<unsigned int>& values);
 
+
+
+
 /* PARTIE POUR LE RAY TRACING */
+// TODO : Commentaires
 
 void savePNG(
     const std::vector<unsigned char>& pixels,

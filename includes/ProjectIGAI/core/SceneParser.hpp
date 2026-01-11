@@ -45,6 +45,13 @@ public:
         {"bezier surface", BEZIER_SURFACE}
     };
 
+    /**
+     * @brief Read the file only to retrieve object counts. This function allow to
+     * construct shaders based on the scene we are going to read.
+     * 
+     * @param file path to the JSON scene file
+     * @return count of each object stored in a map
+     */
     static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const std::string& file);
 
     /**
@@ -148,7 +155,6 @@ private:
      * @brief Auxiliary function for casting json element to Transform.
      * 
      * @param json JSON hierarchy containing the attribute
-     * @param attribute name of the attribute to convert
      */
     static Transform jsonToTransform(json json);
 
@@ -156,15 +162,36 @@ private:
      * @brief Auxiliary function for casting json element to Material.
      * 
      * @param json JSON hierarchy containing the attribute
-     * @param attribute name of the attribute to convert
      */
     static Material jsonToMaterial(json json);
 
+    /**
+     * @brief Auxiliary function for casting json element to ShaderMaterial.
+     * 
+     * @param json JSON hierarchy containing the attribute
+     */
     static ShaderMaterial jsonToShaderMaterial(json json);
 
+    /**
+     * @brief Auxiliary function for casting json element to LightMaterial.
+     * 
+     * @param json JSON hierarchy containing the attribute
+     */
     static LightMaterial jsonToLightMaterial(json json);
 
+    /**
+     * @brief Auxiliary function for casting json element to Vec3Array.
+     * 
+     * @param json JSON hierarchy containing the attribute
+     * @param attribute name of the attribute to convert
+     */
     static vec3Array jsonToVec3Array(json json, const std::string& attribute);
 
+    /**
+     * @brief Auxiliary function for casting json element to Vec3Grid.
+     * 
+     * @param json JSON hierarchy containing the attribute
+     * @param attribute name of the attribute to convert
+     */
     static vec3Grid jsonToVec3Grid(json json, const std::string& attribute);
 };

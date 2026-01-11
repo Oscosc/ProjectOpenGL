@@ -41,7 +41,7 @@ public:
         );
 
     /**
-     * @brief Default destructor. 
+     * @brief Default destructor.
      */
     ~Application() = default;
 
@@ -51,7 +51,8 @@ public:
     void initGLContext();
 
      /**
-      * @brief Create main window.
+      * @brief Create main window. Main window is a RasterWindow by default because it's the
+      * target usage of this project. For a RT window, user need to create an extern window.
       */
     void initMainWindow();
 
@@ -61,12 +62,16 @@ public:
     void initGLComponents();
 
     /**
+     * DEPRECTATED - UNUSED
      * @brief References callbacks to the window.
      */
-    void initCallbacks();
+    // void initCallbacks();
 
     /**
      * @brief Load and compile all default shader files into ShaderManager.
+     * If LOAD_TEXTURES_ON is defined, it will also load textures (process can be slow)
+     * 
+     * TODO : Load shader based on a shader config file
      */
     void initShaders(const std::string& sceneFile);
 
@@ -78,6 +83,11 @@ public:
      */
     void initScene(const std::string& file);
 
+    /**
+     * @brief Call post init processes of the main window. This function alow, for example, to
+     * init an UI after window creation, if this UI constructor depend on window.
+     * 
+     */
     void postInitComponents();
 
     /**
@@ -85,12 +95,10 @@ public:
      * function, after calling all init processes.
      * 
      * The main loop consist of the following steps :
-     * - Updating frame/time information
      * - Processing inputs
-     * - Flushing old screen content
-     * - Rendering scene elements
-     * - Rendering HUD
-     * - Swapping buffers
+     * - Updating shared camera PV between windows
+     * - For each window : rendering
+     * - Polling callback events
      */
     void loop();
 
@@ -100,13 +108,13 @@ public:
      * This function is normaly the only one called by user to display an application, providing
      * a full management of OpenGL initializations and Scene components initialization
      * 
-     * @param sceneFile path of the JSON file containing informations about elements in the scene to
-     * render.
+     * @param sceneFile path of the JSON file containing informations about elements in the scene
+     * to render.
      */
     void run(const std::string& sceneFile);
 
     /**
-     * @brief Check if the application should close or not
+     * @brief Check if the application should close or not.
      */
     bool applicationShouldClose();
 
@@ -192,22 +200,30 @@ public:
      */
     BaseWindow* getExternalWindow(unsigned int windowID) const;
 
+    /**
+     * @brief Return the number of currently active windows.
+     */
     const unsigned int getActiveWindowCount() { return m_activeWindowsCount; }
 
     /**
-     * @brief Set a new external window for this application.
+     * @brief Set a new Ray-tracing external window for this application.
      * 
      * @param width width of the window
      * @param height height of the window
      * @param windowTitle title of the window
      * @return ID of the window created
      */
-    unsigned int createExternalWindow(
+    unsigned int createExternalRTWindow(
         const unsigned int width = DEFAULT_SCREEN_WIDTH,
         const unsigned int height = DEFAULT_SCREEN_HEIGHT,
         const std::string& windowTitle = "New window"
     );
 
+    /**
+     * @brief Remove properly the specified window.
+     * 
+     * @param windowID id of the window to remove, cannot be 0 (main window)
+     */
     void cleanRemoveExternalWindow(unsigned int windowID);
 
     /**
@@ -218,6 +234,9 @@ public:
      */
     Camera* getActiveCamera() const { return this->m_scene->getActiveCamera(); }
 
+    /**
+     * @brief Return the current scene used in display loop for all windows.
+     */
     Scene* getCurrentScene() const { return this->m_scene; }
 
     /**

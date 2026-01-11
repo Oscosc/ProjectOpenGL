@@ -159,8 +159,6 @@ void Application::run(const std::string& sceneFile)
 
     postInitComponents();
     Logger::logInfo("Components are all fully initialized");
-
-    createExternalWindow();
     
     Logger::logInfo("Starting application loop");
     loop();
@@ -192,7 +190,7 @@ BaseWindow* Application::getExternalWindow(unsigned int windowID) const
     return m_windows[windowID];
 }
 
-unsigned int Application::createExternalWindow(const unsigned int width, const unsigned int height, const std::string& windowTitle)
+unsigned int Application::createExternalRTWindow(const unsigned int width, const unsigned int height, const std::string& windowTitle)
 {
     // Check if it's possible to create window
     if(m_activeWindowsCount >= MAX_WINDOWS) {

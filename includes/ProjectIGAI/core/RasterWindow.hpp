@@ -2,6 +2,11 @@
 
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
+/**
+ * @brief Window for displaying a scene using rasterization processes.
+ * Main loop and shaders used for this window are based on LearnOpenGL
+ * basecode.
+ */
 class RasterWindow : public BaseWindow
 {
 public:
@@ -19,8 +24,16 @@ public:
         const unsigned int height = DEFAULT_WINDOW_HEIGHT,
         const std::string& title = DEFAULT_WINDOW_NAME,
         GLFWwindow* rootWindow = nullptr);
-
+    
+    /**
+     * @brief Init HUD (UI) object on this window.
+     * HUD is created as a quad on the screen, and a shader draw the quad on it
+     */
     void postInitProcess() override;
+
+    /**
+     * @brief Create an HUD object associated with this window.
+     */
     void initHUD();
     
 private:
@@ -31,6 +44,7 @@ private:
      * @param scene scene to render
      */
     void subClassRendering() override;
-
+    
+    /** HUD of this window (green crosshair) */
     HUD* m_HUD;
 };
