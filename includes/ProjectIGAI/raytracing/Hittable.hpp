@@ -3,12 +3,22 @@
 #include <ProjectIGAI/raytracing/Ray.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
 
+/**
+ * @brief Classe used to simulate CPU ray-tracing (based on RT in one weekend page)
+ * 
+ * @warning DEPRECATED, UNUSED
+ */
 enum HitType {
     DIFFUSE,
     METAL,
     GLASS
 };
 
+/**
+ * @brief Classe used to simulate CPU ray-tracing (based on RT in one weekend page)
+ * 
+ * @warning DEPRECATED, UNUSED
+ */
 struct HitRecord {
     glm::vec3 point;
     glm::vec3 normal;
@@ -23,6 +33,11 @@ struct HitRecord {
     }
 };
 
+/**
+ * @brief Classe used to simulate CPU ray-tracing (based on RT in one weekend page)
+ * 
+ * @warning DEPRECATED, UNUSED
+ */
 class Hittable
 {
 public:
