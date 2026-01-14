@@ -14,10 +14,6 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 #include <ProjectIGAI/core/RaytracingWindow.hpp>
 
-#include <extern/imgui/imgui.h>
-#include <extern/imgui/imgui_impl_glfw.h>
-#include <extern/imgui/imgui_impl_opengl3.h>
-
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
 #define duration std::chrono::duration_cast<std::chrono::nanoseconds>

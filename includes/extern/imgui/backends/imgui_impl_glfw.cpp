@@ -92,9 +92,9 @@
 //  2017-08-25: Inputs: MousePos set to -FLT_MAX,-FLT_MAX when mouse is unavailable/missing (instead of -1,-1).
 //  2016-10-15: Misc: Added a void* user_data parameter to Clipboard function handlers.
 
-#include <extern/imgui/imgui.h>
+#include "imgui.h"
 #ifndef IMGUI_DISABLE
-#include <extern/imgui/imgui_impl_glfw.h>
+#include "imgui_impl_glfw.h"
 
 // Clang warnings with -Weverything
 #if defined(__clang__)
@@ -236,7 +236,7 @@ static bool ImGui_ImplGlfw_IsWayland()
 #if !GLFW_HAS_X11_OR_WAYLAND
     return false;
 #elif GLFW_HAS_GETPLATFORM
-    return false; // glfwGetPlatform() == GLFW_PLATFORM_WAYLAND;
+    return glfwGetPlatform() == GLFW_PLATFORM_WAYLAND;
 #else
     const char* version = glfwGetVersionString();
     if (strstr(version, "Wayland") == NULL) // e.g. Ubuntu 22.04 ships with GLFW 3.3.6 compiled without Wayland

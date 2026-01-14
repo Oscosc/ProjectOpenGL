@@ -1138,9 +1138,9 @@ IMPLEMENTING SUPPORT for ImGuiBackendFlags_RendererHasTextures:
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 
-#include <extern/imgui/imgui.h>
+#include "imgui.h"
 #ifndef IMGUI_DISABLE
-#include <extern/imgui/imgui_internal.h>
+#include "imgui_internal.h"
 
 // System includes
 #include <stdio.h>      // vsnprintf, sscanf, printf
@@ -17913,7 +17913,7 @@ void ImGui::ShowFontSelector(const char* label)
 // Include imgui_user.inl at the end of imgui.cpp to access private data/functions that aren't exposed.
 // Prefer just including imgui_internal.h from your code rather than using this define. If a declaration is missing from imgui_internal.h add it or request it on the github.
 #ifdef IMGUI_INCLUDE_IMGUI_USER_INL
-#include <extern/imgui/imgui_user.inl>
+#include "imgui_user.inl"
 #endif
 
 //-----------------------------------------------------------------------------
