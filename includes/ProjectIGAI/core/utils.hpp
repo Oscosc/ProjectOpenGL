@@ -77,20 +77,78 @@ void savePNG(
     const std::string& filename
 );
 
+/**
+ * @brief Calcule la norme carrée d'un vecteur
+ * 
+ * @param v vecteur d'entrée
+ * @return norme du vecteur
+ */
 float lengthSquared(glm::vec3 v);
 
+/**
+ * @brief Retourne un nombre flottant aléatoire entre min et max
+ * 
+ * @param min valeur minimale (incluse)
+ * @param max valeur maximale (incluse)
+ * @return nombre aléatoire dans la borne [min, max]
+ */
 float randomFloat(float min = 0, float max = 1);
 
+/**
+ * @brief Retourne un vecteur aléatoire, dont l'ensemble des éléments sont entre min et max, normé
+ * 
+ * @param min valeur minimale (incluse)
+ * @param max valeur maximale (incluse)
+ * @return vecteur normalisé aléatoire (pondéré par les bornes)
+ */
 glm::vec3 randomUnitVec3(float min = -1, float max = 1);
 
+/**
+ * @brief Retourne un vecteur aléatoire normé dans un emisphère donné
+ * 
+ * @param normal normale au plan émisphérique
+ * @return vecteur normalisé aléatoire dans l'émisphère
+ */
 glm::vec3 randomEmisphereVec3(const glm::vec3& normal);
 
+/**
+ * @brief Retourne un vecteur 2D qui est le vecteur (x,y) bruité
+ * 
+ * @param x valeur x du vecteur initial
+ * @param y valeur y du vecteur initial
+ * @param intensity intensité du bruit
+ * @return vecteur 2D bruité
+ */
 glm::vec2 noise2D(const float& x, const float& y, const float &intensity = 1.f);
 
+/**
+ * @brief Retourne le vecteur réfléchi par rapport à la normale
+ * 
+ * @param v vecteur initial
+ * @param n normale
+ * @return vecteur refléchi 
+ */
 glm::vec3 reflectVec3(const glm::vec3& v, const glm::vec3& n);
 
+/**
+ * @brief Calcule le vecteur refracté du rayon v lors de la transition d'un milieu A à B avec un
+ * coefficient eta.
+ * 
+ * @param v vecteur inital
+ * @param n normale à la surface
+ * @param etaCoeff coefficient de refraction du milieu B
+ * @return vecteur réfracté
+ */
 glm::vec3 refractVec3(const glm::vec3& v, const glm::vec3& n, float etaCoeff);
 
+/**
+ * @brief Calcule le niveau de réflectance d'une surface à partir du cosinus de l'angle et de
+ * l'indice de réfraction du milieu.
+ * 
+ * @param cosine cosinus de l'angle d'incidence
+ * @param refractionIndex indice de refraction du milieu
+ * @return niveau de reflectance entre 0 et 1
+ */
 float reflectance(const float& cosine, const float& refractionIndex);
 
 #endif // UTILS_HPP

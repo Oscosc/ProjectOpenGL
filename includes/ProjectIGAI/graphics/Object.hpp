@@ -145,22 +145,45 @@ public:
      */
     void setTransform(Transform transform) { m_transform = transform; }
 
+    /**
+     * @brief Print debug informations of the material in console.
+     * 
+     */
     void debugMaterial() const;
 
+    /**
+     * @brief Get object's Model Matrix.
+     * 
+     * @return glm::mat4 
+     */
     glm::mat4 getModelMatrix() const;
 
 protected:
 
+    /**
+     * @brief init the object as an OpenGL object (buffers, etc...)
+     * 
+     */
     void initGLObject();
+
+    /**
+     * @brief Update the material informations in the shader based on
+     * object's material informations.
+     * 
+     * @param shader shader to modify.
+     */
     void updateMaterial(Shader* shader) const;
 
+    /** Transform and material of the object */
     Transform m_transform;
     Material m_material;
 
+    /** Various buffers for OpenGL */
     GLuint m_VAO;
     GLuint m_VBO;
     GLuint m_EBO;
 
+    /** Information about the mesh configuration */
     bool m_hasNormals;
     bool m_hasUVs;
     std::vector<Vertex> m_vertices;

@@ -4,9 +4,18 @@
 #include <ProjectIGAI/core/Logger.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 
+/**
+ * @brief Class defining a grid object.
+ * A grid can be displayed in a scene as a ground for example.
+ * 
+ */
 class Grid : public Object
 {
 public:
+
+    /**
+     * @brief Construct a new grid (infinite in practice)
+     */
     Grid() : Object() {
         this->m_material.shader = ShaderManager::getInstance().getShader("grid");
 
@@ -21,6 +30,11 @@ public:
         initGLObject();
     }
 
+    /**
+     * @brief Draw the grid on the window
+     * 
+     * @param scene scene informations (shaders, etc)
+     */
     void draw(Scene* scene) const override {
         Shader* shader = this->getMaterial().shader;
         shader->use();
