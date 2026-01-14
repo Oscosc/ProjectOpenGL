@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <unordered_map>
 #include <functional>
 
 #include <glad/glad.h>

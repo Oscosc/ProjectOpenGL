@@ -19,6 +19,7 @@ glm::mat4 Object::getModelMatrix() const
 
     return model;
 }
+
 void Object::initGLObject()
 {
     glGenVertexArrays(1, &this->m_VAO);

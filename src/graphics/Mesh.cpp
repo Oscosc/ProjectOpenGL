@@ -1,5 +1,7 @@
 #include <ProjectIGAI/graphics/Mesh.hpp>
 
+#include <map>
+#include <tuple>
 #include <ProjectIGAI/core/Logger.hpp>
 
 Mesh::Mesh(std::string file, Transform transformation, Material material) :
@@ -48,9 +50,9 @@ void Mesh::displayInformations() const
     std::cout << "  |- UVs : " << uvs << std::endl;
     std::cout << "  |- " << this->m_vertices.size() << " vertices computed" << std::endl;
     std::cout << "  |- " << this->m_indexes.size() << " indexes computed" << std::endl;
-    std::cout << "  |- Position :" << glm::to_string(this->getTransform().position) << std::endl;
-    std::cout << "  |- Rotation :" << glm::to_string(this->getTransform().rotation) << std::endl;
-    std::cout << "  |- Scale :" << glm::to_string(this->getTransform().scale) << std::endl;
+    std::cout << "  |- Position : " << glm::to_string(this->getTransform().position) << std::endl;
+    std::cout << "  |- Rotation : " << glm::to_string(this->getTransform().rotation) << std::endl;
+    std::cout << "  |- Scale : " << glm::to_string(this->getTransform().scale) << std::endl;
 
     debugMaterial();
 
@@ -144,7 +146,7 @@ void Mesh::loadInitMesh(std::string filename)
     initGLObject();
 
     // DEBUG
-    // displayInformations();
+    displayInformations();
 }
 
 void Mesh::parseAsData(const Mesh::LineType id, const std::vector<std::string> tokens,
@@ -196,9 +198,9 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
         }
 
         indexes.push_back({
-            std::stoi(subTokens[0]) - 1,
-            subTokens.size() < 2 ? -1 : std::stoi(subTokens[1]) - 1,
-            subTokens.size() < 3 ? -1 : std::stoi(subTokens[2]) - 1
+            std::stoi(subTokens[0]) - 1,                             // [0] Position
+            subTokens.size() < 2 ? -1 : std::stoi(subTokens[2]) - 1, // [2] Normal
+            subTokens.size() < 3 ? -1 : std::stoi(subTokens[1]) - 1  // [1] UV
         });
     }
 }
@@ -206,29 +208,37 @@ void Mesh::parseAsIndexes(const LineType id, const std::vector<std::string> toke
 void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     const vec2Array &uvs, const std::vector<VertexIndex> &indexes)
 {   
-    std::unordered_map<Vertex, unsigned int> vertexToIndex;
+    std::map<std::tuple<int, int, int>, unsigned int> uniqueVertices;
     std::vector<Vertex> vertexBuffer;
     std::vector<unsigned int> elementBuffer;
 
-    // Creation des normales si nécessaire
+    // Réservation mémoire
+    vertexBuffer.reserve(indexes.size());
+    elementBuffer.reserve(indexes.size());
 
     for(VertexIndex index : indexes) {
-        // Construction du Vertex
-        Vertex item {
-            (index.position != -1) ? positions[index.position] : glm::vec3(0.0f),
-            (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f),
-            (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
-        };
 
-        // Recherche du Vertex
-        auto it = vertexToIndex.find(item);
-        if(it != vertexToIndex.end()) {
-            elementBuffer.push_back(it->second); // (key, -> value <-)
+        // Recherche d'un vertex déjà existant
+        std::tuple<int, int, int> key = std::make_tuple(index.position, index.normal, index.uv);
+        auto it = uniqueVertices.find(key);
+
+        // Réutilisation si trouvé
+        if(it != uniqueVertices.end()) {
+            elementBuffer.push_back(it->second);
         }
+
+        // Sinon, construction du vertex
         else {
-            unsigned int newIndex = vertexBuffer.size();
+            Vertex item {
+                (index.position != -1) ? positions[index.position] : glm::vec3(0.0f),
+                (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f),
+                (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
+            };
+
+            unsigned int newIndex = (unsigned int)vertexBuffer.size();
             vertexBuffer.push_back(item);
-            vertexToIndex[item] = newIndex;
+
+            uniqueVertices[key] = newIndex;
             elementBuffer.push_back(newIndex);
         }
     }

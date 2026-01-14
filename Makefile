@@ -1,21 +1,26 @@
 # ==============================
 # Compiler et flags
 # ==============================
+
 CXX = g++
 CC  = gcc
 LDFLAGS = -lglfw -ldl -g -lm -fopenmp
 COMPFLAGS = -fopenmp -Iincludes -MMD -MP -fdiagnostics-color=always
 
+
 # ==============================
 # Dossiers
 # ==============================
+
 SRC_DIR = src
 OBJ_DIR = obj
 TARGET  = igai_exe
 
+
 # ==============================
 # Fichiers source et objets
 # ==============================
+
 SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
 C_SRC_FILES = $(shell find $(SRC_DIR) -name "*.c")
 
@@ -25,6 +30,7 @@ OBJ_FILES = $(OBJ_FILES_CPP) $(OBJ_FILES_C)
 
 # Nombre total de fichiers pour calcul du pourcentage
 COUNT = $(words $(OBJ_FILES))
+
 
 # ==============================
 # Règles

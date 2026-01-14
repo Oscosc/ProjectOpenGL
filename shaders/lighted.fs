@@ -189,5 +189,6 @@ void main()
         result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
 #endif
 
+    result = pow(result, vec3(1.0 / 2.2));
     FragColor = vec4(result, 1.0);
 }
