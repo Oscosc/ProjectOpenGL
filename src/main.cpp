@@ -1,16 +1,21 @@
-#include "Application.hpp"
-#include "SceneParser.hpp"
+#include <ProjectIGAI/core/Application.hpp>
+#include <ProjectIGAI/core/SceneParser.hpp>
+#include <ProjectIGAI/core/Logger.hpp>
+
 
 int main(int argc, char* argv[]) {
 
-    Application app;
+    Logger::setColoredMode(true);
+    Logger::setVerbosity(MAX_LOG_LEVEL);
+
+    Application app(800, 600);
     if(argc < 2) {
-        std::cout << "[WARNING] No scene file specified for this application, loading default scene" << std::endl;
-        app.run("resources/default_scene.json");
+        Logger::logWarning("No scene file specified for this application, loading default scene");
+        app.run("resources/scenes/default_scene.json");
     } else if (argc == 2) {
         app.run(argv[1]);
     } else {
-        std::cout << "[ERROR] Two many arguments provided, expected one : name of the scene file to load" << std::endl;
+        Logger::logError("Two many arguments provided, expected one : name of the scene file to load");
     }
 
     return 0;
