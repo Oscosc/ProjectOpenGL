@@ -1,5 +1,9 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
+#include <extern/imgui/imgui.h>
+#include <extern/imgui/backends/imgui_impl_glfw.h>
+#include <extern/imgui/backends/imgui_impl_opengl3.h>
+
 BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned int height,
     const std::string& title, GLFWwindow* rootWindow) :
     m_scene(refScene), m_mouseActive(true), m_firstMouse(true), m_screenWidth(width), m_screenHeight(height)
@@ -22,6 +26,9 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
 
     // Init callback for this window
     initCallbacks();
+
+    // Init ImGui interface
+    initImGui();
 }
 
 void BaseWindow::initCallbacks()
@@ -57,10 +64,28 @@ void BaseWindow::initCallbacks()
     });
 }
 
+void BaseWindow::initImGui()
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
+
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init();
+}
+
 void BaseWindow::render()
 {
     // Making current window the active one
     glfwMakeContextCurrent(this->getGLFWwindow());
+
+    // ImGui frame instanciation
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
 
     // Updating frame time
     float currentFrame = static_cast<float>(glfwGetTime());
@@ -73,6 +98,10 @@ void BaseWindow::render()
 
     // Calling window-specific rendering logic
     subClassRendering();
+
+    // ImGui frame rendering
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Swaping buffers to render new frame
     glfwSwapBuffers(this->getGLFWwindow());

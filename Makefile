@@ -24,12 +24,13 @@ TARGET  = igai_exe
 SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
 C_SRC_FILES = $(shell find $(SRC_DIR) -name "*.c")
 
-OBJ_FILES_CPP = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
-OBJ_FILES_C   = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRC_FILES))
-OBJ_FILES = $(OBJ_FILES_CPP) $(OBJ_FILES_C)
+EXT_DIR   = includes/extern
+EXT_FILES = $(shell find $(EXT_DIR) -name "*.cpp")
 
-# Nombre total de fichiers pour calcul du pourcentage
-COUNT = $(words $(OBJ_FILES))
+OBJ_FILES_SRC = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
+OBJ_FILES_C   = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRC_FILES))
+OBJ_FILES_EXT = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(EXT_FILES))
+OBJ_FILES = $(OBJ_FILES_SRC) $(OBJ_FILES_C) $(OBJ_FILES_EXT)
 
 
 # ==============================
@@ -46,6 +47,12 @@ $(TARGET): $(OBJ_FILES)
 
 # Compilation des .cpp
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@echo "\033[0;34m[BUILD] Compiled $<\033[0m"
+	@$(CXX) $(COMPFLAGS) -c $< -o $@
+
+# Compilation des .cpp externes
+$(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo "\033[0;34m[BUILD] Compiled $<\033[0m"
 	@$(CXX) $(COMPFLAGS) -c $< -o $@

@@ -40,6 +40,8 @@ public:
      */
     void initCallbacks();
 
+    void initImGui();
+
     /**
      * @brief Call various functions that needs to be called after object/window creation.
      */
