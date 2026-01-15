@@ -163,7 +163,16 @@ public:
      */
     std::vector<Sphere*> getSpheresRT() const;
 
+    float* getBackgroundColorPointer() { return &m_backgroundColor.x; }
+
+    const glm::vec4 getBackgroundColor() const { return m_backgroundColor; }
+
+    void setBackgroundColor(const glm::vec4 color) { m_backgroundColor = color; }
+
 private:
+
+    /** Background color */
+    glm::vec4 m_backgroundColor = {0.0f, 0.1f, 0.2f, 1.0};
 
     /** ID of active camera */
     unsigned int m_activeCamera;

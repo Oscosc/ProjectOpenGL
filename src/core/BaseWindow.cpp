@@ -70,7 +70,7 @@ void BaseWindow::initImGui()
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange; // Disable mouse control by ImGui
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
@@ -86,7 +86,11 @@ void BaseWindow::render()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
+    ImGui::SetNextWindowPos(ImVec2(100, 100));
+
+    // ImGui elements (TODO : move to a specific class)
+    ImGui::ColorEdit4("Background color", m_scene->getBackgroundColorPointer());
+
 
     // Updating frame time
     float currentFrame = static_cast<float>(glfwGetTime());
@@ -94,7 +98,8 @@ void BaseWindow::render()
     this->m_lastFrame = currentFrame;
 
     // Clearing buffer before drawing
-    glClearColor(0.0f, 0.1f, 0.2f, 1.0f);
+    glm::vec4 bgColor = m_scene->getBackgroundColor();
+    glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calling window-specific rendering logic
