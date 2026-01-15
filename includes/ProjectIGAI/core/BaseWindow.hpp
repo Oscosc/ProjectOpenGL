@@ -87,7 +87,7 @@ public:
     /**
      * @brief Switch value of mouse disponibility status.
      */
-    void switchMouseActive() { m_mouseActive = !m_mouseActive; }
+    void toggleMouseActive() { m_mouseActive = !m_mouseActive; }
 
     /**
      * @brief Return true while mouse hasn't been linked to the quad. False after.
@@ -98,7 +98,7 @@ public:
      * @brief Call this function when mouse link to the quad for the first time.
      * This function switch the status of the firstMouse variable to false.
      */
-    void firstMouseDone() { m_firstMouse = false; }
+    void toggleFirstMouse() { m_firstMouse = !m_firstMouse; }
 
     /**
      * @brief Give cursor position relatively to the center of the application window. 

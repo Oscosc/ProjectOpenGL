@@ -71,6 +71,7 @@ void BaseWindow::initImGui()
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange; // Disable mouse control by ImGui
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
@@ -109,6 +110,9 @@ void BaseWindow::render()
 
 void BaseWindow::onResize(int width, int height)
 {
+    m_screenWidth  = width;
+    m_screenHeight = height;
+    m_scene->getActiveCamera()->Ratio = (float)width / (float)height;
     glViewport(0, 0, width, height);
 }
 
@@ -126,9 +130,14 @@ void BaseWindow::onKey(int key, int scancode, int action, int mods)
 
     // Switch mouse status
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        if(isMouseActive()) glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        else glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        switchMouseActive();
+        if(isMouseActive()) {
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else {
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            toggleFirstMouse();
+        }
+        toggleMouseActive();
     }
 }
 
@@ -157,7 +166,7 @@ void BaseWindow::onCursorPos(double xPos, double yPos)
     if (this->isFirstMouse())
     {
         this->setCursor(xpos, ypos);
-        this->firstMouseDone();
+        this->toggleFirstMouse();
     }
 
     float xoffset = xpos - this->getCursor().x;

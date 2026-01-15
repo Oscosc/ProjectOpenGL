@@ -46,3 +46,9 @@ void HUD::render() const
 {
     renderCursor();
 }
+
+void HUD::setScreenSize(const unsigned int w, const unsigned int h)
+{
+    m_screenWidth = w;
+    m_screenHeight = h;
+}

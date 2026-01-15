@@ -42,6 +42,8 @@ public:
      */
     void render() const;
 
+    void setScreenSize(const unsigned int w, const unsigned int h);
+
 private:
     unsigned int m_cursorVAO, m_cursorVBO;
 

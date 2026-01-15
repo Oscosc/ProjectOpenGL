@@ -25,3 +25,12 @@ void RasterWindow::initHUD()
 {
     this->m_HUD = new HUD(getScreenWidth(), getScreenHeight());
 }
+
+void RasterWindow::onResize(int width, int height)
+{
+    // Calling base
+    BaseWindow::onResize(width, height);
+
+    // HUD update
+    m_HUD->setScreenSize(width, height);
+}

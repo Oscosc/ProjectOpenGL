@@ -12,3 +12,6 @@ resources/*
 
 # Exécutable
 igai_exe
+
+# ImGui
+imgui.ini

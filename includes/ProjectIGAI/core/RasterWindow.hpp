@@ -36,6 +36,14 @@ public:
      */
     void initHUD();
     
+    /**
+     * @brief Override the resize function to update cursor HUD ratio
+     * 
+     * @param width width of the screen
+     * @param height height if the screen
+     */
+    void onResize(int width, int height) override;
+    
 private:
     
     /**
