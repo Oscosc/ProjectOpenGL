@@ -52,6 +52,8 @@ private:
      * @param scene scene to render
      */
     void subClassRendering() override;
+
+    void drawImGuiFrame() override;
     
     /** HUD of this window (green crosshair) */
     HUD* m_HUD;

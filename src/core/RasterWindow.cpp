@@ -1,5 +1,9 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
+#include <extern/imgui/imgui.h>
+#include <extern/imgui/backends/imgui_impl_glfw.h>
+#include <extern/imgui/backends/imgui_impl_opengl3.h>
+
 RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsigned int height,
     const std::string &title, GLFWwindow *rootWindow) : BaseWindow(refScene, width, height, title, rootWindow)
 {
@@ -14,6 +18,27 @@ void RasterWindow::subClassRendering()
     }
 
     m_HUD->render();
+}
+
+void RasterWindow::drawImGuiFrame()
+{
+    // Frame creation
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(300, 700));
+
+    // Modules part
+    ImGui::Begin("Project IGAI configuration");
+
+    ImGui::ColorEdit4("Background color", m_scene->getBackgroundColorPointer());
+    if (ImGui::CollapsingHeader("Scene properties"))
+    {
+        ImGui::BulletText("Testing ImGui");
+    }
+
+    ImGui::End();
 }
 
 void RasterWindow::postInitProcess()

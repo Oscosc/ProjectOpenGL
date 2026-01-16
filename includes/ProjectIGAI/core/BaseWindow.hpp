@@ -191,6 +191,8 @@ protected:
     
     /** Subclass rendering function to define in each child */
     virtual void subClassRendering() = 0;
+
+    virtual void drawImGuiFrame() {}
     
     /** Scene displayed by this window */
     Scene* m_scene;

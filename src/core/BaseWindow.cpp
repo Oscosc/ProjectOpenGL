@@ -82,15 +82,8 @@ void BaseWindow::render()
     // Making current window the active one
     glfwMakeContextCurrent(this->getGLFWwindow());
 
-    // ImGui frame instanciation
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(100, 100));
-
-    // ImGui elements (TODO : move to a specific class)
-    ImGui::ColorEdit4("Background color", m_scene->getBackgroundColorPointer());
-
+    // ImGui frame creation
+    drawImGuiFrame();
 
     // Updating frame time
     float currentFrame = static_cast<float>(glfwGetTime());
