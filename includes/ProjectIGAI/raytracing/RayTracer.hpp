@@ -56,10 +56,9 @@ private:
     struct GPUMaterial {
         // Structure correspondant à l'alignement du standard 430 pour les layouts GLSL
         alignas(16) glm::vec3 ambient;  // 16 octets
-        alignas(16) glm::vec3 diffuse;  // 16 octets
-        alignas(16) glm::vec3 specular; // 16 octets
-        float shininess;                //  4 octets
-                                // TOTAL : 52 octets
+        float roughness;                //  4 octets
+        float metallic;                 //  4 octets
+                                // TOTAL : 24 octets
     };
 
 

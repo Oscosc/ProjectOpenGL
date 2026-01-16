@@ -2,12 +2,10 @@
 
 #include <glm/glm.hpp>
 
-#define DEFAULT_LIGHT_MATERIAL {glm::vec3(0.2), glm::vec3(0.5), glm::vec3(1.0)}
+#define DEFAULT_LIGHT_MATERIAL {glm::vec3(1.0)}
 
 struct LightMaterial {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+    glm::vec3 color;
 };
 
 /**

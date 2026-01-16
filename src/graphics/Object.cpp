@@ -2,10 +2,9 @@
 
 void Object::debugMaterial() const
 {
-    std::cout << "  |- Ambient   : " << glm::to_string(getMaterial().matShader.ambient) << std::endl;
-    std::cout << "  |- Diffuse   : " << glm::to_string(getMaterial().matShader.diffuse) << std::endl;
-    std::cout << "  |- Specular  : " << glm::to_string(getMaterial().matShader.specular) << std::endl;
-    std::cout << "  |- Shininess : " << getMaterial().matShader.shininess << std::endl;
+    std::cout << "  |- Color     : " << glm::to_string(getMaterial().matShader.color) << std::endl;
+    std::cout << "  |- Roughness : " << getMaterial().matShader.roughness << std::endl;
+    std::cout << "  |- Metallic  : " << getMaterial().matShader.metallic << std::endl;
 }
 
 glm::mat4 Object::getModelMatrix() const
@@ -59,8 +58,7 @@ void Object::updateMaterial(Shader *shader) const
 {
     shader->use();
     
-    shader->setVec3("material.ambient", this->getMaterial().matShader.ambient);
-    shader->setVec3("material.diffuse", this->getMaterial().matShader.diffuse);
-    shader->setVec3("material.specular", this->getMaterial().matShader.specular);
-    shader->setFloat("material.shininess", this->getMaterial().matShader.shininess);
+    shader->setVec3("material.color", this->getMaterial().matShader.color);
+    shader->setFloat("material.roughness", this->getMaterial().matShader.roughness);
+    shader->setFloat("material.metallic", this->getMaterial().matShader.metallic);
 }

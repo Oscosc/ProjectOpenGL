@@ -4,47 +4,39 @@
 #define NB_DIR_LIGHTS   DIR_QTE
 #define NB_SPOT_LIGHTS  SPOT_QTE
 
-#define CONSTANT 1.0
-#define LINEAR 0.09
-#define QUADRATIC 0.032
+#define PI 3.14159265359
 
 
 /*************************************************************************************************
  *                                      STRUCTURES SECTION                                       *
  *************************************************************************************************/
 
+/**
+ * Material as defined in gLTF documentation :
+ * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
+ */
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float shininess;
+    vec3 color;
+    float roughness;
+    float metallic;
 };
 
 struct PointLight {
     vec3 position;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 color;
 };
 
 struct DirLight {
     vec3 direction;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 color;
 };
 
 struct SpotLight {
+    vec3 color;
     vec3 direction;
     vec3 position;
-    float cutOff;
-    float outerCutOff;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float innerCos;
+    float outerCos;
 };
 
 
@@ -52,13 +44,13 @@ struct SpotLight {
  *                                      PARAMETERS SECTION                                       *
  *************************************************************************************************/
 
-out vec4 FragColor;
+out vec4 FragColor;         // Visible color of the fragment after computation
 
-in vec3 FragPos;
-in vec3 Normal;
-in vec3 UV;
+in vec3 FragPos;            // World's position of the fragment
+in vec3 Normal;             // Normal of the fragment
+in vec3 UV;                 // UV value of the fragment (for textures)
 
-uniform Material material;
+uniform Material material;  // Material of the fragment
 
 #if NB_POINT_LIGHTS > 0
     #define POINT_LIGHTS
@@ -79,84 +71,75 @@ uniform vec3 viewPos;
 
 
 /*************************************************************************************************
- *                                       FUNCTIONS SECTION                                       *
+ *                               BRDF/MICROFACETS FUNCTIONS SECTION                              *
  *************************************************************************************************/
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+float DistributionTrowbridgeReitzGGX(vec3 N, vec3 H, float alpha2)
 {
-    vec3 lightDir = normalize(light.position - fragPos);
+    float NdotH = max(dot(N, H), 0.0);
+    float denominator = (NdotH * NdotH * (alpha2 - 1.0) + 1.0);
 
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-
-    // attenuation
-    float distance    = length(light.position - fragPos);
-    float attenuation = 1.0 / (CONSTANT + LINEAR * distance + QUADRATIC * (distance * distance));  
-
-    // combine results
-    vec3 ambient  = light.ambient * material.ambient;          // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = light.diffuse * diff * material.diffuse;   // * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular; // * vec3(texture(material.specular, TexCoords));
-
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
-
-    return (ambient + diffuse + specular);
+    return alpha2 / (PI * denominator * denominator);
 }
 
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
+float SeparatedSmithJoint(float NdotX, float alpha2)
 {
-    vec3 lightDir = normalize(-light.direction);
+    float denominator = abs(NdotX) + sqrt(alpha2 + (1.0 - alpha2) * NdotX * NdotX);
 
-    // Diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    return (2.0 * abs(NdotX)) / denominator;
+}
 
-    // Specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+vec3 FresnelSchlick(float HdotV, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - HdotV, 0.0, 1.0), 5.0);
+}
 
-    // combine results
-    vec3 ambient  = light.ambient * material.ambient;          // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = light.diffuse * diff * material.diffuse;   // * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular; // * vec3(texture(material.specular, TexCoords));
+/**
+ * @brief Main microfacets/BRDF function. Describe how light is reflected based on parameters.
+ * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
+ *
+ * @param N Surface normal vector (world space)
+ * @param V Normalized view vector, from fragment position to camera position (world space)
+ * @param L Normalized light vector, from fragment position to light position (world space)
+ * @param color Color of the fragment, part of the material (range 0 -> 1 for each element)
+ * @param roughness Roughness of the fragment, part of the material (range 0 -> 1)
+ * @param metallic Metallic level of the fragment, part of the material (range 0 -> 1)
+ */
+vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float roughness, float metallic)
+{
+    // Check for "no light angle"
+    vec3 H = normalize(V + L);
+    float NdotL = max(dot(N, L), 0.0);
+    float NdotV = max(dot(N, V), 0.0);
+
+    if (NdotL <= 0.0 || NdotV <= 0.0) return vec3(0.0);
+
+    // Material "preparation"
+    vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo, metallic);
+    vec3 cDiff = mix(albedo, vec3(0.0), metallic);
+
+    // Specular
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
     
-    return (ambient + diffuse + specular);
-}
+    float D = DistributionTrowbridgeReitzGGX(N, H, alpha2);
+    float G = SeparatedSmithJoint(NdotL, alpha2) * SeparatedSmithJoint(NdotV, alpha2);
+    vec3 F  = FresnelSchlick(max(dot(H, V), 0.0), F0);
+    
+    vec3 numerator = D * G * F;
+    float denominator = 4.0 * NdotL * NdotV;
+    vec3 specular = numerator / max(denominator, 0.0001);
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
+    // Diffuse
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= (1.0 - metallic);
+    
+    vec3 diffuse = kD * cDiff / PI;
 
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (CONSTANT + LINEAR * distance + QUADRATIC * (distance * distance));
-
-    // spotlight intensity
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-
-    // combine results
-    vec3 ambient = light.ambient * material.ambient;           // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * material.diffuse;    // * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular; // * vec3(texture(material.specular, TexCoords));
-
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
+    // Final color
+    return (diffuse + specular) * radiance * NdotL;
 }
 
 
@@ -166,29 +149,65 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 void main()
 {
-    // properties
-    vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 result = vec3(0.0, 0.0, 0.0);
+    vec3 accumulatedColor = vec3(0.0, 0.0, 0.0);
+
+    vec3 V = normalize(viewPos - FragPos);
+    vec3 N = normalize(Normal);
+    vec3 albedo = material.color;
 
 #ifdef POINT_LIGHTS
+
     // phase 1: Point lights
-    for(int i = 0; i < NB_POINT_LIGHTS; i++)
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+    for(int i = 0; i < NB_POINT_LIGHTS; i++) {
+        vec3 L = normalize(pointLights[i].position - FragPos);
+        float d = length(pointLights[i].position - FragPos);
+
+        float attenuation = 1.0 / (d * d);
+        vec3 radiance = pointLights[i].color * attenuation;
+
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+    }
+
 #endif
 
 #ifdef DIR_LIGHTS
-    // phase 2: Directional lighting
-    for(int i = 0; i < NB_DIR_LIGHTS; i++)
-        result += CalcDirLight(dirLights[i], norm, viewDir);
+
+    // phase 2: Directional lights
+    for(int i = 0; i < NB_DIR_LIGHTS; i++) {
+        vec3 L = normalize(-dirLights[i].direction);
+
+        // No attenuation
+        vec3 radiance = dirLights[i].color;
+
+
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+    }
+
 #endif
 
 #ifdef SPOT_LIGHTS
-    // phase 3: Spot light
-    for(int i = 0; i < NB_SPOT_LIGHTS; i++)
-        result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
+
+    // phase 3: Spot lights
+    for(int i = 0; i < NB_SPOT_LIGHTS; i++) {
+        vec3 L = normalize(spotLights[i].position - FragPos);
+        float d = length(spotLights[i].position - FragPos);
+        float cosTheta = dot(normalize(spotLights[i].direction), -L);
+
+        float intensity = clamp((cosTheta - spotLights[i].outerCos) /
+            (spotLights[i].innerCos - spotLights[i].outerCos), 0.0, 1.0);
+        float attenuation = 1.0 / (d * d);
+        vec3 radiance = spotLights[i].color * intensity * attenuation;
+
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+    }
+
 #endif
 
-    result = pow(result, vec3(1.0 / 2.2));
-    FragColor = vec4(result, 1.0);
+    // Tone mapping (eq. to normalization)
+    vec3 toneMapping = accumulatedColor / (accumulatedColor + vec3(1.0));
+
+    // Gamma correction
+    vec3 correctedGamma = pow(accumulatedColor, vec3(1.0 / 2.2));
+
+    FragColor = vec4(correctedGamma, 1.0);
 }

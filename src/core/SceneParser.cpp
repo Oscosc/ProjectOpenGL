@@ -245,19 +245,16 @@ Material SceneParser::jsonToMaterial(json json)
 ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
 {
     return {
-        jsonToVec3(json, "ambient"),
-        jsonToVec3(json, "diffuse"),
-        jsonToVec3(json, "specular"),
-        jsonToFloat(json, "shininess")
+        jsonToVec3(json, "color"),
+        jsonToFloat(json, "roughness"),
+        jsonToFloat(json, "metallic")
     };
 }
 
 LightMaterial SceneParser::jsonToLightMaterial(json json)
 {
     return {
-        jsonToVec3(json, "ambient"),
-        jsonToVec3(json, "diffuse"),
-        jsonToVec3(json, "specular")
+        jsonToVec3(json, "color"),
     };
 }
 

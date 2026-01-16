@@ -7,7 +7,7 @@
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 
 #define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
-#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), glm::vec3(0.5), glm::vec3(0.5), 32.f}}
+#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), 1.0f, 0.0f}}
 
 using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;
@@ -67,10 +67,9 @@ struct VertexIndex {
 };
 
 struct ShaderMaterial {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
+    glm::vec3 color;
+    float roughness;
+    float metallic;
 };
 
 /**
