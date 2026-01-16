@@ -2,10 +2,11 @@
 
 #include <glm/glm.hpp>
 
-#define DEFAULT_LIGHT_MATERIAL {glm::vec3(1.0)}
+#define DEFAULT_LIGHT_MATERIAL {glm::vec3(1.0), 1.0f}
 
 struct LightMaterial {
     glm::vec3 color;
+    float intensity;
 };
 
 /**

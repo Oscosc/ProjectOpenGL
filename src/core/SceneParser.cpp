@@ -255,6 +255,7 @@ LightMaterial SceneParser::jsonToLightMaterial(json json)
 {
     return {
         jsonToVec3(json, "color"),
+        jsonToFloat(json, "intensity")
     };
 }
 

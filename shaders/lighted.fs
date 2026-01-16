@@ -24,19 +24,22 @@ struct Material {
 struct PointLight {
     vec3 position;
     vec3 color;
+    float intensity;
 };
 
 struct DirLight {
     vec3 direction;
     vec3 color;
+    float intensity;
 };
 
 struct SpotLight {
-    vec3 color;
     vec3 direction;
     vec3 position;
     float innerCos;
     float outerCos;
+    vec3 color;
+    float intensity;
 };
 
 
@@ -163,7 +166,7 @@ void main()
         float d = length(pointLights[i].position - FragPos);
 
         float attenuation = 1.0 / (d * d);
-        vec3 radiance = pointLights[i].color * attenuation;
+        vec3 radiance = pointLights[i].color * pointLights[i].intensity * attenuation;
 
         accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
     }
@@ -177,7 +180,7 @@ void main()
         vec3 L = normalize(-dirLights[i].direction);
 
         // No attenuation
-        vec3 radiance = dirLights[i].color;
+        vec3 radiance = dirLights[i].color * dirLights[i].intensity;
 
 
         accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
@@ -193,10 +196,10 @@ void main()
         float d = length(spotLights[i].position - FragPos);
         float cosTheta = dot(normalize(spotLights[i].direction), -L);
 
-        float intensity = clamp((cosTheta - spotLights[i].outerCos) /
+        float angleAtt = clamp((cosTheta - spotLights[i].outerCos) /
             (spotLights[i].innerCos - spotLights[i].outerCos), 0.0, 1.0);
-        float attenuation = 1.0 / (d * d);
-        vec3 radiance = spotLights[i].color * intensity * attenuation;
+        float distAtt = 1.0 / (d * d);
+        vec3 radiance = spotLights[i].color * spotLights[i].intensity * angleAtt * distAtt;
 
         accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
     }
