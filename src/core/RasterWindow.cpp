@@ -1,7 +1,6 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
-#include <format>
-#include <iostream>
+#include <ProjectIGAI/core/ImGuiWidgets.hpp>
 
 #include <extern/imgui/imgui.h>
 #include <extern/imgui/backends/imgui_impl_glfw.h>
@@ -39,67 +38,13 @@ void RasterWindow::drawImGuiFrame()
     if (ImGui::CollapsingHeader("Scene"))
     {
         // Point lights
-        for(int i = 0; i < m_scene->lightsCount().x; i++) {
-            ImGui::PushID(i);
-            ImGui::Text("Point light %d", i);
-
-            Light* light = m_scene->getLight(i, POINT_LIGHT_INDEX);
-
-            glm::vec3 tmpColor = light->getLightMaterial().color;
-            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
-                m_scene->getLight(i, POINT_LIGHT_INDEX)->setColor(tmpColor);
-            }
-
-            float tmpIntensity = light->getLightMaterial().intensity;
-            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
-                m_scene->getLight(i, POINT_LIGHT_INDEX)->setIntensity(tmpIntensity);
-            }
-            
-            ImGui::Separator();
-            ImGui::PopID();
-        }
+        ImGuiWidgets::pointLightsEditor(m_scene);
 
         // Directional lights
-        for(int i = 0; i < m_scene->lightsCount().y; i++) {
-            ImGui::PushID(i + m_scene->lightsCount().x);
-            ImGui::Text("Directional light %d", i);
-
-            Light* light = m_scene->getLight(i, DIR_LIGHT_INDEX);
-
-            glm::vec3 tmpColor = light->getLightMaterial().color;
-            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
-                m_scene->getLight(i, DIR_LIGHT_INDEX)->setColor(tmpColor);
-            }
-
-            float tmpIntensity = light->getLightMaterial().intensity;
-            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
-                m_scene->getLight(i, DIR_LIGHT_INDEX)->setIntensity(tmpIntensity);
-            }
-            
-            ImGui::Separator();
-            ImGui::PopID();
-        }
+        ImGuiWidgets::dirLightsEditor(m_scene);
 
         // Spot lights
-        for(int i = 0; i < m_scene->lightsCount().z; i++) {
-            ImGui::PushID(i + m_scene->lightsCount().x + m_scene->lightsCount().y);
-            ImGui::Text("Spot light %d", i);
-
-            Light* light = m_scene->getLight(i, SPOT_LIGHT_INDEX);
-
-            glm::vec3 tmpColor = light->getLightMaterial().color;
-            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
-                m_scene->getLight(i, SPOT_LIGHT_INDEX)->setColor(tmpColor);
-            }
-
-            float tmpIntensity = light->getLightMaterial().intensity;
-            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
-                m_scene->getLight(i, SPOT_LIGHT_INDEX)->setIntensity(tmpIntensity);
-            }
-            
-            ImGui::Separator();
-            ImGui::PopID();
-        }
+        ImGuiWidgets::spotLightsEditor(m_scene);
     }
 
     ImGui::End();
