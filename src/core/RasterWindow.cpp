@@ -1,5 +1,8 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
+#include <format>
+#include <iostream>
+
 #include <extern/imgui/imgui.h>
 #include <extern/imgui/backends/imgui_impl_glfw.h>
 #include <extern/imgui/backends/imgui_impl_opengl3.h>
@@ -33,9 +36,70 @@ void RasterWindow::drawImGuiFrame()
     ImGui::Begin("Project IGAI configuration");
 
     ImGui::ColorEdit4("Background color", m_scene->getBackgroundColorPointer());
-    if (ImGui::CollapsingHeader("Scene properties"))
+    if (ImGui::CollapsingHeader("Scene"))
     {
-        ImGui::BulletText("Testing ImGui");
+        // Point lights
+        for(int i = 0; i < m_scene->lightsCount().x; i++) {
+            ImGui::PushID(i);
+            ImGui::Text("Point light %d", i);
+
+            Light* light = m_scene->getLight(i, POINT_LIGHT_INDEX);
+
+            glm::vec3 tmpColor = light->getLightMaterial().color;
+            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
+                m_scene->getLight(i, POINT_LIGHT_INDEX)->setColor(tmpColor);
+            }
+
+            float tmpIntensity = light->getLightMaterial().intensity;
+            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
+                m_scene->getLight(i, POINT_LIGHT_INDEX)->setIntensity(tmpIntensity);
+            }
+            
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+
+        // Directional lights
+        for(int i = 0; i < m_scene->lightsCount().y; i++) {
+            ImGui::PushID(i + m_scene->lightsCount().x);
+            ImGui::Text("Directional light %d", i);
+
+            Light* light = m_scene->getLight(i, DIR_LIGHT_INDEX);
+
+            glm::vec3 tmpColor = light->getLightMaterial().color;
+            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
+                m_scene->getLight(i, DIR_LIGHT_INDEX)->setColor(tmpColor);
+            }
+
+            float tmpIntensity = light->getLightMaterial().intensity;
+            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
+                m_scene->getLight(i, DIR_LIGHT_INDEX)->setIntensity(tmpIntensity);
+            }
+            
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+
+        // Spot lights
+        for(int i = 0; i < m_scene->lightsCount().z; i++) {
+            ImGui::PushID(i + m_scene->lightsCount().x + m_scene->lightsCount().y);
+            ImGui::Text("Spot light %d", i);
+
+            Light* light = m_scene->getLight(i, SPOT_LIGHT_INDEX);
+
+            glm::vec3 tmpColor = light->getLightMaterial().color;
+            if(ImGui::ColorEdit3("Color", &tmpColor[0])) {
+                m_scene->getLight(i, SPOT_LIGHT_INDEX)->setColor(tmpColor);
+            }
+
+            float tmpIntensity = light->getLightMaterial().intensity;
+            if(ImGui::SliderFloat("Intensity", &tmpIntensity, 0.0f, 100.0f)) {
+                m_scene->getLight(i, SPOT_LIGHT_INDEX)->setIntensity(tmpIntensity);
+            }
+            
+            ImGui::Separator();
+            ImGui::PopID();
+        }
     }
 
     ImGui::End();

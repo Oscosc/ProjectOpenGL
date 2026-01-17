@@ -30,7 +30,13 @@ public:
     virtual ~Light() = 0;
 
     LightMaterial getLightMaterial() const { return m_material; }
+
+
     void setLightMaterial(LightMaterial material) { m_material = material; }
+    
+    void setColor(glm::vec3 color) { m_material.color = color; }
+
+    void setIntensity(float intensity) { m_material.intensity = intensity; }
 
 private:
     LightMaterial m_material;

@@ -35,7 +35,7 @@ void Scene::updateActiveCameraPV()
 
 void Scene::updateLigth(Shader *shader)
 {
-    if(lightsCount() == 0) {
+    if(lightsCount().length == 0) {
         Logger::logWarning("No light source was instanciated, for somes shaders, nothing will be drawn");
         return;
     }
@@ -86,11 +86,22 @@ void Scene::addObject(Object *object)
     this->m_objects.push_back(object);
 }
 
-const unsigned int Scene::lightsCount() const {
-    return m_lights.dirLights.size() + m_lights.pointLights.size() + m_lights.spotLights.size();
+const glm::vec3 Scene::lightsCount() const {
+    return glm::vec3(m_lights.pointLights.size(), m_lights.dirLights.size(), m_lights.spotLights.size());
 }
 
-std::vector<Sphere*> Scene::getSpheresRT() const
+Light *Scene::getLight(unsigned int index, unsigned int type) const
+{
+    switch (type)
+    {
+    case POINT_LIGHT_INDEX: return m_lights.pointLights.at(index);
+    case DIR_LIGHT_INDEX:   return m_lights.dirLights.at(index);
+    case SPOT_LIGHT_INDEX:  return m_lights.spotLights.at(index);
+    default: return nullptr;
+    }
+}
+
+std::vector<Sphere *> Scene::getSpheresRT() const
 {
     std::vector<Sphere*> spheres;
     for(auto obj : m_objects) {

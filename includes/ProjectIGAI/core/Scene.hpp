@@ -16,6 +16,10 @@
 class Object;
 class Sphere;
 
+#define POINT_LIGHT_INDEX 0
+#define DIR_LIGHT_INDEX 1
+#define SPOT_LIGHT_INDEX 2
+
 struct LightGroup {
     std::vector<PointLight*> pointLights;
     std::vector<DirectionalLight*> dirLights;
@@ -117,9 +121,12 @@ public:
     const unsigned int camerasCount() const { return m_cameras.size(); }
 
     /**
-     * @brief Return the number of lights in the scene.
+     * @brief Return the number of lights in the scene for each type.
+     * - x = point lights
+     * - y = dir lights
+     * - z = spot lights
      */
-    const unsigned int lightsCount() const;
+    const glm::vec3 lightsCount() const;
 
     /**
      * @brief Return the number of objects in the scene.
@@ -149,6 +156,15 @@ public:
     Object* getObject(unsigned int index) const { return m_objects.at(index); }
 
     /**
+     * @brief Return the 'index' light of type 'type'
+     * 
+     * @param index index of the light in it's type
+     * @param type type of the light
+     * @return reference to the light selected, null if not exist;
+     */
+    Light* getLight(unsigned int index, unsigned int type) const;
+
+    /**
      * @brief Return all the scene objects
      * 
      * @return all scene objects
@@ -163,10 +179,25 @@ public:
      */
     std::vector<Sphere*> getSpheresRT() const;
 
+    /**
+     * @brief Get a pointer on the scene background color for ImGui modification
+     * 
+     * @return pointer to the background color
+     */
     float* getBackgroundColorPointer() { return &m_backgroundColor.x; }
 
+    /**
+     * @brief Get the background color.
+     * 
+     * @return background color
+     */
     const glm::vec4 getBackgroundColor() const { return m_backgroundColor; }
 
+    /**
+     * @brief Set the background color.
+     * 
+     * @param color new background color
+     */
     void setBackgroundColor(const glm::vec4 color) { m_backgroundColor = color; }
 
 private:
