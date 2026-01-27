@@ -34,7 +34,8 @@ void RasterWindow::drawImGuiFrame()
     // Modules part
     ImGui::Begin("Project IGAI configuration");
 
-    ImGui::ColorEdit4("Background color", m_scene->getBackgroundColorPointer());
+    ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
+
     if (ImGui::CollapsingHeader("Scene"))
     {
         // Point lights
