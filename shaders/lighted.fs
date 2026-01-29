@@ -210,7 +210,7 @@ void main()
     vec3 toneMapping = accumulatedColor / (accumulatedColor + vec3(1.0));
 
     // Gamma correction
-    vec3 correctedGamma = pow(accumulatedColor, vec3(1.0 / 2.2));
+    vec3 correctedGamma = pow(toneMapping, vec3(1.0 / 2.2));
 
     FragColor = vec4(correctedGamma, 1.0);
 }

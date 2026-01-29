@@ -1,0 +1,145 @@
+{
+    "main_camera": {
+        "type": "camera",
+        "transform": {
+            "position": [0.0, 2.5, 9.5],
+            "rotation": [0.0, 0.0, -90.0],
+            "scale": [1.0, 1.0, 1.0]
+        }
+    },
+
+    "ceiling_light": {
+        "type": "point light",
+        "position": [0.0, 4.5, 0.0],
+        "material": {
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 10.0
+        }
+    },
+
+    "floor": {
+        "type": "mesh",
+        "file": "resources/objects/1x1_tile.obj",
+        "transform": {
+            "position": [-2.5, 0.0, -2.5],
+            "rotation": [90.0, 0.0, 0.0],
+            "scale": [5.0, 5.0, 5.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.73, 0.73, 0.73],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "ceiling": {
+        "type": "mesh",
+        "file": "resources/objects/1x1_tile.obj",
+        "transform": {
+            "position": [-2.5, 5.0, -2.5],
+            "rotation": [90.0, 0.0, 0.0],
+            "scale": [5.0, 5.0, 5.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.73, 0.73, 0.73],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "back_wall": {
+        "type": "mesh",
+        "file": "resources/objects/1x1_tile.obj",
+        "transform": {
+            "position": [-2.5, 0.0, -2.5],
+            "rotation": [0.0, 0.0, 0.0],
+            "scale": [5.0, 5.0, 5.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.73, 0.73, 0.73],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "left_wall_red": {
+        "type": "mesh",
+        "file": "resources/objects/1x1_tile.obj",
+        "transform": {
+            "position": [-2.5, 0.0, -2.5],
+            "rotation": [0.0, -90.0, 0.0],
+            "scale": [5.0, 5.0, 5.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.63, 0.06, 0.04],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "right_wall_green": {
+        "type": "mesh",
+        "file": "resources/objects/1x1_tile.obj",
+        "transform": {
+            "position": [2.5, 0.0, 2.5],
+            "rotation": [0.0, 90.0, 0.0],
+            "scale": [5.0, 5.0, 5.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.15, 0.48, 0.09],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "tall_box": {
+        "type": "mesh",
+        "file": "resources/objects/cube.obj",
+        "transform": {
+            "position": [-0.85, 1.5, -0.85],
+            "rotation": [0.0, -17.0, 0.0],
+            "scale": [1.5, 3.0, 1.5]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.73, 0.73, 0.73],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "short_box": {
+        "type": "mesh",
+        "file": "resources/objects/cube.obj",
+        "transform": {
+            "position": [0.85, 0.75, 0.85],
+            "rotation": [0.0, 17.0, 0.0],
+            "scale": [1.5, 1.5, 1.5]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [0.73, 0.73, 0.73],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        }
+    }
+}
