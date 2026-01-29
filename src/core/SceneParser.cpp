@@ -10,6 +10,7 @@
 #include <ProjectIGAI/core/Logger.hpp>
 #include <ProjectIGAI/geometry/BezierCurve.hpp>
 #include <ProjectIGAI/geometry/BezierSurface.hpp>
+#include <ProjectIGAI/core/utils.hpp>
 
 std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
 {
@@ -45,8 +46,22 @@ Scene SceneParser::parseScene(const std::string &file)
 
     Scene newScene;
 
-    for(auto& item : data) {
-        addObjectToScene(&newScene, item);
+    for(auto& [objectName, item] : data.items()) {
+        try {
+            addObjectToScene(&newScene, item);
+        }
+        catch (const json::type_error& e) {
+            const std::string errorMessage = string_format("[PARSING] Type error in object '%s'"
+                "\nDetails : %s", objectName.c_str(), e.what());
+            Logger::logError(errorMessage);
+            exit(15);
+        }
+        catch (const json::out_of_range& e) {
+            const std::string errorMessage = string_format("[PARSING] Value missing in object '%s'"
+                "\nDetails : %s", objectName.c_str(), e.what());
+            Logger::logError(errorMessage);
+            exit(16);
+        }
     }
 
     if(newScene.camerasCount() == 0)
