@@ -38,14 +38,23 @@ void RasterWindow::drawImGuiFrame()
 
     if (ImGui::CollapsingHeader("Scene"))
     {
-        // Point lights
-        ImGuiWidgets::pointLightsEditor(m_scene);
+        ImGui::Indent();
+        if (ImGui::CollapsingHeader("Lights")) {
+            // Point lights
+            ImGuiWidgets::pointLightsEditor(m_scene);
 
-        // Directional lights
-        ImGuiWidgets::dirLightsEditor(m_scene);
+            // Directional lights
+            ImGuiWidgets::dirLightsEditor(m_scene);
 
-        // Spot lights
-        ImGuiWidgets::spotLightsEditor(m_scene);
+            // Spot lights
+            ImGuiWidgets::spotLightsEditor(m_scene);
+        }
+
+        if(ImGui::CollapsingHeader("Objects")) {
+            // Objects
+            ImGuiWidgets::objectsEditor(m_scene);
+        }
+        ImGui::Unindent();
     }
 
     ImGui::End();

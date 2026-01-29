@@ -3,27 +3,62 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
 
-bool ImGuiWidgets::transformEditor(glm::vec3 &position, glm::vec3 &scale, glm::vec3 &rotation)
+bool ImGuiWidgets::transformEditor(Transform& transform)
 {
-    bool changed = false;
-    if (ImGui::CollapsingHeader("Light Material")) {
-        changed |= ImGui::SliderFloat3("Position", glm::value_ptr(position), -10.0f, 10.0f);
-        changed |= ImGui::SliderFloat3("Scale",    glm::value_ptr(scale),    -10.0f, 10.0f);
-        changed |= ImGui::SliderFloat3("Rotation", glm::value_ptr(rotation), -10.0f, 10.0f);
-    }
+    ImGui::Indent();
 
+    bool changed = false;
+    if (ImGui::CollapsingHeader("Transform")) {
+        ImGui::Indent();
+
+        changed |= ImGui::SliderFloat3("Position", glm::value_ptr(transform.position),  -10.0f,  10.0f);
+        changed |= ImGui::SliderFloat3("Scale",    glm::value_ptr(transform.scale),       0.0f,  10.0f);
+        changed |= ImGui::SliderFloat3("Rotation", glm::value_ptr(transform.rotation), -180.0f, 180.0f);
+        
+        ImGui::Unindent();
+    }
+    
+    ImGui::Unindent();
     return changed;
 }
 
 bool ImGuiWidgets::lightMaterialEditor(glm::vec3 &color, float &intensity) 
 {
+    ImGui::Indent();
+
     bool changed = false;
     if (ImGui::CollapsingHeader("Light Material")) {
+        ImGui::Indent();
+
         changed |= ImGui::ColorEdit3("Color", glm::value_ptr(color));
         changed |= ImGui::SliderFloat("Intensity", &intensity, 0.0f, 100.0f);
+
+        ImGui::Unindent();
     }
 
+    ImGui::Unindent();
     return changed;
+}
+
+void ImGuiWidgets::objectsEditor(Scene *scene)
+{
+    ImGui::PushID("Objects");
+
+    std::vector<Object*> objects = scene->getAllObjects();
+    for(int i = 0; i < objects.size(); i++) {
+
+        ImGui::PushID(i);
+        ImGui::Text("Object %d", i);
+
+        Transform tmpTransform = objects.at(i)->getTransform();
+        if(transformEditor(tmpTransform)) {
+            objects.at(i)->setTransform(tmpTransform);
+        }
+
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+    ImGui::PopID();
 }
 
 void ImGuiWidgets::pointLightsEditor(Scene *scene)
@@ -45,9 +80,12 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
             light->setIntensity(tmpIntensity);
         }
 
+        // TODO : Switch to separate block
+        ImGui::Indent();
         if(ImGui::SliderFloat3("Position", glm::value_ptr(tmpPosition), -10.0f, 10.0f)) {
             light->setPosition(tmpPosition);
         }
+        ImGui::Unindent();
         
         ImGui::Separator();
         ImGui::PopID();
@@ -74,9 +112,12 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
             light->setIntensity(tmpIntensity);
         }
 
+        // TODO : Switch to separate block
+        ImGui::Indent();
         if(ImGui::SliderFloat3("Direction", glm::value_ptr(tmpDirection), -10.0f, 10.0f)) {
             light->setDirection(tmpDirection);
         }
+        ImGui::Unindent();
         
         ImGui::Separator();
         ImGui::PopID();
@@ -104,13 +145,19 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
             light->setIntensity(tmpIntensity);
         }
 
+        // TODO : Switch to separate block
+        ImGui::Indent();
         if(ImGui::SliderFloat3("Position", &tmpPosition[0], -10.0f, 10.0f)) {
             light->setPosition(tmpPosition);
         }
+        ImGui::Unindent();
 
+        // TODO : Switch to separate block
+        ImGui::Indent();
         if(ImGui::SliderFloat3("Direction", &tmpDirection[0], -10.0f, 10.0f)) {
             light->setDirection(tmpDirection);
         }
+        ImGui::Unindent();
         
         ImGui::Separator();
         ImGui::PopID();
