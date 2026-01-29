@@ -47,6 +47,7 @@ void Scene::updateLigth(Shader *shader)
         std::string i_str = std::to_string(i);
         shader->setVec3("pointLights[" + i_str + "].color", light->getLightMaterial().color);
         shader->setFloat("pointLights[" + i_str + "].intensity", light->getLightMaterial().intensity);
+        shader->setFloat("pointLights[" + i_str + "].radius", light->getRadius());
         shader->setVec3("pointLights[" + i_str + "].position", light->getPosition());
         ++i;
     }
@@ -66,6 +67,7 @@ void Scene::updateLigth(Shader *shader)
         shader->setVec3("spotLights[" + i_str + "].color", light->getLightMaterial().color);
         shader->setFloat("spotLights[" + i_str + "].intensity", light->getLightMaterial().intensity);
         shader->setVec3("spotLights[" + i_str + "].position", light->getPosition());
+        shader->setFloat("spotLights[" + i_str + "].radius", light->getRadius());
         shader->setVec3("spotLights[" + i_str + "].direction", light->getDirection());
         shader->setFloat("spotLights[" + i_str + "].innerCos", light->getCutOff());
         shader->setFloat("spotLights[" + i_str + "].outerCos", light->getOuterCutOff());

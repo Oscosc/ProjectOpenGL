@@ -11,9 +11,10 @@
     "ceiling_light": {
         "type": "point light",
         "position": [0.0, 4.5, 0.0],
+        "radius": 10.0,
         "material": {
             "color": [1.0, 1.0, 1.0],
-            "intensity": 10.0
+            "intensity": 1.0
         }
     },
 

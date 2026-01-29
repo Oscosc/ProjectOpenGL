@@ -11,6 +11,8 @@ namespace ImGuiWidgets
 {
     bool transformEditor(Transform& transform);
 
+    bool shaderMaterialEditor(ShaderMaterial& material);
+
     bool lightMaterialEditor(glm::vec3& color, float& intensity);
 
     void objectsEditor(Scene* scene);

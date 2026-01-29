@@ -22,7 +22,26 @@ bool ImGuiWidgets::transformEditor(Transform& transform)
     return changed;
 }
 
-bool ImGuiWidgets::lightMaterialEditor(glm::vec3 &color, float &intensity) 
+bool ImGuiWidgets::shaderMaterialEditor(ShaderMaterial& material)
+{
+    ImGui::Indent();
+
+    bool changed = false;
+    if (ImGui::CollapsingHeader("Material")) {
+        ImGui::Indent();
+
+        changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material.color));
+        changed |= ImGui::SliderFloat("Roughness", &material.roughness,               0.0f,  1.0f);
+        changed |= ImGui::SliderFloat("Metallic",  &material.metallic,                0.0f,  1.0f);
+        
+        ImGui::Unindent();
+    }
+    
+    ImGui::Unindent();
+    return changed;
+}
+
+bool ImGuiWidgets::lightMaterialEditor(glm::vec3 &color, float &intensity)
 {
     ImGui::Indent();
 
@@ -31,7 +50,7 @@ bool ImGuiWidgets::lightMaterialEditor(glm::vec3 &color, float &intensity)
         ImGui::Indent();
 
         changed |= ImGui::ColorEdit3("Color", glm::value_ptr(color));
-        changed |= ImGui::SliderFloat("Intensity", &intensity, 0.0f, 100.0f);
+        changed |= ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
 
         ImGui::Unindent();
     }
@@ -51,8 +70,14 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
         ImGui::Text("Object %d", i);
 
         Transform tmpTransform = objects.at(i)->getTransform();
+        Material tmpMaterial   = objects.at(i)->getMaterial();
+
         if(transformEditor(tmpTransform)) {
             objects.at(i)->setTransform(tmpTransform);
+        }
+
+        if(shaderMaterialEditor(tmpMaterial.matShader)) {
+            objects.at(i)->setMaterial(tmpMaterial);
         }
 
         ImGui::Separator();
@@ -73,6 +98,7 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
 
         glm::vec3 tmpColor = light->getLightMaterial().color;
         float tmpIntensity = light->getLightMaterial().intensity;
+        float tmpRadius = light->getRadius();
         glm::vec3 tmpPosition = light->getPosition();
 
         if(lightMaterialEditor(tmpColor, tmpIntensity)) {
@@ -82,6 +108,10 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
 
         // TODO : Switch to separate block
         ImGui::Indent();
+        if(ImGui::SliderFloat("Radius", &tmpRadius, 0.0f, 50.0f)) {
+            light->setRadius(tmpRadius);
+        }
+
         if(ImGui::SliderFloat3("Position", glm::value_ptr(tmpPosition), -10.0f, 10.0f)) {
             light->setPosition(tmpPosition);
         }
@@ -137,6 +167,7 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
 
         glm::vec3 tmpColor = light->getLightMaterial().color;
         float tmpIntensity = light->getLightMaterial().intensity;
+        float tmpRadius = light->getRadius();
         glm::vec3 tmpPosition = light->getPosition();
         glm::vec3 tmpDirection = light->getDirection();
 
@@ -147,6 +178,10 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
 
         // TODO : Switch to separate block
         ImGui::Indent();
+        if(ImGui::SliderFloat("Radius", &tmpRadius, 0.0f, 50.0f)) {
+            light->setRadius(tmpRadius);
+        }
+
         if(ImGui::SliderFloat3("Position", &tmpPosition[0], -10.0f, 10.0f)) {
             light->setPosition(tmpPosition);
         }

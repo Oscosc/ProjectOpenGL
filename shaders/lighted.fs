@@ -25,6 +25,7 @@ struct PointLight {
     vec3 position;
     vec3 color;
     float intensity;
+    float radius;
 };
 
 struct DirLight {
@@ -40,6 +41,7 @@ struct SpotLight {
     float outerCos;
     vec3 color;
     float intensity;
+    float radius;
 };
 
 
@@ -115,7 +117,7 @@ vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float r
     float NdotL = max(dot(N, L), 0.0);
     float NdotV = max(dot(N, V), 0.0);
 
-    if (NdotL <= 0.0 || NdotV <= 0.0) return vec3(0.0);
+    // if (NdotL <= 0.0 || NdotV <= 0.0) return vec3(0.0); // ==> Un bug/artefact apparait avec ce code
 
     // Material "preparation"
     vec3 F0 = vec3(0.04); 
@@ -147,16 +149,40 @@ vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float r
 
 
 /*************************************************************************************************
+ *                                    VARIOUS OTHER FUNCTIONS                                    *
+ *************************************************************************************************/
+
+/**
+ * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+ * Page 12 : Lighting Model
+ */
+float WindowedAttenuation(float dist, float lightRadius)
+{
+    // Physical attenuation
+    float attenuation = 1.0 / (dist * dist);
+
+    // Windowed factor attenuation
+    float factor = dist / lightRadius;
+    float factor4 = factor * factor * factor * factor;
+    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
+    fallOff = fallOff * fallOff;
+
+    // Final product
+    return attenuation * fallOff;
+}
+
+
+/*************************************************************************************************
  *                                         MAIN SECTION                                          *
  *************************************************************************************************/
 
 void main()
 {
-    vec3 accumulatedColor = vec3(0.0, 0.0, 0.0);
-
     vec3 V = normalize(viewPos - FragPos);
     vec3 N = normalize(Normal);
     vec3 albedo = material.color;
+
+    vec3 accumulatedColor = vec3(0.0);
 
 #ifdef POINT_LIGHTS
 
@@ -165,7 +191,7 @@ void main()
         vec3 L = normalize(pointLights[i].position - FragPos);
         float d = length(pointLights[i].position - FragPos);
 
-        float attenuation = 1.0 / (d * d);
+        float attenuation = WindowedAttenuation(d, pointLights[i].radius);
         vec3 radiance = pointLights[i].color * pointLights[i].intensity * attenuation;
 
         accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
@@ -198,7 +224,7 @@ void main()
 
         float angleAtt = clamp((cosTheta - spotLights[i].outerCos) /
             (spotLights[i].innerCos - spotLights[i].outerCos), 0.0, 1.0);
-        float distAtt = 1.0 / (d * d);
+        float distAtt = WindowedAttenuation(d, spotLights[i].radius);
         vec3 radiance = spotLights[i].color * spotLights[i].intensity * angleAtt * distAtt;
 
         accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);

@@ -167,8 +167,9 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
 void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
 {
     glm::vec3 position = jsonToVec3(item, "position");
+    float radius = jsonToFloat(item, "radius");
     if(item["material"] != nullptr) {
-        scene->addLight(new PointLight(position, jsonToLightMaterial(item["material"])));
+        scene->addLight(new PointLight(position, radius, jsonToLightMaterial(item["material"])));
     } else {
         scene->addLight(new PointLight(position));
     }
@@ -188,13 +189,14 @@ void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
 {
     glm::vec3 direction = jsonToVec3(item, "direction");
     glm::vec3 position = jsonToVec3(item, "position");
+    float radius = jsonToFloat(item, "radius");
     float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
     float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
 
     if(item["material"] != nullptr) {
-        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
+        scene->addLight(new SpotLight(direction, position, radius, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
     } else {
-        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff));
+        scene->addLight(new SpotLight(direction, position, radius, cutOff, outerCutOff));
     }
 }
 

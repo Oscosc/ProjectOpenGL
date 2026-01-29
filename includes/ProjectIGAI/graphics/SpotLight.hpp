@@ -6,7 +6,7 @@
  * @brief Class representing a Spot Light object.
  * 
  */
-class SpotLight : public Light
+class SpotLight : public PointLight
 {
 public:
 
@@ -21,10 +21,11 @@ public:
      */
     SpotLight(glm::vec3 direction = {0.f, -1.f, 0.f},
         glm::vec3 position = {0.f, 0.f, 0.f},
+        float radius = 1.0f,
         float cutOff = 0.0,
         float outerCutOff = 1.0f,
         LightMaterial material = DEFAULT_LIGHT_MATERIAL)
-    : Light(material), m_direction(direction), m_position(position),
+    : PointLight(position, radius, material), m_direction(direction),
     m_cutOff(cutOff), m_outerCutOff(outerCutOff) {}
     
     /**
@@ -33,13 +34,6 @@ public:
      * @return spot's direction
      */
     glm::vec3 getDirection() const { return m_direction; }
-
-    /**
-     * @brief Return the position of the spot
-     * 
-     * @return spot's position
-     */
-    glm::vec3 getPosition() const { return m_position; }
 
     /**
      * @brief Return the cut-off of the spot
@@ -63,13 +57,6 @@ public:
     void setDirection(glm::vec3 direction) { m_direction = direction; }
 
     /**
-     * @brief Set the spot position
-     * 
-     * @param direction new spot's position
-     */
-    void setPosition(glm::vec3 position) { m_position = position; }
-
-    /**
      * @brief Set the spot cut-off
      * 
      * @param direction new spot's cut-off
@@ -87,7 +74,6 @@ private:
 
     /** attributes of the spot light */
     glm::vec3 m_direction;
-    glm::vec3 m_position;
     float m_cutOff;
     float m_outerCutOff;
 };

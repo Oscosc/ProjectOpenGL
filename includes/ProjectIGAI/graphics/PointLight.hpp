@@ -15,12 +15,14 @@ public:
      * @brief Construct a point light object.
      * 
      * @param position position of the light
+     * @param radius radius of the light
      * @param color color of the light
      * @param strength intensity of the light
      */
     PointLight(glm::vec3 position = {0.f, 0.f, 0.f},
+        float radius = 1.0f,
         LightMaterial material = DEFAULT_LIGHT_MATERIAL)
-        : Light(material), m_position(position) {}
+        : Light(material), m_position(position), m_radius(radius) {}
 
     /**
      * @brief return the light position.
@@ -34,6 +36,11 @@ public:
      */
     void setPosition(glm::vec3 position) { m_position = position; }
 
+    const float getRadius() const { return m_radius; }
+
+    void setRadius(const float radius) { m_radius = radius; }
+
 private:
     glm::vec3 m_position;
+    float m_radius;
 };
