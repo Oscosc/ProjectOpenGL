@@ -48,7 +48,7 @@ Scene SceneParser::parseScene(const std::string &file)
 
     for(auto& [objectName, item] : data.items()) {
         try {
-            addObjectToScene(&newScene, item);
+            addObjectToScene(&newScene, item, objectName);
         }
         catch (const json::type_error& e) {
             const std::string errorMessage = string_format("[PARSING] Type error in object '%s'"
@@ -70,7 +70,7 @@ Scene SceneParser::parseScene(const std::string &file)
     return newScene;
 }
 
-void SceneParser::addObjectToScene(Scene *scene, json item)
+void SceneParser::addObjectToScene(Scene *scene, json item, std::string name)
 {
     if(item["type"] == nullptr) {
         Logger::logError("Scene object must have a 'type' defined");
@@ -86,40 +86,40 @@ void SceneParser::addObjectToScene(Scene *scene, json item)
     ElementType type = it->second;
     switch(type) {
     case CAMERA:
-        parseObjectAs_Camera(scene, item);
+        parseObjectAs_Camera(scene, item, name);
         break;
 
     case POINT_LIGHT:
-        parseObjectAs_PointLight(scene, item);
+        parseObjectAs_PointLight(scene, item, name);
         break;
 
     case SPOT_LIGHT:
-        parseObjectAs_SpotLight(scene, item);
+        parseObjectAs_SpotLight(scene, item, name);
         break;
 
     case DIR_LIGHT:
-        parseObjectAs_DirectionalLight(scene, item);
+        parseObjectAs_DirectionalLight(scene, item, name);
         break;
         
     case SPHERE:
-        parseObjectAs_Sphere(scene, item);
+        parseObjectAs_Sphere(scene, item, name);
         break;
 
     case MESH:
-        parseObjectAs_Mesh(scene, item);
+        parseObjectAs_Mesh(scene, item, name);
         break;
 
     case BEZIER_CURVE:
-        parseObjectAs_BezierCurve(scene, item);
+        parseObjectAs_BezierCurve(scene, item, name);
         break;
     
     case BEZIER_SURFACE:
-        parseObjectAs_BezierSurface(scene, item);
+        parseObjectAs_BezierSurface(scene, item, name);
         break;
     }
 }
 
-void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
+void SceneParser::parseObjectAs_Camera(Scene *scene, json item, std::string name)
 {
     /* Roll(x), Pitch(y), Yaw(z)
      * Roll is fixed (no camera roll), up vector is (0, 1, 0)
@@ -133,96 +133,98 @@ void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
     ));
 }
 
-void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
+void SceneParser::parseObjectAs_Mesh(Scene *scene, json item, std::string name)
 {
     if(item["transform"] != nullptr) {
         if(item["material"] != nullptr) {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), name, jsonToMaterial(item["material"])));
         } else {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"])));
+            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), name));
         }
     } else {
         scene->addObject(new Mesh(item["file"]));
     }
 }
 
-void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
+void SceneParser::parseObjectAs_Sphere(Scene *scene, json item, std::string name)
 {
     float size = jsonToFloat(item, "size");
     if(item["transform"] != nullptr) {
         if(item["material"] != nullptr) {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), name, jsonToMaterial(item["material"])));
             if(item["ray-tracing.type"] != nullptr) {
                 Sphere* last = dynamic_cast<Sphere*>(scene->getObject(scene->objectsCount() - 1));
                 last->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
             }
         } else {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"])));
+            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), name));
         }
     } else {
         scene->addObject(new Sphere(size));
     }
 }
 
-void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
+void SceneParser::parseObjectAs_PointLight(Scene *scene, json item, std::string name)
 {
     float radius = jsonToFloat(item, "radius");
     if(item["material"] != nullptr) {
-        scene->addLight(new PointLight(jsonToTransform(item["transform"]), "Point light",
+        scene->addLight(new PointLight(jsonToTransform(item["transform"]), name,
             jsonToLightMaterial(item["material"]), radius));
     } else {
-        scene->addLight(new PointLight(jsonToTransform(item["transform"])));
+        scene->addLight(new PointLight(jsonToTransform(item["transform"]), name));
     }
 }
 
-void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
+void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item, std::string name)
 {
     if(item["material"] != nullptr) {
-        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), "Directional light",
+        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), name,
             jsonToLightMaterial(item["material"])));
     } else {
-        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"])));
+        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), name));
     }
 }
 
-void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
+void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item, std::string name)
 {
     float radius = jsonToFloat(item, "radius");
     float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
     float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
 
     if(item["material"] != nullptr) {
-        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), "Spot light",
+        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), name,
             jsonToLightMaterial(item["material"]), radius, cutOff, outerCutOff));
     } else {
-        scene->addLight(new SpotLight(jsonToTransform(item["transform"])));
+        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), name));
     }
 }
 
-void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item)
+void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item, std::string name)
 {
     vec3Array controlPoints = jsonToVec3Array(item, "control points");
 
     if(item["transform"] != nullptr) {
         if(item["material"] != nullptr) {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), name,
+                jsonToMaterial(item["material"])));
         } else {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"])));
+            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), name));
         }
     } else {
         scene->addObject(new BezierCurve(controlPoints));
     }
 }
 
-void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item)
+void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item, std::string name)
 {
     vec3Grid controlPoints = jsonToVec3Grid(item, "control points");
 
     if(item["transform"] != nullptr) {
         if(item["material"] != nullptr) {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
+            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), name,
+                jsonToMaterial(item["material"])));
         } else {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"])));
+            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), name));
         }
     } else {
         scene->addObject(new BezierSurface(controlPoints));

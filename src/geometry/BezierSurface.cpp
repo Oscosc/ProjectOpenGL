@@ -2,8 +2,8 @@
 
 #include <ProjectIGAI/geometry/Curve.hpp>
 
-BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, Material material) :
-    Surface(transform, material)
+BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, std::string name, Material material) :
+    Surface(transform, name, material)
 {
     this->m_controlPoints = controlPoints;
     this->m_sizeU = controlPoints.size();

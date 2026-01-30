@@ -4,8 +4,8 @@
 #include <tuple>
 #include <ProjectIGAI/core/Logger.hpp>
 
-Mesh::Mesh(std::string file, Transform transformation, Material material) :
-    m_filename(file), Object(transformation, material)
+Mesh::Mesh(std::string file, Transform transform, std::string name, Material material) :
+    m_filename(file), Object(transform, name, material)
 {
     loadInitMesh(file);
 }

@@ -96,8 +96,9 @@ public:
      */
     Object(
         Transform transform = DEFAULT_TRANSFORM,
-        Material material = DEFAULT_OBJECT_MATERIAL
-    ) : Node(transform), m_material(material) {}
+        std::string name = DEFAULT_NAME,
+        Material material = DEFAULT_OBJECT_MATERIAL)
+    : Node(transform, name), m_material(material) {}
 
     /**
      * @brief Default destructor for object class.

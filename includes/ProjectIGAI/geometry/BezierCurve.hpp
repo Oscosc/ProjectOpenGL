@@ -44,6 +44,7 @@ public:
      */
     BezierCurve(vec3Array controlPoints,
         Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 

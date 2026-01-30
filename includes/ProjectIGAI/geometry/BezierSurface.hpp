@@ -36,6 +36,7 @@ public:
      */
     BezierSurface(vec3Grid controlPoints,
         Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 

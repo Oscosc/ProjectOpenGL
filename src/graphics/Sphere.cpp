@@ -2,7 +2,8 @@
 
 #include <ProjectIGAI/core/Logger.hpp>
 
-Sphere::Sphere(float radius, Transform transform, Material material) : m_radius(radius), Object(transform, material)
+Sphere::Sphere(float radius, Transform transform, std::string name, Material material)
+    : m_radius(radius), Object(transform, name, material)
 {
     unsigned int stacks = (radius > 1.0f) ? DEFAULT_STACKS : round(DEFAULT_STACKS * radius);
     unsigned int sectors = (radius > 1.0f) ? DEFAULT_SECTORS : round(DEFAULT_SECTORS * radius);

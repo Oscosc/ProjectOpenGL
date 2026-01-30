@@ -49,8 +49,8 @@ public:
      */
     Mesh(std::string file,
         Transform transform = DEFAULT_TRANSFORM,
-        Material material = DEFAULT_OBJECT_MATERIAL
-    );
+        std::string name = DEFAULT_NAME,
+        Material material = DEFAULT_OBJECT_MATERIAL);
 
     /**
      * @brief Draw the mesh in the scene.

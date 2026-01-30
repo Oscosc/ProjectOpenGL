@@ -18,7 +18,7 @@ public:
      * @param transform transformation of the surface
      * @param material material of the surface
      */
-    Surface(Transform transform, Material material) : Object(transform, material) {}
+    Surface(Transform transform, std::string name, Material material) : Object(transform, name, material) {}
 
     /**
      * @brief Get the 3D point position of a uv value in the surface
