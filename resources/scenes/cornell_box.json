@@ -22,6 +22,22 @@
         }
     },
 
+    "The big spot": {
+        "type": "spot light",
+        "transform": {
+            "position": [0.0, 4.5, 0.0],
+            "rotation": [-90.0, 0.0, 0.0],
+            "scale":    [0.0, 0.0, 0.0]
+        },
+        "radius": 10.0,
+        "cutOff": 15.0,
+        "outerCutOff": 50.0,
+        "material": {
+            "color": [1.0, 1.0, 0.0],
+            "intensity": 10.0
+        }
+    },
+
     "floor": {
         "type": "mesh",
         "file": "resources/objects/1x1_tile.obj",

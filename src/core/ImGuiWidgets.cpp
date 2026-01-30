@@ -78,20 +78,18 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
         Transform tmpTransform = light->getTransform();
         LightProperties tmpLightMaterial = light->getLightMaterial();
 
+        ImGui::Indent();
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
+        }
+
+        if(ImGui::SliderFloat("Radius", &tmpRadius, 0.0f, 50.0f)) {
+            light->setRadius(tmpRadius);
         }
 
         if(transformEditor(tmpTransform, POINT_LIGHT_FLAGS)) {
             light->setTransform(tmpTransform);
         }
-
-        // TODO : Switch to separate block
-        ImGui::Indent();
-        if(ImGui::SliderFloat("Radius", &tmpRadius, 0.0f, 50.0f)) {
-            light->setRadius(tmpRadius);
-        }
-
         ImGui::Unindent();
         
         ImGui::Separator();
@@ -112,12 +110,11 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
         Transform tmpTransform = light->getTransform();
         LightProperties tmpLightMaterial = light->getLightMaterial();
 
+        ImGui::Indent();
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
         }
 
-        // TODO : Switch to separate block
-        ImGui::Indent();
         if(transformEditor(tmpTransform, DIR_LIGHT_FLAGS)) {
             light->setTransform(tmpTransform);
         }
@@ -139,17 +136,26 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
         ImGui::Text(light->getName().c_str());
 
         float tmpRadius = light->getRadius();
+        float tmpInner = light->getCutOff();
+        float tmpOuter = light->getOuterCutOff();
         Transform tmpTransform = light->getTransform();
         LightProperties tmpLightMaterial = light->getLightMaterial();
 
+        ImGui::Indent();
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
         }
 
-        // TODO : Switch to separate block
-        ImGui::Indent();
         if(ImGui::SliderFloat("Radius", &tmpRadius, 0.0f, 50.0f)) {
             light->setRadius(tmpRadius);
+        }
+
+        if(ImGui::SliderFloat("Inner cut-off", &tmpInner, 0.0f, 2.0f)) {
+            light->setCutOff(tmpInner);
+        }
+
+        if(ImGui::SliderFloat("Outer cut-off", &tmpOuter, 0.0f, 2.0f)) {
+            light->setOuterCutOff(tmpOuter);
         }
 
         if(transformEditor(tmpTransform, SPOT_LIGHT_FLAGS)) {
