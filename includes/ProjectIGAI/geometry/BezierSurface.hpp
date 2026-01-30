@@ -35,7 +35,7 @@ public:
      * @param material material of the surface
      */
     BezierSurface(vec3Grid controlPoints,
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Transform transform = DEFAULT_TRANSFORM,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 

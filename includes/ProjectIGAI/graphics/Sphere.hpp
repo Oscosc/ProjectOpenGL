@@ -25,7 +25,7 @@ public:
      * @param material Sphere default material
      */
     Sphere(float radius,
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Transform transform = DEFAULT_TRANSFORM,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 
