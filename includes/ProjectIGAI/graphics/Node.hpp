@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
+#define DEFAULT_NAME "None"
 
 /**
  * @brief Transformation of any element present in the world.
@@ -17,7 +18,7 @@ struct Transform {
  * @brief Root class for every object that influence the world in a way.
  * * Inheritance table :
  * ```text
- * Node (Tranform)
+ * Node (Tranform, Name)
  * ├── Object (Material, Vertices)
  * │   ├── Mesh (Reference file)
  * │   ├── Sphere (Radius)
@@ -28,8 +29,8 @@ struct Transform {
  * │   └── Grid (...)
  * ├── Light (Properties)
  * ├── Point Light (Radius)
- * ├── Directional Light
- * └── Spot Light (Radius)
+ * |   └──Spot Light (Outer/Inner cut-off)
+ * └── Directional Light
  * ```
  */
 class Node
@@ -43,8 +44,13 @@ public:
      * position = {0, 0, 0}, scale = {1, 1, 1}, rotation = {0, 0, 0}.
      * @param name name of the Node. Default is 'None'.
      */
-    Node(Transform transform = DEFAULT_TRANSFORM, std::string name = "None")
-        : m_transform(transform) {}
+    Node(Transform transform = DEFAULT_TRANSFORM, std::string name = DEFAULT_NAME)
+        : m_transform(transform), m_name(name) {}
+
+    /**
+     * @brief default destructor (virtual to keep class abstract).
+     */
+    virtual ~Node() = 0;
 
     /**
      * @brief Give the transformation state of this node.
@@ -63,6 +69,18 @@ public:
      */
     const std::string& getName() const { return m_name; }
 
+    /**
+     * @brief Get the Forward Vector object
+     * 
+     * @return const glm::vec3& 
+     */
+    glm::vec3 getForwardVector() const
+    {
+        glm::vec3 worldForward = glm::vec3(0.0f, 0.0f, -1.0f);
+        glm::quat rotationQuat = glm::quat(glm::radians(m_transform.rotation));
+        return glm::normalize(rotationQuat * worldForward);
+    }
+
 protected:
 
     /** Transformation of the node element */
@@ -72,3 +90,8 @@ protected:
     const std::string m_name;
 
 };
+
+/**
+ * @brief Virtual destructor declaration for compilation purposes.
+ */
+inline Node::~Node() {}

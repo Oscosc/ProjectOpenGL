@@ -25,7 +25,7 @@ bool ImGuiWidgets::shaderMaterialEditor(ShaderMaterial& material)
     });
 }
 
-bool ImGuiWidgets::lightMaterialEditor(LightMaterial& material)
+bool ImGuiWidgets::lightMaterialEditor(LightProperties& material)
 {
     return genericEditor("Light Settings", [&]() {
         bool changed = false;
@@ -44,7 +44,7 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
     for(int i = 0; i < objects.size(); i++) {
 
         ImGui::PushID(i);
-        ImGui::Text("Object %d", i);
+        ImGui::Text(objects.at(i)->getName().c_str());
 
         Transform tmpTransform = objects.at(i)->getTransform();
         Material tmpMaterial   = objects.at(i)->getMaterial();
@@ -71,16 +71,19 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
     for(int i = 0; i < scene->lightsCount().x; i++) {
 
         ImGui::PushID(i);
-        ImGui::Text("Point light %d", i);
-
         PointLight* light = static_cast<PointLight*>(scene->getLight(i, POINT_LIGHT_INDEX));
+        ImGui::Text(light->getName().c_str());
 
         float tmpRadius = light->getRadius();
-        glm::vec3 tmpPosition = light->getPosition();
-        LightMaterial tmpLightMaterial = light->getLightMaterial();
+        Transform tmpTransform = light->getTransform();
+        LightProperties tmpLightMaterial = light->getLightMaterial();
 
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
+        }
+
+        if(transformEditor(tmpTransform, POINT_LIGHT_FLAGS)) {
+            light->setTransform(tmpTransform);
         }
 
         // TODO : Switch to separate block
@@ -89,9 +92,6 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
             light->setRadius(tmpRadius);
         }
 
-        if(ImGui::SliderFloat3("Position", glm::value_ptr(tmpPosition), -10.0f, 10.0f)) {
-            light->setPosition(tmpPosition);
-        }
         ImGui::Unindent();
         
         ImGui::Separator();
@@ -106,12 +106,11 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
     for(int i = 0; i < scene->lightsCount().y; i++) {
 
         ImGui::PushID(i);
-        ImGui::Text("Directional light %d", i);
-
         DirectionalLight* light = static_cast<DirectionalLight*>(scene->getLight(i, DIR_LIGHT_INDEX));
+        ImGui::Text(light->getName().c_str());
 
-        glm::vec3 tmpDirection = light->getDirection();
-        LightMaterial tmpLightMaterial = light->getLightMaterial();
+        Transform tmpTransform = light->getTransform();
+        LightProperties tmpLightMaterial = light->getLightMaterial();
 
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
@@ -119,8 +118,8 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
 
         // TODO : Switch to separate block
         ImGui::Indent();
-        if(ImGui::SliderFloat3("Direction", glm::value_ptr(tmpDirection), -10.0f, 10.0f)) {
-            light->setDirection(tmpDirection);
+        if(transformEditor(tmpTransform, DIR_LIGHT_FLAGS)) {
+            light->setTransform(tmpTransform);
         }
         ImGui::Unindent();
         
@@ -136,14 +135,12 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
     for(int i = 0; i < scene->lightsCount().z; i++) {
 
         ImGui::PushID(i);
-        ImGui::Text("Spot light %d", i);
-
         SpotLight* light = static_cast<SpotLight*>(scene->getLight(i, SPOT_LIGHT_INDEX));
+        ImGui::Text(light->getName().c_str());
 
         float tmpRadius = light->getRadius();
-        glm::vec3 tmpPosition = light->getPosition();
-        glm::vec3 tmpDirection = light->getDirection();
-        LightMaterial tmpLightMaterial = light->getLightMaterial();
+        Transform tmpTransform = light->getTransform();
+        LightProperties tmpLightMaterial = light->getLightMaterial();
 
         if(lightMaterialEditor(tmpLightMaterial)) {
             light->setLightMaterial(tmpLightMaterial);
@@ -155,15 +152,8 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
             light->setRadius(tmpRadius);
         }
 
-        if(ImGui::SliderFloat3("Position", &tmpPosition[0], -10.0f, 10.0f)) {
-            light->setPosition(tmpPosition);
-        }
-        ImGui::Unindent();
-
-        // TODO : Switch to separate block
-        ImGui::Indent();
-        if(ImGui::SliderFloat3("Direction", &tmpDirection[0], -10.0f, 10.0f)) {
-            light->setDirection(tmpDirection);
+        if(transformEditor(tmpTransform, SPOT_LIGHT_FLAGS)) {
+            light->setTransform(tmpTransform);
         }
         ImGui::Unindent();
         

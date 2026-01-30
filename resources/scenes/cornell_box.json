@@ -10,7 +10,11 @@
 
     "ceiling_light": {
         "type": "point light",
-        "position": [0.0, 4.5, 0.0],
+        "transform": {
+            "position": [0.0, 4.5, 0.0],
+            "rotation": [0.0, 0.0, 0.0],
+            "scale":    [0.0, 0.0, 0.0]
+        },
         "radius": 10.0,
         "material": {
             "color": [1.0, 1.0, 1.0],

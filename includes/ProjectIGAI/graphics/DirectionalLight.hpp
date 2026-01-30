@@ -16,26 +16,10 @@ public:
      * @param direction direction of the light
      * @param material material of the light
      */
-    DirectionalLight(glm::vec3 direction = {0.f, -1.f, 0.f},
-    LightMaterial material = DEFAULT_LIGHT_MATERIAL)
-    : Light(material), m_direction(direction) {}
-    
-    /**
-     * @brief Get light direction
-     * 
-     * @return light direction
-     */
-    glm::vec3 getDirection() const { return m_direction; }
-    
-    /**
-     * @brief Set a new light direction
-     * 
-     * @param direction of the light
-     */
-    void setDirection(glm::vec3 direction) { m_direction = direction; }
+    DirectionalLight(Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
+        LightProperties material = DEFAULT_LIGHT_PROPERTIES)
+    : Light(transform, name, material) {}
     
 private:
-    
-    /** Direction of the light */
-    glm::vec3 m_direction;
 };

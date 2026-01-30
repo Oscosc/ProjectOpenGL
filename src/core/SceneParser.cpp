@@ -166,37 +166,36 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
 
 void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
 {
-    glm::vec3 position = jsonToVec3(item, "position");
     float radius = jsonToFloat(item, "radius");
     if(item["material"] != nullptr) {
-        scene->addLight(new PointLight(position, radius, jsonToLightMaterial(item["material"])));
+        scene->addLight(new PointLight(jsonToTransform(item["transform"]), "Point light",
+            jsonToLightMaterial(item["material"]), radius));
     } else {
-        scene->addLight(new PointLight(position));
+        scene->addLight(new PointLight(jsonToTransform(item["transform"])));
     }
 }
 
 void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
 {
-    glm::vec3 direction = jsonToVec3(item, "direction");
     if(item["material"] != nullptr) {
-        scene->addLight(new DirectionalLight(direction, jsonToLightMaterial(item["material"])));
+        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), "Directional light",
+            jsonToLightMaterial(item["material"])));
     } else {
-        scene->addLight(new DirectionalLight(direction));
+        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"])));
     }
 }
 
 void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
 {
-    glm::vec3 direction = jsonToVec3(item, "direction");
-    glm::vec3 position = jsonToVec3(item, "position");
     float radius = jsonToFloat(item, "radius");
     float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
     float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
 
     if(item["material"] != nullptr) {
-        scene->addLight(new SpotLight(direction, position, radius, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
+        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), "Spot light",
+            jsonToLightMaterial(item["material"]), radius, cutOff, outerCutOff));
     } else {
-        scene->addLight(new SpotLight(direction, position, radius, cutOff, outerCutOff));
+        scene->addLight(new SpotLight(jsonToTransform(item["transform"])));
     }
 }
 
@@ -268,7 +267,7 @@ ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
     };
 }
 
-LightMaterial SceneParser::jsonToLightMaterial(json json)
+LightProperties SceneParser::jsonToLightMaterial(json json)
 {
     return {
         jsonToVec3(json, "color"),

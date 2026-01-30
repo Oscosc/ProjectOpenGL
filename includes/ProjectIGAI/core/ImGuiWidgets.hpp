@@ -24,7 +24,7 @@ namespace ImGuiWidgets
 
     bool shaderMaterialEditor(ShaderMaterial& material);
 
-    bool lightMaterialEditor(LightMaterial& material);
+    bool lightMaterialEditor(LightProperties& material);
 
     template<typename TFunc>
     bool genericEditor(const char* title, TFunc contentFunction)

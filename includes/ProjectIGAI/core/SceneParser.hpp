@@ -10,7 +10,7 @@ using vec3Grid = std::vector<std::vector<glm::vec3>>;
 struct Transform;
 struct Material;
 struct ShaderMaterial;
-struct LightMaterial;
+struct LightProperties;
 
 /**
  * @brief Class containing parsing functions for scene files (.json)
@@ -177,7 +177,7 @@ private:
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static LightMaterial jsonToLightMaterial(json json);
+    static LightProperties jsonToLightMaterial(json json);
 
     /**
      * @brief Auxiliary function for casting json element to Vec3Array.

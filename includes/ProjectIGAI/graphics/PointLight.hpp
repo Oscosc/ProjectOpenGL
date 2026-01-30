@@ -2,6 +2,8 @@
 
 #include <ProjectIGAI/graphics/Light.hpp>
 
+#define DEFAULT_RADIUS 1.0f
+
 /**
  * @brief This class represents a point light object, which is a positionned light that's diffuse
  * light all around it in a certain intensity. This light, do not have an associated visible
@@ -19,28 +21,28 @@ public:
      * @param color color of the light
      * @param strength intensity of the light
      */
-    PointLight(glm::vec3 position = {0.f, 0.f, 0.f},
-        float radius = 1.0f,
-        LightMaterial material = DEFAULT_LIGHT_MATERIAL)
-        : Light(material), m_position(position), m_radius(radius) {}
-
+    PointLight(Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
+        LightProperties material = DEFAULT_LIGHT_PROPERTIES,
+        float radius = DEFAULT_RADIUS)
+    : Light(transform, name, material), m_radius(radius) {}
+    
     /**
-     * @brief return the light position.
-     */
-    glm::vec3 getPosition() const { return m_position; }
-
-    /**
-     * @brief set the ligth to a new position.
+     * @brief Get the Radius object
      * 
-     * @param position new position
+     * @return const float 
      */
-    void setPosition(glm::vec3 position) { m_position = position; }
-
     const float getRadius() const { return m_radius; }
 
+    /**
+     * @brief Set the Radius object
+     * 
+     * @param radius 
+     */
     void setRadius(const float radius) { m_radius = radius; }
 
 private:
-    glm::vec3 m_position;
+    
+    /** Radius of light emission */
     float m_radius;
 };
