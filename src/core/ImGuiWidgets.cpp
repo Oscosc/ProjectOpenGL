@@ -3,67 +3,44 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
 
-bool ImGuiWidgets::transformEditor(Transform& transform)
+bool ImGuiWidgets::transformEditor(Transform& transform, const TransformFlags flags)
 {
-    ImGui::Indent();
-
-    bool changed = false;
-    if (ImGui::CollapsingHeader("Transform")) {
-        ImGui::Indent();
-
-        changed |= ImGui::SliderFloat3("Position", glm::value_ptr(transform.position),  -10.0f,  10.0f);
-        changed |= ImGui::SliderFloat3("Scale",    glm::value_ptr(transform.scale),       0.0f,  10.0f);
-        changed |= ImGui::SliderFloat3("Rotation", glm::value_ptr(transform.rotation), -180.0f, 180.0f);
-        
-        ImGui::Unindent();
-    }
-    
-    ImGui::Unindent();
-    return changed;
+    return genericEditor("Transform", [&]() {
+        bool changed = false;
+        if(flags.showPosition) changed |= ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.1f);
+        if(flags.showScale)    changed |= ImGui::DragFloat3("Scale",    glm::value_ptr(transform.scale),    0.1f);
+        if(flags.showRotation) changed |= ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation), 0.1f);
+        return changed;
+    });
 }
 
 bool ImGuiWidgets::shaderMaterialEditor(ShaderMaterial& material)
 {
-    ImGui::Indent();
-
-    bool changed = false;
-    if (ImGui::CollapsingHeader("Material")) {
-        ImGui::Indent();
-
+    return genericEditor("Material", [&]() {
+        bool changed = false;
         changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material.color));
-        changed |= ImGui::SliderFloat("Roughness", &material.roughness,               0.0f,  1.0f);
-        changed |= ImGui::SliderFloat("Metallic",  &material.metallic,                0.0f,  1.0f);
-        
-        ImGui::Unindent();
-    }
-    
-    ImGui::Unindent();
-    return changed;
+        changed |= ImGui::SliderFloat("Roughness", &material.roughness, 0.0f,  1.0f);
+        changed |= ImGui::SliderFloat("Metallic",  &material.metallic,  0.0f,  1.0f);
+        return changed;
+    });
 }
 
-bool ImGuiWidgets::lightMaterialEditor(glm::vec3 &color, float &intensity)
+bool ImGuiWidgets::lightMaterialEditor(LightMaterial& material)
 {
-    ImGui::Indent();
-
-    bool changed = false;
-    if (ImGui::CollapsingHeader("Light Material")) {
-        ImGui::Indent();
-
-        changed |= ImGui::ColorEdit3("Color", glm::value_ptr(color));
-        changed |= ImGui::SliderFloat("Intensity", &intensity, 0.0f, 10.0f);
-
-        ImGui::Unindent();
-    }
-
-    ImGui::Unindent();
-    return changed;
+    return genericEditor("Light Settings", [&]() {
+        bool changed = false;
+        changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material.color));
+        changed |= ImGui::SliderFloat("Intensity", &material.intensity, 0.0f, 10.0f);
+        return changed;
+    });
 }
 
 void ImGuiWidgets::objectsEditor(Scene *scene)
 {
     ImGui::PushID("Objects");
+    ImGui::Indent();
 
-    std::vector<Object*> objects = scene->getAllObjects();
+    const std::vector<Object*>& objects = scene->getAllObjects();
     for(int i = 0; i < objects.size(); i++) {
 
         ImGui::PushID(i);
@@ -72,7 +49,7 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
         Transform tmpTransform = objects.at(i)->getTransform();
         Material tmpMaterial   = objects.at(i)->getMaterial();
 
-        if(transformEditor(tmpTransform)) {
+        if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
             objects.at(i)->setTransform(tmpTransform);
         }
 
@@ -83,6 +60,8 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
         ImGui::Separator();
         ImGui::PopID();
     }
+
+    ImGui::Unindent();
     ImGui::PopID();
 }
 
@@ -96,14 +75,12 @@ void ImGuiWidgets::pointLightsEditor(Scene *scene)
 
         PointLight* light = static_cast<PointLight*>(scene->getLight(i, POINT_LIGHT_INDEX));
 
-        glm::vec3 tmpColor = light->getLightMaterial().color;
-        float tmpIntensity = light->getLightMaterial().intensity;
         float tmpRadius = light->getRadius();
         glm::vec3 tmpPosition = light->getPosition();
+        LightMaterial tmpLightMaterial = light->getLightMaterial();
 
-        if(lightMaterialEditor(tmpColor, tmpIntensity)) {
-            light->setColor(tmpColor);
-            light->setIntensity(tmpIntensity);
+        if(lightMaterialEditor(tmpLightMaterial)) {
+            light->setLightMaterial(tmpLightMaterial);
         }
 
         // TODO : Switch to separate block
@@ -133,13 +110,11 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
 
         DirectionalLight* light = static_cast<DirectionalLight*>(scene->getLight(i, DIR_LIGHT_INDEX));
 
-        glm::vec3 tmpColor = light->getLightMaterial().color;
-        float tmpIntensity = light->getLightMaterial().intensity;
         glm::vec3 tmpDirection = light->getDirection();
+        LightMaterial tmpLightMaterial = light->getLightMaterial();
 
-        if(lightMaterialEditor(tmpColor, tmpIntensity)) {
-            light->setColor(tmpColor);
-            light->setIntensity(tmpIntensity);
+        if(lightMaterialEditor(tmpLightMaterial)) {
+            light->setLightMaterial(tmpLightMaterial);
         }
 
         // TODO : Switch to separate block
@@ -165,15 +140,13 @@ void ImGuiWidgets::spotLightsEditor(Scene *scene)
 
         SpotLight* light = static_cast<SpotLight*>(scene->getLight(i, SPOT_LIGHT_INDEX));
 
-        glm::vec3 tmpColor = light->getLightMaterial().color;
-        float tmpIntensity = light->getLightMaterial().intensity;
         float tmpRadius = light->getRadius();
         glm::vec3 tmpPosition = light->getPosition();
         glm::vec3 tmpDirection = light->getDirection();
+        LightMaterial tmpLightMaterial = light->getLightMaterial();
 
-        if(lightMaterialEditor(tmpColor, tmpIntensity)) {
-            light->setColor(tmpColor);
-            light->setIntensity(tmpIntensity);
+        if(lightMaterialEditor(tmpLightMaterial)) {
+            light->setLightMaterial(tmpLightMaterial);
         }
 
         // TODO : Switch to separate block
