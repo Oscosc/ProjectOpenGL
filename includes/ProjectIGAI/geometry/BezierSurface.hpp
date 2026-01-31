@@ -69,4 +69,10 @@ protected:
      * 
      */
     void computeNormals();
+
+    /**
+     * @brief Compute UVs of each point discretized on the surface.
+     * 
+     */
+    void computeUVs();
 };

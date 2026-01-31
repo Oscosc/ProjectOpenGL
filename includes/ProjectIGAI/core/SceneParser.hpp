@@ -5,7 +5,7 @@
 
 using json = nlohmann::json;
 using vec3Array = std::vector<glm::vec3>;
-using vec3Grid = std::vector<std::vector<glm::vec3>>;
+using vec3Grid = std::vector<vec3Array>;
 
 struct Transform;
 struct Material;
