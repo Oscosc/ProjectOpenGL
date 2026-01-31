@@ -2,7 +2,8 @@
 
 #include <ProjectIGAI/core/Logger.hpp>
 
-BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, Material material) : Curve(transform, material)
+BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, std::string name, Material material)
+: Curve(transform, name, material)
 {
     this->m_controlPoints = controlPoints;
     this->m_controlPolygonVisibility = Curve::Visibility::LINES;

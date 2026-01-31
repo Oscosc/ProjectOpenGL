@@ -1,0 +1,97 @@
+{
+    "main_camera": {
+        "type": "camera",
+        "transform": {
+            "position": [0.0, 4.0, 10.0],
+            "rotation": [0.0, -15.0, -90.0],
+            "scale":    [1.0, 1.0, 1.0]
+        }
+    },
+
+    "top_light": {
+        "type": "dir light",
+        "transform": {
+            "position": [0.0, 0.0, 0.0],
+            "rotation": [-90.0, 0.0, 0.0],
+            "scale":    [0.0, 0.0, 0.0]
+        },
+        "material": {
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 1.0
+        }
+    },
+
+    "sphere": {
+        "type": "sphere",
+        "size": 1.0,
+        "transform": {
+            "position": [-3.0, 0.0, 0.0],
+            "rotation": [0.0, 0.0, 0.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [1.0, 1.0, 1.0],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "cube": {
+        "type": "mesh",
+        "file": "resources/objects/cube.obj",
+        "transform": {
+            "position": [0.0, 0.0, 0.0],
+            "rotation": [0.0, 0.0, 0.0],
+            "scale": [2.0, 2.0, 2.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [1.0, 1.0, 1.0],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        }
+    },
+
+    "surface": {
+        "type": "bezier surface",
+        "control points": [[
+                [0.0, 0.0, 0.0],
+                [0.33, 0.5, 0.0],
+                [0.66, -0.2, 0.0],
+                [1.0, 1.0, 0.0]
+            ],[
+                [0.0, 0.0, 0.33],
+                [0.33, 0.2, 0.33],
+                [0.66, 0.8, 0.33],
+                [1.0, 1.2, 0.33]
+            ],[
+                [0.0, 0.0, 0.66],
+                [0.33, -0.4, 0.66],
+                [0.66, 0.6, 0.66],
+                [1.0, 0.9, 0.66]
+            ],[
+                [0.0, 0.0, 1.0],
+                [0.33, 0.4, 1.0],
+                [0.66, 0.2, 1.0],
+                [1.0, 1.0, 1.0]
+        ]],
+        "transform": {
+            "position": [2.0, -1.0, 1.0],
+            "rotation": [0.0, 90.0, 0.0],
+            "scale": [2.0, 2.0, 2.0]
+        },
+        "material": {
+            "shader": "lighted",
+            "shader material": {
+                "color": [1.0, 1.0, 1.0],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        }
+    }
+}

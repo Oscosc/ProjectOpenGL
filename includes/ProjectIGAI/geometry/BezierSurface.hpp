@@ -35,7 +35,8 @@ public:
      * @param material material of the surface
      */
     BezierSurface(vec3Grid controlPoints,
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 
@@ -68,4 +69,10 @@ protected:
      * 
      */
     void computeNormals();
+
+    /**
+     * @brief Compute UVs of each point discretized on the surface.
+     * 
+     */
+    void computeUVs();
 };

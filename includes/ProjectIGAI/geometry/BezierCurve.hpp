@@ -43,7 +43,8 @@ public:
      * @param controlPoints Points de contrôle de la courbe de Bézier.
      */
     BezierCurve(vec3Array controlPoints,
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
+        Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
         Material material = DEFAULT_OBJECT_MATERIAL
     );
 

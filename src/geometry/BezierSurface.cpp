@@ -2,8 +2,8 @@
 
 #include <ProjectIGAI/geometry/Curve.hpp>
 
-BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, Material material) :
-    Surface(transform, material)
+BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, std::string name, Material material) :
+    Surface(transform, name, material)
 {
     this->m_controlPoints = controlPoints;
     this->m_sizeU = controlPoints.size();
@@ -22,6 +22,7 @@ BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, Materi
     this->m_vertices = defaultPointToVertex(points);
     computeNormals();
     computeIndexes();
+    computeUVs();
 
     initGLObject();
 }
@@ -82,20 +83,44 @@ void BezierSurface::draw(Scene* scene) const
 
 void BezierSurface::computeNormals() 
 {
+    // Normals reset (for safety)
+    for (auto& vertex : m_vertices) {
+        vertex.normal = glm::vec3(0.0f);
+    }
+
+    // Quads iterating
     for (size_t u = 0; u < NB_CURVE_POINTS - 1; ++u) {
         for (size_t v = 0; v < NB_CURVE_POINTS - 1; ++v) {
-            glm::vec3 Su = this->m_vertices[(u+1) * NB_CURVE_POINTS + v].position - this->m_vertices[u * NB_CURVE_POINTS + v].position;
-            glm::vec3 Sv = this->m_vertices[u * NB_CURVE_POINTS + (v+1)].position - this->m_vertices[u * NB_CURVE_POINTS + v].position;
+            
+            // Indexes
+            int i0 = u * NB_CURVE_POINTS + v;
+            int i1 = (u + 1) * NB_CURVE_POINTS + v;
+            int i2 = u * NB_CURVE_POINTS + (v + 1);
+            int i3 = (u + 1) * NB_CURVE_POINTS + (v + 1);
 
-            this->m_vertices[u * NB_CURVE_POINTS + v].normal = glm::normalize(glm::cross(Sv, Su));
+            // Positions
+            glm::vec3 p0 = m_vertices[i0].position;
+            glm::vec3 p1 = m_vertices[i1].position;
+            glm::vec3 p2 = m_vertices[i2].position;
+            glm::vec3 p3 = m_vertices[i3].position;
+
+            // Both triangles normals
+            glm::vec3 n1 = glm::cross(p1 - p0, p2 - p0);
+            glm::vec3 n2 = glm::cross(p3 - p1, p2 - p1);
+
+            // Accumulation
+            m_vertices[i0].normal += n1;
+            m_vertices[i1].normal += n1 + n2;
+            m_vertices[i2].normal += n1 + n2;
+            m_vertices[i3].normal += n2;
         }
     }
 
-    // Dernier point
-    glm::vec3 Su = this->m_vertices[(NB_CURVE_POINTS-2) * NB_CURVE_POINTS + (NB_CURVE_POINTS-1)].position - this->m_vertices[NB_CURVE_POINTS * NB_CURVE_POINTS - 1].position;
-    glm::vec3 Sv = this->m_vertices[NB_CURVE_POINTS * NB_CURVE_POINTS - 2].position - this->m_vertices[NB_CURVE_POINTS * NB_CURVE_POINTS - 1].position;
-    
-    this->m_vertices[NB_CURVE_POINTS * NB_CURVE_POINTS - 1].normal = glm::normalize(glm::cross(Sv, Su));
+    // Final normalization
+    for (auto& vertex : m_vertices) {
+        if (glm::length(vertex.normal) > 0.0f)
+            vertex.normal = glm::normalize(vertex.normal);
+    }
 }
 
 void BezierSurface::computeIndexes()
@@ -127,6 +152,17 @@ void BezierSurface::computeIndexes()
                 this->m_indexes.push_back((i+1) * NB_CURVE_POINTS + j);
                 this->m_indexes.push_back(i * NB_CURVE_POINTS + (j+1));
             }
+        }
+    }
+}
+
+void BezierSurface::computeUVs()
+{
+    int k = 0;
+    for(float i=0; i < NB_CURVE_POINTS; ++i) {
+        for(float j=0; j < NB_CURVE_POINTS; ++j) {
+            m_vertices[k].uv = {i/(NB_CURVE_POINTS-1), j/(NB_CURVE_POINTS-1)};
+            k++;
         }
     }
 }

@@ -5,12 +5,12 @@
 
 using json = nlohmann::json;
 using vec3Array = std::vector<glm::vec3>;
-using vec3Grid = std::vector<std::vector<glm::vec3>>;
+using vec3Grid = std::vector<vec3Array>;
 
 struct Transform;
 struct Material;
 struct ShaderMaterial;
-struct LightMaterial;
+struct LightProperties;
 
 /**
  * @brief Class containing parsing functions for scene files (.json)
@@ -67,7 +67,7 @@ public:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void addObjectToScene(Scene* scene, json item);
+    static void addObjectToScene(Scene* scene, json item, std::string name);
 
 private:
 
@@ -77,7 +77,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Camera(Scene* scene, json item);
+    static void parseObjectAs_Camera(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a mesh.
@@ -85,7 +85,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Mesh(Scene* scene, json item);
+    static void parseObjectAs_Mesh(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a sphere.
@@ -93,7 +93,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Sphere(Scene* scene, json item);
+    static void parseObjectAs_Sphere(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a point light.
@@ -101,7 +101,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_PointLight(Scene* scene, json item);
+    static void parseObjectAs_PointLight(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a directional light.
@@ -109,7 +109,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_DirectionalLight(Scene* scene, json item);
+    static void parseObjectAs_DirectionalLight(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a spot light.
@@ -117,7 +117,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_SpotLight(Scene* scene, json item);
+    static void parseObjectAs_SpotLight(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a bezier curve.
@@ -125,7 +125,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_BezierCurve(Scene* scene, json item);
+    static void parseObjectAs_BezierCurve(Scene* scene, json item, std::string name);
 
     /**
      * @brief Parse the object as a bezier surface.
@@ -133,7 +133,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_BezierSurface(Scene* scene, json item);
+    static void parseObjectAs_BezierSurface(Scene* scene, json item, std::string name);
 
     /**
      * @brief Auxiliary function for casting json element to glm::vec3.
@@ -177,7 +177,7 @@ private:
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static LightMaterial jsonToLightMaterial(json json);
+    static LightProperties jsonToLightMaterial(json json);
 
     /**
      * @brief Auxiliary function for casting json element to Vec3Array.

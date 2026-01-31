@@ -48,9 +48,9 @@ public:
      * @param material material used to render the Mesh in the application
      */
     Mesh(std::string file,
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
-        Material material = DEFAULT_OBJECT_MATERIAL
-    );
+        Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
+        Material material = DEFAULT_OBJECT_MATERIAL);
 
     /**
      * @brief Draw the mesh in the scene.

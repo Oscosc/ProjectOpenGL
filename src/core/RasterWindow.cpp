@@ -17,6 +17,7 @@ void RasterWindow::subClassRendering()
 {
     for(Object* object : m_scene->getAllObjects()) {
         object->draw(m_scene);
+        object->getMaterial().shader->setInt("renderingMode", m_renderingMode);
     }
 
     m_HUD->render();
@@ -35,6 +36,9 @@ void RasterWindow::drawImGuiFrame()
     ImGui::Begin("Project IGAI configuration");
 
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
+
+    const char* items[] = {"PBR", "Normals", "UVs"};
+    ImGui::Combo("Render mode", &m_renderingMode, items, IM_ARRAYSIZE(items));
 
     if (ImGui::CollapsingHeader("Scene"))
     {

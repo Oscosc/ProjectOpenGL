@@ -24,7 +24,7 @@ public:
      * @param transform transformation of the curve
      * @param material material of the curve
      */
-    Curve(Transform transform, Material material) : Object(transform, material) {}
+    Curve(Transform transform, std::string name, Material material) : Object(transform, name, material) {}
 
     /**
      * @brief Get the position of a point based on a curve value.

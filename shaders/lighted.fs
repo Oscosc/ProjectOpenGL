@@ -72,7 +72,17 @@ uniform Material material;  // Material of the fragment
     uniform SpotLight spotLights[NB_SPOT_LIGHTS];
 #endif
 
-uniform vec3 viewPos;
+uniform vec3 viewPos; // Camera position in the world space
+
+
+/* UNIFORMS FOR DEBUGGING */
+
+/**
+ * 0 = Standard mode (PBR)
+ * 1 = Normals mode
+ * 2 = UVs mode
+ */
+uniform int renderingMode;
 
 
 /*************************************************************************************************
@@ -147,36 +157,8 @@ vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float r
     return (diffuse + specular) * radiance * NdotL;
 }
 
-
-/*************************************************************************************************
- *                                    VARIOUS OTHER FUNCTIONS                                    *
- *************************************************************************************************/
-
-/**
- * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
- * Page 12 : Lighting Model
- */
-float WindowedAttenuation(float dist, float lightRadius)
-{
-    // Physical attenuation
-    float attenuation = 1.0 / (dist * dist);
-
-    // Windowed factor attenuation
-    float factor = dist / lightRadius;
-    float factor4 = factor * factor * factor * factor;
-    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
-    fallOff = fallOff * fallOff;
-
-    // Final product
-    return attenuation * fallOff;
-}
-
-
-/*************************************************************************************************
- *                                         MAIN SECTION                                          *
- *************************************************************************************************/
-
-void main()
+// Physically Based Rendering main function
+vec4 PBR()
 {
     vec3 V = normalize(viewPos - FragPos);
     vec3 N = normalize(Normal);
@@ -238,5 +220,52 @@ void main()
     // Gamma correction
     vec3 correctedGamma = pow(toneMapping, vec3(1.0 / 2.2));
 
-    FragColor = vec4(correctedGamma, 1.0);
+    return vec4(correctedGamma, 1.0);
+}
+
+
+/*************************************************************************************************
+ *                                    VARIOUS OTHER FUNCTIONS                                    *
+ *************************************************************************************************/
+
+/**
+ * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+ * Page 12 : Lighting Model
+ */
+float WindowedAttenuation(float dist, float lightRadius)
+{
+    // Physical attenuation
+    float attenuation = 1.0 / (dist * dist);
+
+    // Windowed factor attenuation
+    float factor = dist / lightRadius;
+    float factor4 = factor * factor * factor * factor;
+    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
+    fallOff = fallOff * fallOff;
+
+    // Final product
+    return attenuation * fallOff;
+}
+
+
+/*************************************************************************************************
+ *                                         MAIN SECTION                                          *
+ *************************************************************************************************/
+
+void main()
+{
+    switch (renderingMode)
+    {
+    case 0: // PBR
+        FragColor = PBR();
+        break;
+
+    case 1: // Normals
+        FragColor = vec4((normalize(Normal) + vec3(1.0)) * 0.5, 1.0);
+        break;
+
+    case 2: // UVs
+        FragColor = vec4(UV, 1.0);
+        break;
+    }
 }

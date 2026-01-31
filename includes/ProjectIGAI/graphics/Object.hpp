@@ -5,8 +5,8 @@
 #include <ProjectIGAI/graphics/ProjViewMatrix.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <ProjectIGAI/graphics/Node.hpp>
 
-#define DEFAULT_OBJECT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), 1.0f, 0.0f}}
 
 using vec3Array = std::vector<glm::vec3>;
@@ -81,19 +81,10 @@ struct Material {
 };
 
 /**
- * @brief Structure that contains informations about an object transformation.
- */
-struct Transform {
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::vec3 rotation;
-};
-
-/**
  * @brief This abstract class is defining any type of object that can be represented visualy in
  * a 3D world, with transformation and material.
  */
-class Object
+class Object : public Node
 {
 public:
 
@@ -104,9 +95,10 @@ public:
      * @param material material of the object used to render it
      */
     Object(
-        Transform transform = DEFAULT_OBJECT_TRANSFORM,
-        Material material = DEFAULT_OBJECT_MATERIAL
-    ) : m_transform(transform), m_material(material) {}
+        Transform transform = DEFAULT_TRANSFORM,
+        std::string name = DEFAULT_NAME,
+        Material material = DEFAULT_OBJECT_MATERIAL)
+    : Node(transform, name), m_material(material) {}
 
     /**
      * @brief Default destructor for object class.
@@ -131,18 +123,6 @@ public:
      * @param material new material
      */
     void setMaterial(Material material) { m_material = material; }
-
-    /**
-     * @brief Give the transformation state of this object.
-     */
-    Transform getTransform() const { return m_transform; }
-
-    /**
-     * @brief Set a new transformation for this object.
-     * 
-     * @param transform new transform
-     */
-    void setTransform(Transform transform) { m_transform = transform; }
 
     /**
      * @brief Print debug informations of the material in console.
@@ -173,8 +153,7 @@ protected:
      */
     void updateMaterial(Shader* shader) const;
 
-    /** Transform and material of the object */
-    Transform m_transform;
+    /** Material of the object */
     Material m_material;
 
     /** Various buffers for OpenGL */
