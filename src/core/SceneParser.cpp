@@ -17,14 +17,14 @@ std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieve
     std::unordered_map<ElementType, unsigned int> sceneCounts;
 
     for(auto& item : data) {
-        if(item["type"] == nullptr) {
+        if(item.at("type") == nullptr) {
             Logger::logError("Scene object must have a 'type' defined");
             exit(1);
         }
 
-        auto it = s_TypeAliases.find(item["type"]);
+        auto it = s_TypeAliases.find(item.at("type"));
         if(it == s_TypeAliases.end()) {
-            Logger::logError("Type " + (std::string)item["type"] + " does not exist");
+            Logger::logError("Type " + (std::string)item.at("type") + " does not exist");
             exit(1);
         }
 
@@ -63,16 +63,16 @@ Scene SceneParser::parseScene(const json& data)
     return newScene;
 }
 
-void SceneParser::addObjectToScene(Scene *scene, json item, std::string name)
+void SceneParser::addObjectToScene(Scene *scene, const json& item, std::string name)
 {
-    if(item["type"] == nullptr) {
+    if(item.at("type") == nullptr) {
         Logger::logError("Scene object must have a 'type' defined");
         exit(1);
     }
 
-    auto it = s_TypeAliases.find(item["type"]);
+    auto it = s_TypeAliases.find(item.at("type"));
     if(it == s_TypeAliases.end()) {
-        Logger::logError("Type " + (std::string)item["type"] + " does not exist");
+        Logger::logError("Type " + (std::string)item.at("type") + " does not exist");
         exit(1);
     }
     
@@ -112,12 +112,12 @@ void SceneParser::addObjectToScene(Scene *scene, json item, std::string name)
     }
 }
 
-void SceneParser::parseObjectAs_Camera(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_Camera(Scene *scene, const json& item, std::string name)
 {
     /* Roll(x), Pitch(y), Yaw(z)
      * Roll is fixed (no camera roll), up vector is (0, 1, 0)
      */
-    Transform transform = jsonToTransform(item["transform"]);
+    Transform transform = jsonToTransform(item.at("transform"));
     scene->addCamera(new Camera(
         transform.position,
         glm::vec3(0.f, 1.f, 0.f),
@@ -126,10 +126,10 @@ void SceneParser::parseObjectAs_Camera(Scene *scene, json item, std::string name
     ));
 }
 
-void SceneParser::parseObjectAs_Mesh(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_Mesh(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
-    std::string file = item["file"];
+    std::string file = item.at("file");
     Mesh* mesh = new Mesh(file);
 
     // Global object configuration
@@ -139,7 +139,7 @@ void SceneParser::parseObjectAs_Mesh(Scene *scene, json item, std::string name)
     scene->addObject(mesh);
 }
 
-void SceneParser::parseObjectAs_Sphere(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_Sphere(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     float size = jsonToFloat(item, "size");
@@ -149,14 +149,14 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, json item, std::string name
     configureObject(sphere, item);
 
     // Specific class configuration
-    if(item["ray-tracing.type"] != nullptr)
-        sphere->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
+    if(item.contains("ray-tracing.type"))
+        sphere->Type = Hittable::HitTypeCatalog.at(item.at("ray-tracing.type"));
 
     // Adding to scene
     scene->addObject(sphere);
 }
 
-void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_BezierCurve(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     vec3Array controlPoints = jsonToVec3Array(item, "control points");
@@ -169,7 +169,7 @@ void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item, std::string
     scene->addObject(bezierCurve);
 }
 
-void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_BezierSurface(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     vec3Grid controlPoints = jsonToVec3Grid(item, "control points");
@@ -182,7 +182,7 @@ void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item, std::stri
     scene->addObject(bezierSurface);
 }
 
-void SceneParser::parseObjectAs_PointLight(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_PointLight(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     PointLight* pointLight = new PointLight();
@@ -191,13 +191,13 @@ void SceneParser::parseObjectAs_PointLight(Scene *scene, json item, std::string 
     configureLight(pointLight, item);
 
     // Specific class configuration
-    if(item["radius"] != nullptr) pointLight->setRadius(jsonToFloat(item, "radius"));
+    if(item.contains("radius")) pointLight->setRadius(jsonToFloat(item, "radius"));
 
     // Adding to scene
     scene->addLight(pointLight);
 }
 
-void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     DirectionalLight* dirLight = new DirectionalLight();
@@ -209,7 +209,7 @@ void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item, std::s
     scene->addLight(dirLight);
 }
 
-void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item, std::string name)
+void SceneParser::parseObjectAs_SpotLight(Scene *scene, const json& item, std::string name)
 {
     // Base class construction
     SpotLight* spotLight = new SpotLight();
@@ -218,40 +218,42 @@ void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item, std::string n
     configureLight(spotLight, item);
 
     // Specific class configuration
-    if(item["radius"]      != nullptr) spotLight->setRadius(jsonToFloat(item, "radius"));
-    if(item["cutOff"]      != nullptr) spotLight->setCutOff(glm::cos(glm::radians(jsonToFloat(item, "cutOff"))));
-    if(item["outerCutOff"] != nullptr) spotLight->setOuterCutOff(glm::cos(glm::radians(jsonToFloat(item, "outerCutOff"))));
+    if(item.contains("radius"))      spotLight->setRadius(jsonToFloat(item, "radius"));
+    if(item.contains("cutOff"))      spotLight->setCutOff(glm::cos(glm::radians(jsonToFloat(item, "cutOff"))));
+    if(item.contains("outerCutOff")) spotLight->setOuterCutOff(glm::cos(glm::radians(jsonToFloat(item, "outerCutOff"))));
 
     // Adding to scene
     scene->addLight(spotLight);
 }
 
-void SceneParser::configureObject(Object* object, json item)
+void SceneParser::configureObject(Object* object, const json& item)
 {
-    if(item["transform"] != nullptr) object->setTransform(jsonToTransform(item["transform"]));
-    if(item["material"]  != nullptr) object->setMaterial(jsonToMaterial(item["material"]));
-    if(item["texture"]   != nullptr) object->addTexture(item["texture"]);
+    if(item.contains("transform")) object->setTransform(jsonToTransform(item.at("transform")));
+    if(item.contains("material")) object->setMaterial(jsonToMaterial(item.at("material")));
+    if(item.contains("texture")) object->addTexture(item.at("texture"));
 }
 
-void SceneParser::configureLight(Light* light, json item)
+void SceneParser::configureLight(Light* light, const json& item)
 {
-    if(item["transform"] != nullptr) light->setTransform(jsonToTransform(item["transform"]));
-    if(item["material"]  != nullptr) light->setLightMaterial(jsonToLightProperties(item["material"]));
+    if(item.contains("transform")) light->setTransform(jsonToTransform(item.at("transform")));
+    if(item.contains("material")) light->setLightMaterial(jsonToLightProperties(item.at("material")));
 }
 
-glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
+glm::vec3 SceneParser::jsonToVec3(const json& json, const std::string &attribute)
 {
-    std::vector<float> value = static_cast<std::vector<float>>(json[attribute]);
-    return glm::vec3(value[0], value[1], value[2]);
+    return glm::vec3(
+        json.at(attribute)[0].get<float>(),
+        json.at(attribute)[1].get<float>(),
+        json.at(attribute)[2].get<float>()
+    );
 }
 
-float SceneParser::jsonToFloat(json json, const std::string &attribute)
+float SceneParser::jsonToFloat(const json& json, const std::string &attribute)
 {
-    float value = static_cast<float>(json[attribute]);
-    return value;
+    return json.at(attribute).get<float>();
 }
 
-Transform SceneParser::jsonToTransform(json json)
+Transform SceneParser::jsonToTransform(const json& json)
 {
     return {
         jsonToVec3(json, "position"),
@@ -260,15 +262,15 @@ Transform SceneParser::jsonToTransform(json json)
     };
 }
 
-Material SceneParser::jsonToMaterial(json json)
+Material SceneParser::jsonToMaterial(const json& json)
 {
     return {
-        ShaderManager::getInstance().getShader(json["shader"]),
-        jsonToShaderMaterial(json["shader material"])
+        ShaderManager::getInstance().getShader(json.at("shader")),
+        jsonToShaderMaterial(json.at("shader material"))
     };
 }
 
-ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
+ShaderMaterial SceneParser::jsonToShaderMaterial(const json& json)
 {
     return {
         jsonToVec3(json, "color"),
@@ -277,7 +279,7 @@ ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
     };
 }
 
-LightProperties SceneParser::jsonToLightProperties(json json)
+LightProperties SceneParser::jsonToLightProperties(const json& json)
 {
     return {
         jsonToVec3(json, "color"),
@@ -285,7 +287,7 @@ LightProperties SceneParser::jsonToLightProperties(json json)
     };
 }
 
-vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
+vec3Array SceneParser::jsonToVec3Array(const json& json, const std::string &attribute)
 {
     vec3Array value;
     for(const auto& item : json[attribute]) {
@@ -295,7 +297,7 @@ vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
     return value;
 }
 
-vec3Grid SceneParser::jsonToVec3Grid(json json, const std::string &attribute)
+vec3Grid SceneParser::jsonToVec3Grid(const json& json, const std::string &attribute)
 {
     vec3Grid value;
     unsigned int i = 0;

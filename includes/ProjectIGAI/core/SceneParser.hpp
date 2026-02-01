@@ -67,7 +67,7 @@ public:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void addObjectToScene(Scene* scene, json item, std::string name);
+    static void addObjectToScene(Scene* scene, const json& item, std::string name);
 
 private:
 
@@ -77,7 +77,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Camera(Scene* scene, json item, std::string name);
+    static void parseObjectAs_Camera(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a mesh.
@@ -85,7 +85,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Mesh(Scene* scene, json item, std::string name);
+    static void parseObjectAs_Mesh(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a sphere.
@@ -93,7 +93,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Sphere(Scene* scene, json item, std::string name);
+    static void parseObjectAs_Sphere(Scene* scene, const json& item, std::string name);
 
         /**
      * @brief Parse the object as a bezier curve.
@@ -101,7 +101,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_BezierCurve(Scene* scene, json item, std::string name);
+    static void parseObjectAs_BezierCurve(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a bezier surface.
@@ -109,7 +109,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_BezierSurface(Scene* scene, json item, std::string name);
+    static void parseObjectAs_BezierSurface(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a point light.
@@ -117,7 +117,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_PointLight(Scene* scene, json item, std::string name);
+    static void parseObjectAs_PointLight(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a directional light.
@@ -125,7 +125,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_DirectionalLight(Scene* scene, json item, std::string name);
+    static void parseObjectAs_DirectionalLight(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief Parse the object as a spot light.
@@ -133,7 +133,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_SpotLight(Scene* scene, json item, std::string name);
+    static void parseObjectAs_SpotLight(Scene* scene, const json& item, std::string name);
 
     /**
      * @brief 
@@ -141,7 +141,7 @@ private:
      * @param object 
      * @param item 
      */
-    static void configureObject(Object* object, json item);
+    static void configureObject(Object* object, const json& item);
 
     /**
      * @brief 
@@ -149,7 +149,7 @@ private:
      * @param light 
      * @param item 
      */
-    static void configureLight(Light* light, json item);
+    static void configureLight(Light* light, const json& item);
 
     /**
      * @brief Auxiliary function for casting json element to glm::vec3.
@@ -157,7 +157,7 @@ private:
      * @param json JSON hierarchy containing the attribute
      * @param attribute name of the attribute to convert
      */
-    static glm::vec3 jsonToVec3(json json, const std::string& attribute);
+    static glm::vec3 jsonToVec3(const json& json, const std::string& attribute);
 
     /**
      * @brief Auxiliary function for casting json element to float.
@@ -165,35 +165,35 @@ private:
      * @param json JSON hierarchy containing the attribute
      * @param attribute name of the attribute to convert
      */
-    static float jsonToFloat(json json, const std::string& attribute);
+    static float jsonToFloat(const json& json, const std::string& attribute);
 
     /**
      * @brief Auxiliary function for casting json element to Transform.
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static Transform jsonToTransform(json json);
+    static Transform jsonToTransform(const json& json);
 
     /**
      * @brief Auxiliary function for casting json element to Material.
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static Material jsonToMaterial(json json);
+    static Material jsonToMaterial(const json& json);
 
     /**
      * @brief Auxiliary function for casting json element to ShaderMaterial.
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static ShaderMaterial jsonToShaderMaterial(json json);
+    static ShaderMaterial jsonToShaderMaterial(const json& json);
 
     /**
      * @brief Auxiliary function for casting json element to LightMaterial.
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static LightProperties jsonToLightProperties(json json);
+    static LightProperties jsonToLightProperties(const json& json);
 
     /**
      * @brief Auxiliary function for casting json element to Vec3Array.
@@ -201,7 +201,7 @@ private:
      * @param json JSON hierarchy containing the attribute
      * @param attribute name of the attribute to convert
      */
-    static vec3Array jsonToVec3Array(json json, const std::string& attribute);
+    static vec3Array jsonToVec3Array(const json& json, const std::string& attribute);
 
     /**
      * @brief Auxiliary function for casting json element to Vec3Grid.
@@ -209,5 +209,5 @@ private:
      * @param json JSON hierarchy containing the attribute
      * @param attribute name of the attribute to convert
      */
-    static vec3Grid jsonToVec3Grid(json json, const std::string& attribute);
+    static vec3Grid jsonToVec3Grid(const json& json, const std::string &attribute);
 };
