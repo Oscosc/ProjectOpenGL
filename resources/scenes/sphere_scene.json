@@ -29,10 +29,11 @@
             "rotation": [0.0, 0.0, 0.0],
             "scale": [1.0, 1.0, 1.0]
         },
+        "texture": "ceres",
         "material": {
             "shader": "lighted",
             "shader material": {
-                "color": [0.73, 0.0, 0.0],
+                "color": [0.73, 0.1, 0.0],
                 "roughness": 0.5,
                 "metallic": 0.0
             }

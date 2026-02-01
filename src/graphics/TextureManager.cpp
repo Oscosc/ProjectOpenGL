@@ -34,12 +34,12 @@ void TextureManager::loadTexture(const std::string& name, const std::string text
     stbi_image_free(data);
 }
 
-const unsigned int* TextureManager::getTexture(const std::string& name) const
+unsigned int TextureManager::getTexture(const std::string& name) const
 {
     auto it = this->m_textures.find(name);
     if(it != m_textures.end()) {
-        return &it->second;
+        return it->second;
     }
     Logger::logWarning("Texture '" + name + "' not found");
-    return nullptr;
+    return 0; // Default texture for OpenGL
 }

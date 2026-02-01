@@ -74,9 +74,9 @@ void Application::initGLComponents()
     glViewport(0, 0, this->m_screenWidth, this->m_screenHeight);
 }
 
-void Application::initShaders(const std::string& sceneFile)
+void Application::initShaders(const json& scene)
 {
-    auto sceneCount = SceneParser::retrieveSceneCounts(sceneFile);
+    auto sceneCount = SceneParser::retrieveSceneCounts(scene);
     unsigned int pointLights = sceneCount[SceneParser::POINT_LIGHT];
     unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
     unsigned int spotLights = sceneCount[SceneParser::SPOT_LIGHT];
@@ -91,16 +91,16 @@ void Application::initShaders(const std::string& sceneFile)
     ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
 
 #ifdef LOAD_TEXTURES_ON
-    TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
-    TextureManager::getInstance().loadTexture("ceres", "resources/4k_ceres.jpg");
-    TextureManager::getInstance().loadTexture("metal", "resources/4k_metal.jpg");
+    TextureManager::getInstance().loadTexture("earth", "resources/textures/8k_earth.jpg");
+    TextureManager::getInstance().loadTexture("ceres", "resources/textures/4k_ceres.jpg");
+    TextureManager::getInstance().loadTexture("metal", "resources/textures/4k_metal.jpg");
 #endif
 }
 
-void Application::initScene(const std::string& file)
+void Application::initScene(const json& scene)
 {
     // Loading scene
-    this->m_scene = new Scene(SceneParser::parseScene(file));
+    this->m_scene = new Scene(SceneParser::parseScene(scene));
 
     // Associating scene to main window
     this->getMainWindow()->setSceneRef(m_scene);
@@ -147,10 +147,13 @@ void Application::run(const std::string& sceneFile)
     initGLComponents();
     Logger::logInfo("OpenGL/GLAD components correctly loaded");
 
-    initShaders(sceneFile);
+    std::ifstream stream(sceneFile);
+    const json scene = json::parse(stream);
+
+    initShaders(scene);
     Logger::logInfo("Shaders correctly loaded and computed");
 
-    initScene(sceneFile);
+    initScene(scene);
     Logger::logInfo("Scene correctly loaded");
 
     postInitComponents();

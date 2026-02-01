@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <extern/json.hpp>
 
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/core/BaseWindow.hpp>
@@ -16,7 +17,7 @@
 #define DEFAULT_SCREEN_HEIGHT 600
 
 #define MAX_WINDOWS 2
-// #define LOAD_TEXTURES_ON
+#define LOAD_TEXTURES_ON
 
 class BaseWindow; // For includes error
 
@@ -73,7 +74,7 @@ public:
      * 
      * TODO : Load shader based on a shader config file
      */
-    void initShaders(const std::string& sceneFile);
+    void initShaders(const nlohmann::json& scene);
 
     /**
      * @brief Read scene file to construct scene. Scene files structure is
@@ -81,7 +82,7 @@ public:
      * 
      * @param file relative path from executable to the scene file to load
      */
-    void initScene(const std::string& file);
+    void initScene(const nlohmann::json& scene);
 
     /**
      * @brief Call post init processes of the main window. This function alow, for example, to

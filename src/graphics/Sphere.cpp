@@ -59,6 +59,8 @@ void Sphere::draw(Scene* scene) const
 
     scene->updateLigth(shader);
 
+    bindTexture(shader);
+
     glBindVertexArray(this->m_VAO);
     glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
 

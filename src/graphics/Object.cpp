@@ -1,5 +1,7 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 
+#include <ProjectIGAI/core/Logger.hpp>
+
 void Object::debugMaterial() const
 {
     std::cout << "  |- Color     : " << glm::to_string(getMaterial().matShader.color) << std::endl;
@@ -17,6 +19,22 @@ glm::mat4 Object::getModelMatrix() const
     model = glm::scale(model, this->m_transform.scale);
 
     return model;
+}
+
+void Object::addTexture(std::string name)
+{
+    m_texture = TextureManager::getInstance().getTexture(name);
+    if(m_texture)
+        m_hasTexture = true;
+}
+
+void Object::bindTexture(Shader* shader) const
+{
+    if(!m_hasTexture) return;
+
+    shader->setInt("objectTexture", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
 void Object::initGLObject()

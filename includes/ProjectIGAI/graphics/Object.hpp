@@ -137,6 +137,14 @@ public:
      */
     glm::mat4 getModelMatrix() const;
 
+    void addTexture(std::string name);
+    
+    /**
+     * @brief If this object has a texture, bind it with the shader.
+     * 
+     */
+    void bindTexture(Shader* shader) const;
+
 protected:
 
     /**
@@ -166,4 +174,7 @@ protected:
     bool m_hasUVs;
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indexes;
+
+    bool m_hasTexture = false;
+    unsigned int m_texture;
 };

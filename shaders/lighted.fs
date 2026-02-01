@@ -53,8 +53,9 @@ out vec4 FragColor;         // Visible color of the fragment after computation
 
 in vec3 FragPos;            // World's position of the fragment
 in vec3 Normal;             // Normal of the fragment
-in vec3 UV;                 // UV value of the fragment (for textures)
+in vec2 UV;                 // UV value of the fragment (for textures)
 
+uniform sampler2D objectTexture;  // Optional texture
 uniform Material material;  // Material of the fragment
 
 #if NB_POINT_LIGHTS > 0
@@ -81,9 +82,33 @@ uniform vec3 viewPos; // Camera position in the world space
  * 0 = Standard mode (PBR)
  * 1 = Normals mode
  * 2 = UVs mode
+ * 3 = Texture only
  */
 uniform int renderingMode;
 
+
+/*************************************************************************************************
+ *                                    VARIOUS OTHER FUNCTIONS                                    *
+ *************************************************************************************************/
+
+/**
+ * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+ * Page 12 : Lighting Model
+ */
+float WindowedAttenuation(float dist, float lightRadius)
+{
+    // Physical attenuation
+    float attenuation = 1.0 / (dist * dist);
+
+    // Windowed factor attenuation
+    float factor = dist / lightRadius;
+    float factor4 = factor * factor * factor * factor;
+    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
+    fallOff = fallOff * fallOff;
+
+    // Final product
+    return attenuation * fallOff;
+}
 
 /*************************************************************************************************
  *                               BRDF/MICROFACETS FUNCTIONS SECTION                              *
@@ -225,30 +250,6 @@ vec4 PBR()
 
 
 /*************************************************************************************************
- *                                    VARIOUS OTHER FUNCTIONS                                    *
- *************************************************************************************************/
-
-/**
- * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
- * Page 12 : Lighting Model
- */
-float WindowedAttenuation(float dist, float lightRadius)
-{
-    // Physical attenuation
-    float attenuation = 1.0 / (dist * dist);
-
-    // Windowed factor attenuation
-    float factor = dist / lightRadius;
-    float factor4 = factor * factor * factor * factor;
-    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
-    fallOff = fallOff * fallOff;
-
-    // Final product
-    return attenuation * fallOff;
-}
-
-
-/*************************************************************************************************
  *                                         MAIN SECTION                                          *
  *************************************************************************************************/
 
@@ -257,7 +258,7 @@ void main()
     switch (renderingMode)
     {
     case 0: // PBR
-        FragColor = PBR();
+        FragColor = PBR() * texture(objectTexture, UV);
         break;
 
     case 1: // Normals
@@ -265,7 +266,10 @@ void main()
         break;
 
     case 2: // UVs
-        FragColor = vec4(UV, 1.0);
+        FragColor = vec4(UV, 0.0, 1.0);
         break;
+    
+    case 3: // Texture only
+        FragColor = texture(objectTexture, UV);
     }
 }

@@ -52,14 +52,14 @@ public:
      * @param file path to the JSON scene file
      * @return count of each object stored in a map
      */
-    static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const std::string& file);
+    static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const json& data);
 
     /**
      * @brief Main function for parsing a Scene file (.json)
      * 
      * @param file path to the JSON scene file
      */
-    static Scene parseScene(const std::string& file);
+    static Scene parseScene(const json& data);
 
     /**
      * @brief Global function for adding a new element (all types) in the scene.
@@ -95,6 +95,22 @@ private:
      */
     static void parseObjectAs_Sphere(Scene* scene, json item, std::string name);
 
+        /**
+     * @brief Parse the object as a bezier curve.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_BezierCurve(Scene* scene, json item, std::string name);
+
+    /**
+     * @brief Parse the object as a bezier surface.
+     * 
+     * @param scene Scene where element will be added
+     * @param item JSON sub-object that contain the element informations.
+     */
+    static void parseObjectAs_BezierSurface(Scene* scene, json item, std::string name);
+
     /**
      * @brief Parse the object as a point light.
      * 
@@ -120,20 +136,20 @@ private:
     static void parseObjectAs_SpotLight(Scene* scene, json item, std::string name);
 
     /**
-     * @brief Parse the object as a bezier curve.
+     * @brief 
      * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
+     * @param object 
+     * @param item 
      */
-    static void parseObjectAs_BezierCurve(Scene* scene, json item, std::string name);
+    static void configureObject(Object* object, json item);
 
     /**
-     * @brief Parse the object as a bezier surface.
+     * @brief 
      * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
+     * @param light 
+     * @param item 
      */
-    static void parseObjectAs_BezierSurface(Scene* scene, json item, std::string name);
+    static void configureLight(Light* light, json item);
 
     /**
      * @brief Auxiliary function for casting json element to glm::vec3.
@@ -177,7 +193,7 @@ private:
      * 
      * @param json JSON hierarchy containing the attribute
      */
-    static LightProperties jsonToLightMaterial(json json);
+    static LightProperties jsonToLightProperties(json json);
 
     /**
      * @brief Auxiliary function for casting json element to Vec3Array.

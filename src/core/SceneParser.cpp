@@ -12,11 +12,8 @@
 #include <ProjectIGAI/geometry/BezierSurface.hpp>
 #include <ProjectIGAI/core/utils.hpp>
 
-std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
+std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const json& data)
 {
-    std::ifstream stream(file);
-    json data = json::parse(stream);
-
     std::unordered_map<ElementType, unsigned int> sceneCounts;
 
     for(auto& item : data) {
@@ -35,15 +32,11 @@ std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieve
         (sceneCounts.find(type) == sceneCounts.end()) ? sceneCounts[type] = 1 : sceneCounts[type]++;
     }
 
-    // for(auto item : sceneCounts) std::cout << item.second << " occurences of " << item.first << std::endl;
     return sceneCounts;
 }
 
-Scene SceneParser::parseScene(const std::string &file)
+Scene SceneParser::parseScene(const json& data)
 {
-    std::ifstream stream(file);
-    json data = json::parse(stream);
-
     Scene newScene;
 
     for(auto& [objectName, item] : data.items()) {
@@ -135,100 +128,115 @@ void SceneParser::parseObjectAs_Camera(Scene *scene, json item, std::string name
 
 void SceneParser::parseObjectAs_Mesh(Scene *scene, json item, std::string name)
 {
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), name, jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), name));
-        }
-    } else {
-        scene->addObject(new Mesh(item["file"]));
-    }
+    // Base class construction
+    std::string file = item["file"];
+    Mesh* mesh = new Mesh(file);
+
+    // Global object configuration
+    configureObject(mesh, item);
+
+    // Adding to scene
+    scene->addObject(mesh);
 }
 
 void SceneParser::parseObjectAs_Sphere(Scene *scene, json item, std::string name)
 {
+    // Base class construction
     float size = jsonToFloat(item, "size");
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), name, jsonToMaterial(item["material"])));
-            if(item["ray-tracing.type"] != nullptr) {
-                Sphere* last = dynamic_cast<Sphere*>(scene->getObject(scene->objectsCount() - 1));
-                last->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
-            }
-        } else {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), name));
-        }
-    } else {
-        scene->addObject(new Sphere(size));
-    }
-}
+    Sphere* sphere = new Sphere(size);
 
-void SceneParser::parseObjectAs_PointLight(Scene *scene, json item, std::string name)
-{
-    float radius = jsonToFloat(item, "radius");
-    if(item["material"] != nullptr) {
-        scene->addLight(new PointLight(jsonToTransform(item["transform"]), name,
-            jsonToLightMaterial(item["material"]), radius));
-    } else {
-        scene->addLight(new PointLight(jsonToTransform(item["transform"]), name));
-    }
-}
+    // Global object configuration
+    configureObject(sphere, item);
 
-void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item, std::string name)
-{
-    if(item["material"] != nullptr) {
-        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), name,
-            jsonToLightMaterial(item["material"])));
-    } else {
-        scene->addLight(new DirectionalLight(jsonToTransform(item["transform"]), name));
-    }
-}
+    // Specific class configuration
+    if(item["ray-tracing.type"] != nullptr)
+        sphere->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
 
-void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item, std::string name)
-{
-    float radius = jsonToFloat(item, "radius");
-    float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
-    float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
-
-    if(item["material"] != nullptr) {
-        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), name,
-            jsonToLightMaterial(item["material"]), radius, cutOff, outerCutOff));
-    } else {
-        scene->addLight(new SpotLight(jsonToTransform(item["transform"]), name));
-    }
+    // Adding to scene
+    scene->addObject(sphere);
 }
 
 void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item, std::string name)
 {
+    // Base class construction
     vec3Array controlPoints = jsonToVec3Array(item, "control points");
+    BezierCurve* bezierCurve = new BezierCurve(controlPoints);
 
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), name,
-                jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), name));
-        }
-    } else {
-        scene->addObject(new BezierCurve(controlPoints));
-    }
+    // Global object configuration
+    configureObject(bezierCurve, item);
+
+    // Adding to scene
+    scene->addObject(bezierCurve);
 }
 
 void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item, std::string name)
 {
+    // Base class construction
     vec3Grid controlPoints = jsonToVec3Grid(item, "control points");
+    BezierSurface* bezierSurface = new BezierSurface(controlPoints);
 
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), name,
-                jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), name));
-        }
-    } else {
-        scene->addObject(new BezierSurface(controlPoints));
-    }
+    // Global object configuration
+    configureObject(bezierSurface, item);
+
+    // Adding to scene
+    scene->addObject(bezierSurface);
+}
+
+void SceneParser::parseObjectAs_PointLight(Scene *scene, json item, std::string name)
+{
+    // Base class construction
+    PointLight* pointLight = new PointLight();
+
+    // Global object configuration
+    configureLight(pointLight, item);
+
+    // Specific class configuration
+    if(item["radius"] != nullptr) pointLight->setRadius(jsonToFloat(item, "radius"));
+
+    // Adding to scene
+    scene->addLight(pointLight);
+}
+
+void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item, std::string name)
+{
+    // Base class construction
+    DirectionalLight* dirLight = new DirectionalLight();
+
+    // Global object configuration
+    configureLight(dirLight, item);
+
+    // Adding to scene
+    scene->addLight(dirLight);
+}
+
+void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item, std::string name)
+{
+    // Base class construction
+    SpotLight* spotLight = new SpotLight();
+
+    // Global object configuration
+    configureLight(spotLight, item);
+
+    // Specific class configuration
+    if(item["radius"]      != nullptr) spotLight->setRadius(jsonToFloat(item, "radius"));
+    if(item["cutOff"]      != nullptr) spotLight->setCutOff(glm::cos(glm::radians(jsonToFloat(item, "cutOff"))));
+    if(item["outerCutOff"] != nullptr) spotLight->setOuterCutOff(glm::cos(glm::radians(jsonToFloat(item, "outerCutOff"))));
+
+    // Adding to scene
+    scene->addLight(spotLight);
+}
+
+void SceneParser::configureObject(Object* object, json item)
+{
+    if(item["transform"] != nullptr) object->setTransform(jsonToTransform(item["transform"]));
+    if(item["material"]  != nullptr) object->setMaterial(jsonToMaterial(item["material"]));
+    if(item["texture"]   != nullptr) object->addTexture(item["texture"]);
+}
+
+void SceneParser::configureLight(Light* light, json item)
+{
+    if(item["transform"] != nullptr) light->setTransform(jsonToTransform(item["transform"]));
+    if(item["material"]  != nullptr) light->setLightMaterial(jsonToLightProperties(item["material"]));
 }
 
 glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
@@ -269,7 +277,7 @@ ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
     };
 }
 
-LightProperties SceneParser::jsonToLightMaterial(json json)
+LightProperties SceneParser::jsonToLightProperties(json json)
 {
     return {
         jsonToVec3(json, "color"),

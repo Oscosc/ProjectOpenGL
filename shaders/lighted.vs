@@ -1,11 +1,11 @@
 #version 460 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec3 aUV;
+layout (location = 2) in vec2 aUV;
 
 out vec3 FragPos; // Fragment position
 out vec3 Normal; // Normal value
-out vec3 UV; // UV Map (only Bezier Curve)
+out vec2 UV; // UV Map
 
 uniform mat4 model;
 uniform mat4 view;

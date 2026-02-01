@@ -27,7 +27,7 @@ public:
      * @param name name of the texture
      * @return pointer to the texture object
      */
-    const unsigned int* getTexture(const std::string& name) const;
+    unsigned int getTexture(const std::string& name) const;
 
 private:
 
