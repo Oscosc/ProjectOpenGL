@@ -43,3 +43,19 @@ unsigned int TextureManager::getTexture(const std::string& name) const
     Logger::logWarning("Texture '" + name + "' not found");
     return 0; // Default texture for OpenGL
 }
+
+unsigned int TextureManager::createDefaultTexture()
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    unsigned char white[] = { 255, 255, 255, 255 };
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    return textureID;
+}

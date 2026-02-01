@@ -29,11 +29,20 @@ public:
      */
     unsigned int getTexture(const std::string& name) const;
 
+    /**
+     * @brief Get the Default white texture
+     */
+    unsigned int getDefaultTexture() { return m_defaultTexture; }
+
 private:
 
     /** Texture manager constructor (private for Singleton) */
     TextureManager() = default;
 
+    unsigned int createDefaultTexture();
+
     /** textures map */
     std::unordered_map<std::string, unsigned int> m_textures;
+
+    unsigned int m_defaultTexture = createDefaultTexture();
 };

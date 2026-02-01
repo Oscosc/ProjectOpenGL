@@ -257,7 +257,7 @@ void main()
 {
     switch (renderingMode)
     {
-    case 0: // PBR
+    case 0: // PBR + texture
         FragColor = PBR() * texture(objectTexture, UV);
         break;
 
@@ -269,7 +269,12 @@ void main()
         FragColor = vec4(UV, 0.0, 1.0);
         break;
     
-    case 3: // Texture only
+    case 3: // PBR only
+        FragColor = PBR();
+        break;
+
+    case 4: // Texture only
         FragColor = texture(objectTexture, UV);
+        break;
     }
 }

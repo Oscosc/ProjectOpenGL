@@ -29,6 +29,7 @@
             "rotation": [0.0, 0.0, 0.0],
             "scale": [1.0, 1.0, 1.0]
         },
+        "texture": "earth",
         "material": {
             "shader": "lighted",
             "shader material": {
@@ -47,6 +48,7 @@
             "rotation": [0.0, 0.0, 0.0],
             "scale": [2.0, 2.0, 2.0]
         },
+        "texture": "ceres",
         "material": {
             "shader": "lighted",
             "shader material": {
@@ -85,6 +87,7 @@
             "rotation": [0.0, 90.0, 0.0],
             "scale": [2.0, 2.0, 2.0]
         },
+        "texture": "metal",
         "material": {
             "shader": "lighted",
             "shader material": {

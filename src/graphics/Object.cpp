@@ -30,11 +30,14 @@ void Object::addTexture(std::string name)
 
 void Object::bindTexture(Shader* shader) const
 {
-    if(!m_hasTexture) return;
-
     shader->setInt("objectTexture", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+
+    if(m_hasTexture)
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+    
+    else
+        glBindTexture(GL_TEXTURE_2D, TextureManager::getInstance().getDefaultTexture());
 }
 
 void Object::initGLObject()

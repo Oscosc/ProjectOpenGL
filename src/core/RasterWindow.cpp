@@ -37,7 +37,7 @@ void RasterWindow::drawImGuiFrame()
 
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
 
-    const char* items[] = {"PBR", "Normals", "UVs", "Texture"};
+    const char* items[] = {"PBR & Texture", "Normals", "UVs", "PBR Only", "Texture Only"};
     ImGui::Combo("Render mode", &m_renderingMode, items, IM_ARRAYSIZE(items));
 
     if (ImGui::CollapsingHeader("Scene"))
