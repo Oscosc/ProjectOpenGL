@@ -133,7 +133,7 @@ void SceneParser::parseObjectAs_Mesh(Scene *scene, const json& item, std::string
     Mesh* mesh = new Mesh(file);
 
     // Global object configuration
-    configureObject(mesh, item);
+    configureObject(mesh, item, name);
 
     // Adding to scene
     scene->addObject(mesh);
@@ -146,7 +146,7 @@ void SceneParser::parseObjectAs_Sphere(Scene *scene, const json& item, std::stri
     Sphere* sphere = new Sphere(size);
 
     // Global object configuration
-    configureObject(sphere, item);
+    configureObject(sphere, item, name);
 
     // Specific class configuration
     if(item.contains("ray-tracing.type"))
@@ -163,7 +163,7 @@ void SceneParser::parseObjectAs_BezierCurve(Scene *scene, const json& item, std:
     BezierCurve* bezierCurve = new BezierCurve(controlPoints);
 
     // Global object configuration
-    configureObject(bezierCurve, item);
+    configureObject(bezierCurve, item, name);
 
     // Adding to scene
     scene->addObject(bezierCurve);
@@ -176,7 +176,7 @@ void SceneParser::parseObjectAs_BezierSurface(Scene *scene, const json& item, st
     BezierSurface* bezierSurface = new BezierSurface(controlPoints);
 
     // Global object configuration
-    configureObject(bezierSurface, item);
+    configureObject(bezierSurface, item, name);
 
     // Adding to scene
     scene->addObject(bezierSurface);
@@ -188,7 +188,7 @@ void SceneParser::parseObjectAs_PointLight(Scene *scene, const json& item, std::
     PointLight* pointLight = new PointLight();
 
     // Global object configuration
-    configureLight(pointLight, item);
+    configureLight(pointLight, item, name);
 
     // Specific class configuration
     if(item.contains("radius")) pointLight->setRadius(jsonToFloat(item, "radius"));
@@ -203,7 +203,7 @@ void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, const json& item,
     DirectionalLight* dirLight = new DirectionalLight();
 
     // Global object configuration
-    configureLight(dirLight, item);
+    configureLight(dirLight, item, name);
 
     // Adding to scene
     scene->addLight(dirLight);
@@ -215,7 +215,7 @@ void SceneParser::parseObjectAs_SpotLight(Scene *scene, const json& item, std::s
     SpotLight* spotLight = new SpotLight();
 
     // Global object configuration
-    configureLight(spotLight, item);
+    configureLight(spotLight, item, name);
 
     // Specific class configuration
     if(item.contains("radius"))      spotLight->setRadius(jsonToFloat(item, "radius"));
@@ -226,17 +226,23 @@ void SceneParser::parseObjectAs_SpotLight(Scene *scene, const json& item, std::s
     scene->addLight(spotLight);
 }
 
-void SceneParser::configureObject(Object* object, const json& item)
+void SceneParser::configureObject(Object* object, const json& item, const std::string name)
 {
-    if(item.contains("transform")) object->setTransform(jsonToTransform(item.at("transform")));
+    configureNode(object, item, name);
     if(item.contains("material")) object->setMaterial(jsonToMaterial(item.at("material")));
     if(item.contains("texture")) object->addTexture(item.at("texture"));
 }
 
-void SceneParser::configureLight(Light* light, const json& item)
+void SceneParser::configureLight(Light* light, const json& item, const std::string name)
 {
-    if(item.contains("transform")) light->setTransform(jsonToTransform(item.at("transform")));
+    configureNode(light, item, name);
     if(item.contains("material")) light->setLightMaterial(jsonToLightProperties(item.at("material")));
+}
+
+void SceneParser::configureNode(Node* node, const json& item, const std::string name)
+{
+       if(item.contains("transform")) node->setTransform(jsonToTransform(item.at("transform")));
+       node->setName(name);
 }
 
 glm::vec3 SceneParser::jsonToVec3(const json& json, const std::string &attribute)

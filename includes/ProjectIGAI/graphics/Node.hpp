@@ -69,6 +69,8 @@ public:
      */
     const std::string& getName() const { return m_name; }
 
+    void setName(const std::string name) { m_name = name; }
+
     /**
      * @brief Get the Forward Vector object
      * 
@@ -87,7 +89,7 @@ protected:
     Transform m_transform;
 
     /** Name of the node */
-    const std::string m_name;
+    std::string m_name;
 
 };
 

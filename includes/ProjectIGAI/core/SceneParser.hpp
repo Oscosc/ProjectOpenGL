@@ -141,7 +141,7 @@ private:
      * @param object 
      * @param item 
      */
-    static void configureObject(Object* object, const json& item);
+    static void configureObject(Object* object, const json& item, const std::string name);
 
     /**
      * @brief 
@@ -149,7 +149,16 @@ private:
      * @param light 
      * @param item 
      */
-    static void configureLight(Light* light, const json& item);
+    static void configureLight(Light* light, const json& item, const std::string name);
+
+    /**
+     * @brief 
+     * 
+     * @param node 
+     * @param item 
+     * @param name 
+     */
+    static void configureNode(Node* node, const json& item, const std::string name);
 
     /**
      * @brief Auxiliary function for casting json element to glm::vec3.
