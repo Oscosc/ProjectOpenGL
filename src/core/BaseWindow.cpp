@@ -1,5 +1,7 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
+
 #include <extern/imgui/imgui.h>
 #include <extern/imgui/backends/imgui_impl_glfw.h>
 #include <extern/imgui/backends/imgui_impl_opengl3.h>
@@ -94,6 +96,9 @@ void BaseWindow::render()
     glm::vec4 bgColor = m_scene->getBackgroundColor();
     glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Rendering skybox/cubemap
+    CubemapManager::getInstance().drawCubemap("Lake", m_scene);
 
     // Calling window-specific rendering logic
     subClassRendering();

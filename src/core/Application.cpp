@@ -5,6 +5,7 @@
 #include <ProjectIGAI/graphics/Callbacks.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
 #include <ProjectIGAI/graphics/Mesh.hpp>
 #include <ProjectIGAI/graphics/Sphere.hpp>
 #include <ProjectIGAI/graphics/PointLight.hpp>
@@ -71,6 +72,7 @@ void Application::initGLComponents()
     }, nullptr);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // For cubemaps
     glViewport(0, 0, this->m_screenWidth, this->m_screenHeight);
 }
 
@@ -87,6 +89,8 @@ void Application::initShaders(const json& scene)
     ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
     ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
 
+    ShaderManager::getInstance().loadShader("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs");
+
     ShaderManager::getInstance().loadShader("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs");
     ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
 
@@ -95,6 +99,9 @@ void Application::initShaders(const json& scene)
     TextureManager::getInstance().loadTexture("ceres", "resources/textures/4k_ceres.jpg");
     TextureManager::getInstance().loadTexture("metal", "resources/textures/4k_metal.jpg");
 #endif
+
+    CubemapManager::getInstance().loadCubemap("Lake");
+    CubemapManager::getInstance().loadCubemap("Storforsen");
 }
 
 void Application::initScene(const json& scene)
@@ -230,7 +237,7 @@ void Application::cleanRemoveExternalWindow(unsigned int windowID)
     m_windows[m_activeWindowsCount] = nullptr;
 }
 
-Application *Application::getApplicationFromWindow(GLFWwindow *window)
+Application* Application::getApplicationFromWindow(GLFWwindow *window)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
     if(!app) {

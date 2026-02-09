@@ -49,14 +49,18 @@ struct SpotLight {
  *                                      PARAMETERS SECTION                                       *
  *************************************************************************************************/
 
-out vec4 FragColor;         // Visible color of the fragment after computation
+out vec4 FragColor;              // Visible color of the fragment after computation
 
-in vec3 FragPos;            // World's position of the fragment
-in vec3 Normal;             // Normal of the fragment
-in vec2 UV;                 // UV value of the fragment (for textures)
+in vec3 FragPos;                 // World's position of the fragment
+in vec3 Normal;                  // Normal of the fragment
+in vec2 UV;                      // UV value of the fragment (for textures)
 
-uniform sampler2D objectTexture;  // Optional texture
-uniform Material material;  // Material of the fragment
+uniform sampler2D objectTexture; // Optional texture
+uniform samplerCube skybox;      // Cubemap
+uniform Material material;       // Material of the fragment
+
+bool global_textureOn = true;
+
 
 #if NB_POINT_LIGHTS > 0
     #define POINT_LIGHTS
@@ -134,6 +138,11 @@ vec3 FresnelSchlick(float HdotV, vec3 F0)
     return F0 + (1.0 - F0) * pow(clamp(1.0 - HdotV, 0.0, 1.0), 5.0);
 }
 
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
 /**
  * @brief Main microfacets/BRDF function. Describe how light is reflected based on parameters.
  * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
@@ -147,6 +156,9 @@ vec3 FresnelSchlick(float HdotV, vec3 F0)
  */
 vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float roughness, float metallic)
 {
+    // To avoid division by zero
+    roughness = max(roughness, 0.05);
+
     // Check for "no light angle"
     vec3 H = normalize(V + L);
     float NdotL = max(dot(N, L), 0.0);
@@ -157,7 +169,6 @@ vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float r
     // Material "preparation"
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
-    vec3 cDiff = mix(albedo, vec3(0.0), metallic);
 
     // Specular
     float alpha = roughness * roughness;
@@ -168,15 +179,15 @@ vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float r
     vec3 F  = FresnelSchlick(max(dot(H, V), 0.0), F0);
     
     vec3 numerator = D * G * F;
-    float denominator = 4.0 * NdotL * NdotV;
-    vec3 specular = numerator / max(denominator, 0.0001);
+    float denominator = 4.0 * NdotL * NdotV + 0.00001;
+    vec3 specular = numerator / denominator;
 
     // Diffuse
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= (1.0 - metallic);
     
-    vec3 diffuse = kD * cDiff / PI;
+    vec3 diffuse = kD * albedo / PI;
 
     // Final color
     return (diffuse + specular) * radiance * NdotL;
@@ -187,7 +198,14 @@ vec4 PBR()
 {
     vec3 V = normalize(viewPos - FragPos);
     vec3 N = normalize(Normal);
+    
     vec3 albedo = material.color;
+    if(global_textureOn) albedo = albedo * texture(objectTexture, UV).rgb; 
+
+    albedo = pow(albedo, vec3(2.2));
+
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, material.metallic);
 
     vec3 accumulatedColor = vec3(0.0);
 
@@ -239,11 +257,25 @@ vec4 PBR()
 
 #endif
 
-    // Tone mapping (eq. to normalization)
-    vec3 toneMapping = accumulatedColor / (accumulatedColor + vec3(1.0));
+    vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, material.roughness);
+    vec3 kD = 1.0 - kS;
+    kD *= (1.0 - material.metallic);
+    vec3 ambientDiffuse = kD * albedo;
+
+    vec3 R = reflect(-V, N);
+    vec3 prefilteredColor = textureLod(skybox, R, material.roughness * 10.0).rgb; 
+    vec3 ambientSpecular = prefilteredColor * kS;
+
+
+    accumulatedColor += (ambientDiffuse + ambientSpecular);
+
+    // ACES (instead of tone mapping) : Academic Color Encoding System
+    vec3 color = accumulatedColor;
+    color = (color * (2.51 * color + 0.03)) / (color * (2.43 * color + 0.59) + 0.14);
+    color = clamp(color, 0.0, 1.0);
 
     // Gamma correction
-    vec3 correctedGamma = pow(toneMapping, vec3(1.0 / 2.2));
+    vec3 correctedGamma = pow(color, vec3(1.0 / 2.2));
 
     return vec4(correctedGamma, 1.0);
 }
@@ -258,7 +290,8 @@ void main()
     switch (renderingMode)
     {
     case 0: // PBR + texture
-        FragColor = PBR() * texture(objectTexture, UV);
+        global_textureOn = true;
+        FragColor = PBR();
         break;
 
     case 1: // Normals
@@ -270,6 +303,7 @@ void main()
         break;
     
     case 3: // PBR only
+        global_textureOn = false;
         FragColor = PBR();
         break;
 

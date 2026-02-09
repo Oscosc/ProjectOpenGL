@@ -1,6 +1,7 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 
 #include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
 
 void Object::debugMaterial() const
 {
@@ -38,6 +39,10 @@ void Object::bindTexture(Shader* shader) const
     
     else
         glBindTexture(GL_TEXTURE_2D, TextureManager::getInstance().getDefaultTexture());
+
+    shader->setInt("skybox", 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, CubemapManager::getInstance().getCubemap("Lake"));
 }
 
 void Object::initGLObject()
