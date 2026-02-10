@@ -100,8 +100,8 @@ void Application::initShaders(const json& scene)
     TextureManager::getInstance().loadTexture("metal", "resources/textures/4k_metal.jpg");
 #endif
 
-    CubemapManager::getInstance().loadCubemap("Lake");
-    CubemapManager::getInstance().loadCubemap("Storforsen");
+    CubemapManager::getInstance().loadResource(CubemapParam("Lake"));
+    CubemapManager::getInstance().loadResource(CubemapParam("Storforsen"));
 }
 
 void Application::initScene(const json& scene)

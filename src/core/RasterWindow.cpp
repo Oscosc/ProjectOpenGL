@@ -1,6 +1,7 @@
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
 #include <ProjectIGAI/core/ImGuiWidgets.hpp>
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
 
 #include <extern/imgui/imgui.h>
 #include <extern/imgui/backends/imgui_impl_glfw.h>
@@ -36,6 +37,8 @@ void RasterWindow::drawImGuiFrame()
     ImGui::Begin("Project IGAI configuration");
 
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
+
+    ImGuiWidgets::mapSelector(CubemapManager::getInstance().getAll(), "Skybox", &m_skybox);
 
     const char* items[] = {"PBR & Texture", "Normals", "UVs", "PBR Only", "Texture Only"};
     ImGui::Combo("Render mode", &m_renderingMode, items, IM_ARRAYSIZE(items));

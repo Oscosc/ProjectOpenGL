@@ -63,4 +63,5 @@ private:
     HUD* m_HUD;
 
     int m_renderingMode;
+    int m_skybox;
 };

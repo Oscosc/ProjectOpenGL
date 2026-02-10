@@ -8,15 +8,15 @@
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 
-void CubemapManager::loadCubemap(const std::string& name)
+void CubemapManager::loadResource(const ResourceParam& params)
 {
     std::vector<std::string> facesFiles = {
-        "resources/cubemaps/" + name + "/right.jpg",
-        "resources/cubemaps/" + name + "/left.jpg",
-        "resources/cubemaps/" + name + "/top.jpg",
-        "resources/cubemaps/" + name + "/bottom.jpg",
-        "resources/cubemaps/" + name + "/front.jpg",
-        "resources/cubemaps/" + name + "/back.jpg",
+        "resources/cubemaps/" + params.name + "/right.jpg",
+        "resources/cubemaps/" + params.name + "/left.jpg",
+        "resources/cubemaps/" + params.name + "/top.jpg",
+        "resources/cubemaps/" + params.name + "/bottom.jpg",
+        "resources/cubemaps/" + params.name + "/front.jpg",
+        "resources/cubemaps/" + params.name + "/back.jpg",
     };
 
     unsigned int textureID;
@@ -50,7 +50,7 @@ void CubemapManager::loadCubemap(const std::string& name)
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     // Ajout aux Cubemaps disponibles
-    m_cubemaps.emplace(name, textureID);
+    m_resources.emplace(params.name, textureID);
 }
 
 void CubemapManager::drawCubemap(const std::string &name, Scene* scene)
@@ -66,7 +66,7 @@ void CubemapManager::drawCubemap(const std::string &name, Scene* scene)
     
     glBindVertexArray(m_VAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemaps.at(name));
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_resources.at(name));
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
