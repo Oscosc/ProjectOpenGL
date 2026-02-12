@@ -2,19 +2,16 @@
 
 #include <ProjectIGAI/core/Logger.hpp>
 
-void ShaderManager::loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath,
-    const unsigned int pointLight, const unsigned int dirLight, const unsigned int spotLight)
+void ShaderManager::loadResource(const ResourceParam &params)
 {
-    this->m_shaders.emplace(name, Shader(vertexPath.c_str(), fragmentPath.c_str(), pointLight, dirLight, spotLight));
+    const ShaderParam* shParams = dynamic_cast<const ShaderParam*>(&params);
+    this->m_resources.emplace(shParams->name,
+        Shader(
+            shParams->vertexFile.c_str(),
+            shParams->fragmentFile.c_str(),
+            shParams->pointLights,
+            shParams->dirLights,
+            shParams->spotLights
+        )
+    );
 }
-
-Shader *ShaderManager::getShader(const std::string &name)
-{
-    auto it = this->m_shaders.find(name);
-    if(it != m_shaders.end()) {
-        return &it->second;
-    }
-    Logger::logWarning("Shader '" + name + "' not found");
-    return nullptr;
-}
-

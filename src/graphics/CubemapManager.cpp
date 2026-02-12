@@ -57,7 +57,7 @@ void CubemapManager::drawCubemap(const std::string &name, Scene* scene)
 {
     glDepthFunc(GL_EQUAL);
 
-    Shader* shader = ShaderManager::getInstance().getShader("cubemap");
+    Shader* shader = ShaderManager::getInstance().getResource("cubemap");
     shader->use();
 
     glm::mat4 view = glm::mat4(glm::mat3(scene->getActiveCameraPV().view)); 
@@ -131,7 +131,7 @@ CubemapManager::CubemapManager()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    Shader* shader = ShaderManager::getInstance().getShader("cubemap");
+    Shader* shader = ShaderManager::getInstance().getResource("cubemap");
     shader->use();
     shader->setInt("skybox", 0);
 }

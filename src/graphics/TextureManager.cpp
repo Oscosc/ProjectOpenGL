@@ -7,9 +7,9 @@
 #include <extern/stb_image.h>
 #include <ProjectIGAI/core/Logger.hpp>
 
-void TextureManager::loadResource(const ResourceParam &param)
+void TextureManager::loadResource(const ResourceParam &params)
 {
-    const TextureParam* texParam = dynamic_cast<const TextureParam*>(&param);
+    const TextureParam* texParams = dynamic_cast<const TextureParam*>(&params);
     unsigned int texture;
 
     glGenTextures(1, &texture);
@@ -21,7 +21,7 @@ void TextureManager::loadResource(const ResourceParam &param)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(texParam->file.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(texParams->file.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -29,11 +29,11 @@ void TextureManager::loadResource(const ResourceParam &param)
     }
     else
     {
-        Logger::logError("Failed to load texture '" + texParam->file + "'");
+        Logger::logError("Failed to load texture '" + texParams->file + "'");
     }
     stbi_image_free(data);
 
-    this->m_resources.emplace(texParam->name, texture);
+    this->m_resources.emplace(texParams->name, texture);
 }
 
 unsigned int TextureManager::createDefaultTexture()

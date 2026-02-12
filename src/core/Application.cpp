@@ -83,16 +83,16 @@ void Application::initShaders(const json& scene)
     unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
     unsigned int spotLights = sceneCount[SceneParser::SPOT_LIGHT];
 
-    ShaderManager::getInstance().loadShader("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights);
-    ShaderManager::getInstance().loadShader("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs");
-    ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
-    ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
-    ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
+    ShaderManager::getInstance().loadResource(ShaderParam("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights));
+    ShaderManager::getInstance().loadResource(ShaderParam("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs"));
+    ShaderManager::getInstance().loadResource(ShaderParam("quad", "shaders/quad.vs", "shaders/quad.fs"));
+    ShaderManager::getInstance().loadResource(ShaderParam("uv", "shaders/uv.vs", "shaders/uv.fs"));
+    ShaderManager::getInstance().loadResource(ShaderParam("grid", "shaders/grid.vs", "shaders/grid.fs"));
 
-    ShaderManager::getInstance().loadShader("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs");
+    ShaderManager::getInstance().loadResource(ShaderParam("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs"));
 
-    ShaderManager::getInstance().loadShader("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs");
-    ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
+    ShaderManager::getInstance().loadResource(ShaderParam("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs"));
+    ShaderManager::getInstance().loadResource(ShaderParam("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs"));
 
 #ifdef LOAD_TEXTURES_ON
     TextureManager::getInstance().loadResource(TextureParam("earth", "resources/textures/8k_earth.jpg"));

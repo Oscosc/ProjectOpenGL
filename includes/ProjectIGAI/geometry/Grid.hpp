@@ -17,7 +17,7 @@ public:
      * @brief Construct a new grid (infinite in practice)
      */
     Grid() : Object() {
-        this->m_material.shader = ShaderManager::getInstance().getShader("grid");
+        this->m_material.shader = ShaderManager::getInstance().getResource("grid");
 
         m_vertices = {
             {glm::vec3(-500.0f, 0.f, -500.0f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f)},

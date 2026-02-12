@@ -7,7 +7,7 @@
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 #include <ProjectIGAI/graphics/Node.hpp>
 
-#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getShader("monochrome"), {glm::vec3(0.5), 1.0f, 0.0f}}
+#define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getResource("monochrome"), {glm::vec3(0.5), 1.0f, 0.0f}}
 
 using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;

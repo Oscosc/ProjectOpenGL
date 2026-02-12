@@ -16,12 +16,12 @@ RayTracer::RayTracer(unsigned int width, unsigned int height, GLFWwindow* window
     m_fboB = createFBO(m_textureB);
 
     // Shader for ray-tracing logic
-    m_shader_compute = ShaderManager::getInstance().getShader("ray-tracing-compute");
+    m_shader_compute = ShaderManager::getInstance().getResource("ray-tracing-compute");
     m_shader_compute->use();
     m_shader_compute->setVec2("u_resolution", width, height);
 
     // Shader for texture display
-    m_shader_display = ShaderManager::getInstance().getShader("ray-tracing-display");
+    m_shader_display = ShaderManager::getInstance().getResource("ray-tracing-display");
 
     // Load data to GPU
     passSceneToGPU(scene);

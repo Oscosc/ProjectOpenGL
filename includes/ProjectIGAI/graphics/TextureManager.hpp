@@ -23,7 +23,7 @@ class TextureManager : public IResourceManager<unsigned int>, public Singleton<T
 
 public:
 
-    void loadResource(const ResourceParam& param) override;
+    void loadResource(const ResourceParam& params) override;
 
     /**
      * @brief Get the Default white texture

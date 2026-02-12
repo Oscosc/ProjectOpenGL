@@ -271,7 +271,7 @@ Transform SceneParser::jsonToTransform(const json& json)
 Material SceneParser::jsonToMaterial(const json& json)
 {
     return {
-        ShaderManager::getInstance().getShader(json.at("shader")),
+        ShaderManager::getInstance().getResource(json.at("shader")),
         jsonToShaderMaterial(json.at("shader material"))
     };
 }
