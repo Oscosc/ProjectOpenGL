@@ -5,29 +5,25 @@
 #include <iostream>
 
 #include <ProjectIGAI/core/Singleton.hpp>
+#include <ProjectIGAI/graphics/IResourceManager.hpp>
 
-class TextureManager : public Singleton<TextureManager>
+struct TextureParam : public ResourceParam {
+    std::string file;
+
+    TextureParam(const std::string name, const std::string file) {
+        this->name = name;
+        this->file = file;
+    }
+};
+
+class TextureManager : public IResourceManager<unsigned int>, public Singleton<TextureManager>
 {
     // INFO : friend permet d'accéder aux valeurs protected de la classe Singleton
     friend class Singleton<TextureManager>;
 
 public:
 
-    /**
-     * @brief Load a texture as an OpenGL object
-     * 
-     * @param name name of the texture in the program
-     * @param textureFile file where the texture is stored
-     */
-    void loadTexture(const std::string& name, const std::string textureFile);
-
-    /**
-     * @brief Retrieve a texture by it's name stored in the TextureManager
-     * 
-     * @param name name of the texture
-     * @return pointer to the texture object
-     */
-    unsigned int getTexture(const std::string& name) const;
+    void loadResource(const ResourceParam& param) override;
 
     /**
      * @brief Get the Default white texture

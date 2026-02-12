@@ -24,7 +24,7 @@ glm::mat4 Object::getModelMatrix() const
 
 void Object::addTexture(std::string name)
 {
-    m_texture = TextureManager::getInstance().getTexture(name);
+    m_texture = *TextureManager::getInstance().getResource(name);
     if(m_texture)
         m_hasTexture = true;
 }

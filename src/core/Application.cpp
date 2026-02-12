@@ -95,9 +95,9 @@ void Application::initShaders(const json& scene)
     ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
 
 #ifdef LOAD_TEXTURES_ON
-    TextureManager::getInstance().loadTexture("earth", "resources/textures/8k_earth.jpg");
-    TextureManager::getInstance().loadTexture("ceres", "resources/textures/4k_ceres.jpg");
-    TextureManager::getInstance().loadTexture("metal", "resources/textures/4k_metal.jpg");
+    TextureManager::getInstance().loadResource(TextureParam("earth", "resources/textures/8k_earth.jpg"));
+    TextureManager::getInstance().loadResource(TextureParam("ceres", "resources/textures/4k_ceres.jpg"));
+    TextureManager::getInstance().loadResource(TextureParam("metal", "resources/textures/4k_metal.jpg"));
 #endif
 
     CubemapManager::getInstance().loadResource(CubemapParam("Lake"));

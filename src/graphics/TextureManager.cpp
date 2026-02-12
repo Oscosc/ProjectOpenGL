@@ -7,13 +7,13 @@
 #include <extern/stb_image.h>
 #include <ProjectIGAI/core/Logger.hpp>
 
-void TextureManager::loadTexture(const std::string& name, const std::string textureFile)
+void TextureManager::loadResource(const ResourceParam &param)
 {
-    this->m_textures.emplace(name, 0);
-    unsigned int* texture = &this->m_textures.find(name)->second;
+    const TextureParam* texParam = dynamic_cast<const TextureParam*>(&param);
+    unsigned int texture;
 
-    glGenTextures(1, texture);
-    glBindTexture(GL_TEXTURE_2D, *texture);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -21,7 +21,7 @@ void TextureManager::loadTexture(const std::string& name, const std::string text
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(textureFile.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(texParam->file.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -29,19 +29,11 @@ void TextureManager::loadTexture(const std::string& name, const std::string text
     }
     else
     {
-        Logger::logError("Failed to load texture '" + textureFile + "'");
+        Logger::logError("Failed to load texture '" + texParam->file + "'");
     }
     stbi_image_free(data);
-}
 
-unsigned int TextureManager::getTexture(const std::string& name) const
-{
-    auto it = this->m_textures.find(name);
-    if(it != m_textures.end()) {
-        return it->second;
-    }
-    Logger::logWarning("Texture '" + name + "' not found");
-    return 0; // Default texture for OpenGL
+    this->m_resources.emplace(texParam->name, texture);
 }
 
 unsigned int TextureManager::createDefaultTexture()

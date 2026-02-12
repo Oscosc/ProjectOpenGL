@@ -10,7 +10,9 @@
 class Scene;
 
 struct CubemapParam : public ResourceParam {
-    CubemapParam(std::string n) { this->name = n; }
+    CubemapParam(const std::string name) {
+        this->name = name;
+    }
 };
 
 class CubemapManager : public IResourceManager<unsigned int>, public Singleton<CubemapManager>

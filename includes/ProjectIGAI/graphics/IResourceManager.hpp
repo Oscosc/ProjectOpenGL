@@ -14,6 +14,7 @@
  */
 struct ResourceParam {
     std::string name;
+    
     virtual ~ResourceParam() = default; // For polymorphism
 };
 
