@@ -42,7 +42,8 @@ namespace ImGuiWidgets
     }
 
     template<typename T>
-    bool mapSelector(const std::unordered_map<std::string, T>* map, const std::string& title, int* selectedIndex)
+    bool mapSelector(const std::unordered_map<std::string, T>* map, const std::string& title, int* selectedIndex,
+        std::string* valueName)
     {
         std::vector<std::string> keys;
         keys.reserve(map->size());
@@ -58,6 +59,9 @@ namespace ImGuiWidgets
         for (const auto& key : keys) {
             key_ptrs.push_back(key.c_str());
         }
+
+        // setting the current valueName selected
+        *valueName = keys[*selectedIndex];
 
         return ImGui::Combo(title.c_str(), selectedIndex, key_ptrs.data(), (int)key_ptrs.size());
     }

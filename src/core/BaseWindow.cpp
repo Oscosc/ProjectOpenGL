@@ -97,9 +97,6 @@ void BaseWindow::render()
     glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Rendering skybox/cubemap
-    CubemapManager::getInstance().drawCubemap("Lake", m_scene);
-
     // Calling window-specific rendering logic
     subClassRendering();
 

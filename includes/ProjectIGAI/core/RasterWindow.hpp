@@ -63,5 +63,7 @@ private:
     HUD* m_HUD;
 
     int m_renderingMode;
+
     int m_skybox;
+    std::string m_skyboxName;
 };
