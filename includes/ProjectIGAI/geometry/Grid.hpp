@@ -27,7 +27,7 @@ public:
         };
         m_indexes = {0, 1, 2, 1, 2, 3};
 
-        initGLObject();
+        m_geometry = new Geometry(m_vertices, m_indexes);
     }
 
     /**
@@ -54,14 +54,7 @@ public:
 
         scene->updateLigth(shader);
 
-        glBindVertexArray(this->m_VAO);
-        glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
-
-        GLenum err;
-        while((err = glGetError()) != GL_NO_ERROR)
-        {
-            Logger::logError("in Grid : GLError " + std::to_string(err));
-        }
+        m_geometry->draw();
     }
 
 private:

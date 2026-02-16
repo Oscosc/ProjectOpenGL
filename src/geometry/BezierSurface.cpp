@@ -24,7 +24,7 @@ BezierSurface::BezierSurface(vec3Grid controlPoints, Transform transform, std::s
     computeIndexes();
     computeUVs();
 
-    initGLObject();
+    m_geometry = new Geometry(m_vertices, m_indexes);
 }
 
 glm::vec3 BezierSurface::getValue(glm::vec2 uv) const
@@ -71,8 +71,7 @@ void BezierSurface::draw(Scene* scene) const
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glBindVertexArray(this->m_VAO);
-    glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
+    m_geometry->draw();
 
     // drawControlPolygon();
 

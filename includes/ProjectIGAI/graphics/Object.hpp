@@ -6,65 +6,9 @@
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 #include <ProjectIGAI/graphics/Node.hpp>
+#include <ProjectIGAI/geometry/Geometry.hpp>
 
 #define DEFAULT_OBJECT_MATERIAL {ShaderManager::getInstance().getResource("monochrome"), {glm::vec3(0.5), 1.0f, 0.0f}}
-
-using vec3Array = std::vector<glm::vec3>;
-using vec2Array = std::vector<glm::vec2>;
-using vec3Grid = std::vector<std::vector<glm::vec3>>;
-
-/**
- * @brief Complete representation of a vertice in a graphic sense.
- * Contain position, normal, uv and equality operator.
- */
-struct Vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 uv;
-
-    /**
-     * @brief Implementation of the equality operator for Vertices.
-     * 
-     * Vertices are equals if all their attributes are equals.
-     * 
-     * @param other Vertice to compare with
-     */
-    bool operator==(const Vertex& other) const {
-        return position == other.position && normal == other.normal && uv == other.uv;
-    }
-};
-
-/**
- * @brief Specialization of the hash function for the Vertex structure to allow
- * Vertices to be added to an unordered map (computeUniques function)
- */
-namespace std {
-    template <>
-    struct hash<Vertex> {
-        std::size_t operator()(const Vertex& v) const {
-            std::size_t hPos = std::hash<float>()(v.position.x)
-                ^ std::hash<float>()(v.position.y)
-                ^ std::hash<float>()(v.position.z);
-            std::size_t hNorm = std::hash<float>()(v.normal.x)
-                ^ std::hash<float>()(v.normal.y)
-                ^ std::hash<float>()(v.normal.z);
-            std::size_t hUV = std::hash<float>()(v.uv.x)
-                ^ std::hash<float>()(v.uv.y);
-                
-            return hPos ^ (hNorm << 1) ^ (hUV << 2);
-        }
-    };
-}
-
-/**
- * @brief Intermediate structure for representing Vertex indices (one index per vertex attribute).
- * 
- */
-struct VertexIndex {
-    int position;
-    int normal;
-    int uv;
-};
 
 struct ShaderMaterial {
     glm::vec3 color;
@@ -98,7 +42,7 @@ public:
         Transform transform = DEFAULT_TRANSFORM,
         std::string name = DEFAULT_NAME,
         Material material = DEFAULT_OBJECT_MATERIAL)
-    : Node(transform, name), m_material(material) {}
+    : Node(transform, name), m_material(material), m_geometry(nullptr) {}
 
     /**
      * @brief Default destructor for object class.
@@ -148,12 +92,6 @@ public:
 protected:
 
     /**
-     * @brief init the object as an OpenGL object (buffers, etc...)
-     * 
-     */
-    void initGLObject();
-
-    /**
      * @brief Update the material informations in the shader based on
      * object's material informations.
      * 
@@ -164,11 +102,6 @@ protected:
     /** Material of the object */
     Material m_material;
 
-    /** Various buffers for OpenGL */
-    GLuint m_VAO;
-    GLuint m_VBO;
-    GLuint m_EBO;
-
     /** Information about the mesh configuration */
     bool m_hasNormals;
     bool m_hasUVs;
@@ -177,4 +110,6 @@ protected:
 
     bool m_hasTexture = false;
     unsigned int m_texture;
+
+    Geometry* m_geometry;
 };

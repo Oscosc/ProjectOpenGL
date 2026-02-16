@@ -14,7 +14,7 @@ Sphere::Sphere(float radius, Transform transform, std::string name, Material mat
     this->m_hasNormals = true;
     this->m_hasUVs = true;
 
-    initGLObject();
+    m_geometry = new Geometry(m_vertices, m_indexes);
 }
 
 bool Sphere::hit(const Ray &ray, float tMin, float tMax, HitRecord &record) const
@@ -61,14 +61,7 @@ void Sphere::draw(Scene* scene) const
 
     bindTexture(shader, scene);
 
-    glBindVertexArray(this->m_VAO);
-    glDrawElements(GL_TRIANGLES, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
-
-    GLenum err;
-    while((err = glGetError()) != GL_NO_ERROR)
-    {
-        Logger::logError("in Sphere : GLError " + std::to_string(err));
-    }
+    m_geometry->draw();
 }
 
 

@@ -20,7 +20,7 @@ BezierCurve::BezierCurve(vec3Array controlPoints, Transform transform, std::stri
         this->m_indexes[i] = i;
     }
 
-    initGLObject();
+    m_geometry = new Geometry(m_vertices, m_indexes);
     initGLControlPolygon();
 }
 
@@ -58,16 +58,9 @@ void BezierCurve::draw(Scene* scene) const
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glBindVertexArray(this->m_VAO);
-    glDrawElements(GL_LINE_STRIP, this->m_indexes.size(), GL_UNSIGNED_INT, (void*)0);
+    m_geometry->draw();
 
     drawControlPolygon();
-
-    GLenum err;
-    while((err = glGetError()) != GL_NO_ERROR)
-    {
-        Logger::logError("in Mesh drawing : GLError "  + std::to_string(err));
-    }
 }
 
 /*
