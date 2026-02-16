@@ -67,7 +67,7 @@ void BezierSurface::draw(Scene* scene) const
     
     scene->updateLigth(shader);
 
-    bindTexture(shader);
+    bindTexture(shader, scene);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 

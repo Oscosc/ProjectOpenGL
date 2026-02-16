@@ -200,6 +200,10 @@ public:
      */
     void setBackgroundColor(const glm::vec4 color) { m_backgroundColor = color; }
 
+    std::string& skyboxName() { return m_skyboxName; }
+
+    int& skyboxAttr() { return m_skybox; }
+
 private:
 
     /** Background color */
@@ -219,5 +223,9 @@ private:
 
     /** Tuple of lists of lights in the scene */
     LightGroup m_lights;
+
+    /** Skybox */
+    int m_skybox;
+    std::string m_skyboxName = "Lake";
 
 };

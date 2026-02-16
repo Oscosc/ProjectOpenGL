@@ -28,7 +28,7 @@ void Mesh::draw(Scene* scene) const
     
     scene->updateLigth(shader);
 
-    bindTexture(shader);
+    bindTexture(shader, scene);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -250,7 +250,8 @@ void Mesh::computeUniques(const vec3Array &positions, const vec3Array &normals,
     this->m_indexes = std::move(elementBuffer);
 }
 
-void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std::vector<VertexIndex> &indexes)
+void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std::vector<VertexIndex> &indexes,
+    const bool invertNormals)
 {
     normals.resize(positions.size(), glm::vec3(0.0f)); // Une normale par sommet
 
@@ -268,9 +269,9 @@ void Mesh::subComputeNormals(const vec3Array &positions, vec3Array &normals, std
         glm::vec3 edge2 = v2 - v0;
         glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
 
-        normals[i0] += faceNormal;
-        normals[i1] += faceNormal;
-        normals[i2] += faceNormal;
+        normals[i0] += invertNormals ? -faceNormal : faceNormal;
+        normals[i1] += invertNormals ? -faceNormal : faceNormal;
+        normals[i2] += invertNormals ? -faceNormal : faceNormal;
     }
 
     // Normalisation des normales par sommet

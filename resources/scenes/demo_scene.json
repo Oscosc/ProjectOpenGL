@@ -42,11 +42,11 @@
 
     "cube": {
         "type": "mesh",
-        "file": "resources/objects/cube.obj",
+        "file": "resources/objects/xyzrgb_dragon.obj",
         "transform": {
             "position": [0.0, 0.0, 0.0],
             "rotation": [0.0, 0.0, 0.0],
-            "scale": [2.0, 2.0, 2.0]
+            "scale": [0.015, 0.015, 0.015]
         },
         "texture": "ceres",
         "material": {

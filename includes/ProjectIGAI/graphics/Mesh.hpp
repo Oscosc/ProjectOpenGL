@@ -150,9 +150,11 @@ private:
      * @param normals normal array, empty at the beggining but filled during the process
      * @param indexes indexes of the Vertices, will be updated during the process to reflect
      * normals informations
+     * @param invertNormals tell the function to invert normals in case triangles are defined in
+     * anti-trigonometric direction (default = false)
      */
     void subComputeNormals(const vec3Array &positions, vec3Array &normals,
-        std::vector<VertexIndex> &indexes);
+        std::vector<VertexIndex> &indexes, const bool invertNormals = false);
     
     std::string m_filename;
 };

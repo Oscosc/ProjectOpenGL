@@ -29,7 +29,7 @@ void Object::addTexture(std::string name)
         m_hasTexture = true;
 }
 
-void Object::bindTexture(Shader* shader) const
+void Object::bindTexture(Shader* shader, Scene* scene) const
 {
     shader->setInt("objectTexture", 0);
     glActiveTexture(GL_TEXTURE0);
@@ -42,7 +42,7 @@ void Object::bindTexture(Shader* shader) const
 
     shader->setInt("skybox", 1);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, *CubemapManager::getInstance().getResource("Lake"));
+    glBindTexture(GL_TEXTURE_CUBE_MAP, *CubemapManager::getInstance().getResource(scene->skyboxName()));
 }
 
 void Object::initGLObject()

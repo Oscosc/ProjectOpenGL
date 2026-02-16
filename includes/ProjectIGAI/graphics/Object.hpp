@@ -143,7 +143,7 @@ public:
      * @brief If this object has a texture, bind it with the shader.
      * 
      */
-    void bindTexture(Shader* shader) const;
+    void bindTexture(Shader* shader, Scene* scene) const;
 
 protected:
 
