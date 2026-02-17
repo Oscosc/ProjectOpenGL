@@ -16,6 +16,8 @@ public:
     Geometry(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indexes);
 
     ~Geometry();
+    Geometry(const Geometry&) = delete;
+    Geometry& operator=(const Geometry&) = delete;
 
     void draw();
 

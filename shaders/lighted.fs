@@ -16,9 +16,17 @@
  * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
  */
 struct Material {
-    vec3 color;
+    vec3 albedo;
     float roughness;
     float metallic;
+
+    sampler2D albedoMap;
+    sampler2D roughnessMap;
+    sampler2D metallicMap;
+
+    bool hasAlbedoMap;
+    bool hasRoughnessMap;
+    bool hasMetallicMap;
 };
 
 struct PointLight {
@@ -199,8 +207,8 @@ vec4 PBR()
     vec3 V = normalize(viewPos - FragPos);
     vec3 N = normalize(Normal);
     
-    vec3 albedo = material.color;
-    if(global_textureOn) albedo = albedo * texture(objectTexture, UV).rgb; 
+    vec3 albedo = material.albedo;
+    if(material.hasAlbedoMap) albedo = albedo * texture(material.albedoMap, UV).rgb; 
 
     albedo = pow(albedo, vec3(2.2));
 
@@ -308,7 +316,11 @@ void main()
         break;
 
     case 4: // Texture only
-        FragColor = texture(objectTexture, UV);
+        if(material.hasAlbedoMap) {
+            FragColor = texture(material.albedoMap, UV);
+        } else {
+            FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        }
         break;
     }
 }

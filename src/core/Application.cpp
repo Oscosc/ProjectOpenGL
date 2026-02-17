@@ -16,6 +16,7 @@
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight), m_activeWindowsCount(0)
 {
+    this->m_scene = new Scene();
 }
 
 void Application::initGLContext()
@@ -128,7 +129,7 @@ void Application::loop()
         for(unsigned int i = 0; i < m_activeWindowsCount; i++) {
             m_windows[i]->render();
         }
-
+        
         // Poolling callbacks events
         glfwPollEvents();
     }

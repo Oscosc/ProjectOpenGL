@@ -25,9 +25,4 @@ public:
     void setRoughnessTexture(const std::string& path);
 
     void setMetallicTexture(const std::string& path);
-
-private:
-
-    Shader* m_shader;
-
 };

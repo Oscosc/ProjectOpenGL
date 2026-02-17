@@ -4,12 +4,15 @@
 
 void StandardPBRMaterial::bind(Scene* scene)
 {
+    // Activation shader
     m_shader->use();
 
+    // Ecriture des éléments principaux PBR
     m_shader->setVec3("material.albedo", albedo);
     m_shader->setFloat("material.roughness", roughness);
     m_shader->setFloat("material.metallic", metallic);
 
+    // Ecriture éventuelle de l'albedoMap si existante
     if(albedoMap) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, albedoMap);
@@ -19,6 +22,7 @@ void StandardPBRMaterial::bind(Scene* scene)
         m_shader->setBool("material.hasAlbedoMap", false);
     }
 
+    // Ecriture éventuelle de la roughnessMap si existante
     if(roughnessMap) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, albedoMap);
@@ -28,6 +32,7 @@ void StandardPBRMaterial::bind(Scene* scene)
         m_shader->setBool("material.hasRoughnessMap", false);
     }
 
+    // Ecriture éventuelle de la metallicMap si existante
     if(metallicMap) {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, albedoMap);
