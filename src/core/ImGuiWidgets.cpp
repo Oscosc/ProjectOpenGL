@@ -14,13 +14,13 @@ bool ImGuiWidgets::transformEditor(Transform& transform, const TransformFlags fl
     });
 }
 
-bool ImGuiWidgets::shaderMaterialEditor(ShaderMaterial& material)
+bool ImGuiWidgets::standardPBRMaterialEditor(StandardPBRMaterial* material)
 {
     return genericEditor("Material", [&]() {
         bool changed = false;
-        changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material.color));
-        changed |= ImGui::SliderFloat("Roughness", &material.roughness, 0.0f,  1.0f);
-        changed |= ImGui::SliderFloat("Metallic",  &material.metallic,  0.0f,  1.0f);
+        changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material->albedo));
+        changed |= ImGui::SliderFloat("Roughness", &material->roughness, 0.0f,  1.0f);
+        changed |= ImGui::SliderFloat("Metallic",  &material->metallic,  0.0f,  1.0f);
         return changed;
     });
 }
@@ -47,13 +47,13 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
         ImGui::Text(objects.at(i)->getName().c_str());
 
         Transform tmpTransform = objects.at(i)->getTransform();
-        Material tmpMaterial   = objects.at(i)->getMaterial();
+        StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(objects.at(i)->getMaterial());
 
         if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
             objects.at(i)->setTransform(tmpTransform);
         }
 
-        if(shaderMaterialEditor(tmpMaterial.matShader)) {
+        if(standardPBRMaterialEditor(tmpMaterial)) {
             objects.at(i)->setMaterial(tmpMaterial);
         }
 

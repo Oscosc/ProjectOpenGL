@@ -4,6 +4,8 @@
 #include <ProjectIGAI/geometry/Geometry.hpp>
 #include <ProjectIGAI/graphics/Material.hpp>
 
+class Scene;
+
 class Object : public Node
 {
 public:

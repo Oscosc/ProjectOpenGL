@@ -12,9 +12,7 @@
 #include <ProjectIGAI/graphics/DirectionalLight.hpp>
 #include <ProjectIGAI/graphics/SpotLight.hpp>
 #include <ProjectIGAI/graphics/ProjViewMatrix.hpp>
-
-class Object;
-class Sphere;
+#include <ProjectIGAI/graphics/Object.hpp>
 
 #define POINT_LIGHT_INDEX 0
 #define DIR_LIGHT_INDEX 1
@@ -80,19 +78,46 @@ public:
      */
     ProjViewMatrix getActiveCameraPV() const;
 
+    void addNode(Node* node) {
+        if (!node) return;
+    
+        if (auto* light = dynamic_cast<PointLight*>(node)) {
+            addLight(light);
+        }
+
+        else if (auto* light = dynamic_cast<DirectionalLight*>(node)) {
+            addLight(light);
+        }
+
+        else if (auto* light = dynamic_cast<SpotLight*>(node)) {
+            addLight(light);
+        }
+
+        else if (auto* cam = dynamic_cast<Camera*>(node)) {
+            addCamera(cam);
+        }
+
+        else if (auto* obj = dynamic_cast<Object*>(node)) {
+            addObject(obj);
+        }
+    }
+
     /**
      * @brief Add a new camera to the scene.
      * 
      * @param camera element to add.
      */
-    void addCamera(Camera* camera);
+    void addCamera(Camera* camera) {
+        this->m_cameras.push_back(camera);
+        if(camerasCount() == 1) { this->m_activeCamera = 0; }
+    }
 
     /**
      * @brief Add a new object to the scene.
      * 
      * @param object element to add.
      */
-    void addObject(Object* object);
+    void addObject(Object* object) { this->m_objects.push_back(object); }
 
     /**
      * @brief Add a new point light to the scene.
@@ -170,14 +195,6 @@ public:
      * @return all scene objects
      */
     std::vector<Object*> getAllObjects() { return m_objects; }
-
-    /**
-     * @brief Return the list of spheres in the scene for ray tracing purpose
-     * 
-     * @warning Function need to be removed when BVH and ray/triangle intersection
-     * will be implemented.
-     */
-    std::vector<Sphere*> getSpheresRT() const;
 
     /**
      * @brief Get a pointer on the scene background color for ImGui modification

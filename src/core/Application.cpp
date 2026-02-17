@@ -6,14 +6,8 @@
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 #include <ProjectIGAI/graphics/CubemapManager.hpp>
-#include <ProjectIGAI/graphics/Mesh.hpp>
-#include <ProjectIGAI/graphics/Sphere.hpp>
 #include <ProjectIGAI/graphics/PointLight.hpp>
-#include <ProjectIGAI/geometry/BezierCurve.hpp>
-#include <ProjectIGAI/geometry/BezierSurface.hpp>
-#include <ProjectIGAI/geometry/Grid.hpp>
 #include <ProjectIGAI/core/RasterWindow.hpp>
-#include <ProjectIGAI/core/RaytracingWindow.hpp>
 
 #include <chrono>
 #define timer std::chrono::high_resolution_clock
@@ -76,8 +70,11 @@ void Application::initGLComponents()
     glViewport(0, 0, this->m_screenWidth, this->m_screenHeight);
 }
 
-void Application::initShaders(const json& scene)
+void Application::initShaders(const std::string& sceneFile)
 {
+    std::ifstream stream(sceneFile);
+    const json scene = json::parse(stream);
+
     auto sceneCount = SceneParser::retrieveSceneCounts(scene);
     unsigned int pointLights = sceneCount[SceneParser::POINT_LIGHT];
     unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
@@ -94,20 +91,14 @@ void Application::initShaders(const json& scene)
     ShaderManager::getInstance().loadResource(ShaderParam("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs"));
     ShaderManager::getInstance().loadResource(ShaderParam("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs"));
 
-#ifdef LOAD_TEXTURES_ON
-    TextureManager::getInstance().loadResource(TextureParam("earth", "resources/textures/8k_earth.jpg"));
-    TextureManager::getInstance().loadResource(TextureParam("ceres", "resources/textures/4k_ceres.jpg"));
-    TextureManager::getInstance().loadResource(TextureParam("metal", "resources/textures/4k_metal.jpg"));
-#endif
-
     CubemapManager::getInstance().loadResource(CubemapParam("Lake"));
     CubemapManager::getInstance().loadResource(CubemapParam("Storforsen"));
 }
 
-void Application::initScene(const json& scene)
+void Application::initScene(const std::string& sceneFile)
 {
     // Loading scene
-    this->m_scene = new Scene(SceneParser::parseScene(scene));
+    SceneParser::parseScene(this->m_scene, sceneFile);
 
     // Associating scene to main window
     this->getMainWindow()->setSceneRef(m_scene);
@@ -154,13 +145,10 @@ void Application::run(const std::string& sceneFile)
     initGLComponents();
     Logger::logInfo("OpenGL/GLAD components correctly loaded");
 
-    std::ifstream stream(sceneFile);
-    const json scene = json::parse(stream);
-
-    initShaders(scene);
+    initShaders(sceneFile);
     Logger::logInfo("Shaders correctly loaded and computed");
 
-    initScene(scene);
+    initScene(sceneFile);
     Logger::logInfo("Scene correctly loaded");
 
     postInitComponents();
@@ -194,37 +182,6 @@ BaseWindow* Application::getExternalWindow(unsigned int windowID) const
         return getMainWindow();
     }
     return m_windows[windowID];
-}
-
-unsigned int Application::createExternalRTWindow(const unsigned int width, const unsigned int height, const std::string& windowTitle)
-{
-    // Check if it's possible to create window
-    if(m_activeWindowsCount >= MAX_WINDOWS) {
-        Logger::logWarning("Could not create a new external window, no space left");
-        return -1;
-    }
-    else if(m_activeWindowsCount == 0) {
-        Logger::logWarning("Could not create a new external window, a main window is needed first");
-        return -1;
-    }
-
-    // Create window
-    unsigned int windowID = m_activeWindowsCount;
-    m_activeWindowsCount++;
-    this->m_windows[windowID] = new RaytracingWindow(
-        m_scene, width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow()
-    );
-
-    if (getExternalWindow(windowID) == NULL)
-    {
-        Logger::logError("Failed to create GLFW external window");
-        glfwTerminate();
-        exit(-2);
-    }
-
-    // Update values and inform user
-    Logger::logInfo("New external window correctly created. Current windows count is " + std::to_string(m_activeWindowsCount));
-    return windowID;
 }
 
 void Application::cleanRemoveExternalWindow(unsigned int windowID)

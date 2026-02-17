@@ -1,7 +1,5 @@
 #include <ProjectIGAI/graphics/Callbacks.hpp>
 
-#include <ProjectIGAI/core/RaytracingWindow.hpp>
-
 void Callbacks::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -51,11 +49,6 @@ void Callbacks::key_callback(GLFWwindow* window, int key, int scancode, int acti
         if(app->isMouseActive()) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         app->switchMouseActive();
-    }
-
-    // Open a window for ray-tracing
-    if(key == GLFW_KEY_R && action == GLFW_PRESS) {
-        app->createExternalRTWindow(800, 600, "Ray-tracing");
     }
 
     /*
@@ -153,14 +146,5 @@ void Callbacks::processInput(Application *app)
     if (glfwGetKey(mainWindow->getGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS) {
         mainWindow->getScene()->getActiveCamera()->ProcessKeyboard(RIGHT, mainWindow->getDeltaTime());
         movement = true;
-    }
-
-    // If a movement has been recorded, ray-tracers needs to be reset
-    if(movement) {
-        for(unsigned int i = 1; i < app->getActiveWindowCount(); i++) {
-            RaytracingWindow* rtWin = dynamic_cast<RaytracingWindow*>(app->getExternalWindow(i));
-            if(rtWin != nullptr)
-                rtWin->getRayTracer()->resetAccumulation();
-        }
     }
 }

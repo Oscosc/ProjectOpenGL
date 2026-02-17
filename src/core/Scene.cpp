@@ -1,6 +1,8 @@
 #include <ProjectIGAI/core/Scene.hpp>
-#include <ProjectIGAI/graphics/Object.hpp>
+
 #include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/graphics/Object.hpp>
+#include <ProjectIGAI/graphics/GeometryManager.hpp>
 
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
 {
@@ -74,17 +76,6 @@ void Scene::updateLigth(Shader *shader)
     }
 
     shader->setVec3("viewPos", this->getActiveCamera()->Position);
-}
-
-void Scene::addCamera(Camera *camera)
-{
-    this->m_cameras.push_back(camera);
-    if(camerasCount() == 1) { this->m_activeCamera = 0; }
-}
-
-void Scene::addObject(Object *object)
-{
-    this->m_objects.push_back(object);
 }
 
 const glm::vec3 Scene::lightsCount() const {

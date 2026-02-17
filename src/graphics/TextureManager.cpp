@@ -1,16 +1,17 @@
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <extern/stb_image.h>
 #include <ProjectIGAI/core/Logger.hpp>
 
-void TextureManager::loadResource(const ResourceParam &params)
+GLuint TextureManager::loadTexture(const std::string& path)
 {
-    const TextureParam* texParams = dynamic_cast<const TextureParam*>(&params);
     unsigned int texture;
+
+    if(m_textures.find(path) != m_textures.end()) {
+        Logger::logPerf("Existing instance of '" + path + "' texture found !");
+        return m_textures[path];
+    }
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -21,7 +22,7 @@ void TextureManager::loadResource(const ResourceParam &params)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(texParams->file.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -29,25 +30,10 @@ void TextureManager::loadResource(const ResourceParam &params)
     }
     else
     {
-        Logger::logError("Failed to load texture '" + texParams->file + "'");
+        Logger::logError("Failed to load texture '" + path + "'");
     }
     stbi_image_free(data);
 
-    this->m_resources.emplace(texParams->name, texture);
-}
-
-unsigned int TextureManager::createDefaultTexture()
-{
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    unsigned char white[] = { 255, 255, 255, 255 };
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    return textureID;
+    m_textures[path] = texture;
+    return texture;
 }

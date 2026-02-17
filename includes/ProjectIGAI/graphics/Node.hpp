@@ -1,6 +1,9 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
+#include <string>
 
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_NAME "None"
@@ -50,7 +53,7 @@ public:
     /**
      * @brief default destructor (virtual to keep class abstract).
      */
-    virtual ~Node() = 0;
+    virtual ~Node() = default;
 
     /**
      * @brief Give the transformation state of this node.
@@ -92,8 +95,3 @@ protected:
     std::string m_name;
 
 };
-
-/**
- * @brief Virtual destructor declaration for compilation purposes.
- */
-inline Node::~Node() {}

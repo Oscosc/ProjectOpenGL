@@ -26,9 +26,7 @@ public:
     enum ElementType {
         CAMERA,
         POINT_LIGHT, SPOT_LIGHT, DIR_LIGHT,
-        SPHERE,
-        MESH,
-        BEZIER_CURVE, BEZIER_SURFACE
+        OBJECT
     };
 
     /**
@@ -36,13 +34,10 @@ public:
      */
     static inline const std::unordered_map<std::string, ElementType> s_TypeAliases = {
         {"camera", CAMERA},
-        {"point light", POINT_LIGHT},
-        {"spot light", SPOT_LIGHT},
-        {"dir light", DIR_LIGHT},
-        {"sphere", SPHERE},
-        {"mesh", MESH},
-        {"bezier curve", BEZIER_CURVE},
-        {"bezier surface", BEZIER_SURFACE}
+        {"point_light", POINT_LIGHT},
+        {"spot_light", SPOT_LIGHT},
+        {"directional_light", DIR_LIGHT},
+        {"object", OBJECT}
     };
 
     /**
@@ -54,20 +49,7 @@ public:
      */
     static std::unordered_map<ElementType, unsigned int> retrieveSceneCounts(const json& data);
 
-    /**
-     * @brief Main function for parsing a Scene file (.json)
-     * 
-     * @param file path to the JSON scene file
-     */
-    static Scene parseScene(const json& data);
-
-    /**
-     * @brief Global function for adding a new element (all types) in the scene.
-     * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
-     */
-    static void addObjectToScene(Scene* scene, const json& item, std::string name);
+    static void parseScene(Scene* scene, const std::string &filePath);
 
 private:
 
@@ -77,7 +59,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Camera(Scene* scene, const json& item, std::string name);
+    static Camera* parseCamera(const json& node);
 
     /**
      * @brief Parse the object as a mesh.
@@ -85,31 +67,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_Mesh(Scene* scene, const json& item, std::string name);
-
-    /**
-     * @brief Parse the object as a sphere.
-     * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
-     */
-    static void parseObjectAs_Sphere(Scene* scene, const json& item, std::string name);
-
-        /**
-     * @brief Parse the object as a bezier curve.
-     * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
-     */
-    static void parseObjectAs_BezierCurve(Scene* scene, const json& item, std::string name);
-
-    /**
-     * @brief Parse the object as a bezier surface.
-     * 
-     * @param scene Scene where element will be added
-     * @param item JSON sub-object that contain the element informations.
-     */
-    static void parseObjectAs_BezierSurface(Scene* scene, const json& item, std::string name);
+    static Object* parseObject(const json& node);
 
     /**
      * @brief Parse the object as a point light.
@@ -117,7 +75,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_PointLight(Scene* scene, const json& item, std::string name);
+    static PointLight* parsePointLight(const json& node);
 
     /**
      * @brief Parse the object as a directional light.
@@ -125,7 +83,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_DirectionalLight(Scene* scene, const json& item, std::string name);
+    static DirectionalLight* parseDirectionalLight(const json& node);
 
     /**
      * @brief Parse the object as a spot light.
@@ -133,32 +91,7 @@ private:
      * @param scene Scene where element will be added
      * @param item JSON sub-object that contain the element informations.
      */
-    static void parseObjectAs_SpotLight(Scene* scene, const json& item, std::string name);
-
-    /**
-     * @brief 
-     * 
-     * @param object 
-     * @param item 
-     */
-    static void configureObject(Object* object, const json& item, const std::string name);
-
-    /**
-     * @brief 
-     * 
-     * @param light 
-     * @param item 
-     */
-    static void configureLight(Light* light, const json& item, const std::string name);
-
-    /**
-     * @brief 
-     * 
-     * @param node 
-     * @param item 
-     * @param name 
-     */
-    static void configureNode(Node* node, const json& item, const std::string name);
+    static SpotLight* parseSpotLight(const json& node);
 
     /**
      * @brief Auxiliary function for casting json element to glm::vec3.
@@ -169,33 +102,11 @@ private:
     static glm::vec3 jsonToVec3(const json& json, const std::string& attribute);
 
     /**
-     * @brief Auxiliary function for casting json element to float.
-     * 
-     * @param json JSON hierarchy containing the attribute
-     * @param attribute name of the attribute to convert
-     */
-    static float jsonToFloat(const json& json, const std::string& attribute);
-
-    /**
      * @brief Auxiliary function for casting json element to Transform.
      * 
      * @param json JSON hierarchy containing the attribute
      */
     static Transform jsonToTransform(const json& json);
-
-    /**
-     * @brief Auxiliary function for casting json element to Material.
-     * 
-     * @param json JSON hierarchy containing the attribute
-     */
-    static Material jsonToMaterial(const json& json);
-
-    /**
-     * @brief Auxiliary function for casting json element to ShaderMaterial.
-     * 
-     * @param json JSON hierarchy containing the attribute
-     */
-    static ShaderMaterial jsonToShaderMaterial(const json& json);
 
     /**
      * @brief Auxiliary function for casting json element to LightMaterial.

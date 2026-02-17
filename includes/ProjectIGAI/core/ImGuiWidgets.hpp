@@ -4,6 +4,7 @@
 
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
+#include <ProjectIGAI/graphics/StandardPBRMaterial.hpp>
 
 #include <extern/imgui/imgui.h>
 #include <extern/imgui/backends/imgui_impl_glfw.h>
@@ -24,7 +25,7 @@ namespace ImGuiWidgets
 
     bool transformEditor(Transform& transform, const TransformFlags flags);
 
-    bool shaderMaterialEditor(ShaderMaterial& material);
+    bool standardPBRMaterialEditor(StandardPBRMaterial* material);
 
     bool lightMaterialEditor(LightProperties& material);
 

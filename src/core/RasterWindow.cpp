@@ -21,7 +21,7 @@ void RasterWindow::subClassRendering()
 
     for(Object* object : m_scene->getAllObjects()) {
         object->draw(m_scene);
-        object->getMaterial().shader->setInt("renderingMode", m_renderingMode);
+        // object->getMaterial().shader->setInt("renderingMode", m_renderingMode);
     }
 
     m_HUD->render();
