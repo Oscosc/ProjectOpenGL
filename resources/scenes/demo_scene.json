@@ -1,100 +1,71 @@
 {
-    "main_camera": {
-        "type": "camera",
-        "transform": {
-            "position": [0.0, 4.0, 10.0],
-            "rotation": [0.0, -15.0, -90.0],
-            "scale":    [1.0, 1.0, 1.0]
-        }
-    },
-
-    "top_light": {
-        "type": "dir light",
-        "transform": {
-            "position": [0.0, 0.0, 0.0],
-            "rotation": [-90.0, 0.0, 0.0],
-            "scale":    [0.0, 0.0, 0.0]
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 4.0, 10.0],
+                "rotation": [0.0, -15.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
         },
-        "material": {
+        {
+            "name": "top_light",
+            "type": "directional_light",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [-90.0, 0.0, 0.0],
+                "scale":    [0.0, 0.0, 0.0]
+            },
             "color": [1.0, 1.0, 1.0],
             "intensity": 1.0
-        }
-    },
-
-    "sphere": {
-        "type": "sphere",
-        "size": 1.0,
-        "transform": {
-            "position": [-3.0, 0.0, 0.0],
-            "rotation": [-90.0, 0.0, 60.0],
-            "scale": [1.0, 1.0, 1.0]
         },
-        "texture": "earth",
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [1.0, 1.0, 1.0],
+        {
+            "name": "sphere_demo",
+            "type": "object",
+            "transform": {
+                "position": [-3.0, 0.0, 0.0],
+                "rotation": [-90.0, 0.0, 60.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "earth",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
                 "roughness": 0.5,
-                "metallic": 0.0
+                "metallic": 0.0,
+                "textures": {
+                    "albedo": "resources/textures/8k_earth.jpg"
+                }
+            }
+        },
+        {
+            "name": "backpack_demo",
+            "type": "object",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/backpack.obj"
+            },
+            "material": {
+                "name": "earth",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "textures": {
+                    "albedo": "resources/textures/8k_earth.jpg"
+                }
             }
         }
-    },
-
-    "cube": {
-        "type": "mesh",
-        "file": "resources/objects/xyzrgb_dragon.obj",
-        "transform": {
-            "position": [0.0, 0.0, 0.0],
-            "rotation": [0.0, 0.0, 0.0],
-            "scale": [0.015, 0.015, 0.015]
-        },
-        "texture": "ceres",
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [1.0, 1.0, 1.0],
-                "roughness": 0.5,
-                "metallic": 0.0
-            }
-        }
-    },
-
-    "surface": {
-        "type": "bezier surface",
-        "control points": [[
-                [0.0, 0.0, 0.0],
-                [0.33, 0.5, 0.0],
-                [0.66, -0.2, 0.0],
-                [1.0, 1.0, 0.0]
-            ],[
-                [0.0, 0.0, 0.33],
-                [0.33, 0.2, 0.33],
-                [0.66, 0.8, 0.33],
-                [1.0, 1.2, 0.33]
-            ],[
-                [0.0, 0.0, 0.66],
-                [0.33, -0.4, 0.66],
-                [0.66, 0.6, 0.66],
-                [1.0, 0.9, 0.66]
-            ],[
-                [0.0, 0.0, 1.0],
-                [0.33, 0.4, 1.0],
-                [0.66, 0.2, 1.0],
-                [1.0, 1.0, 1.0]
-        ]],
-        "transform": {
-            "position": [2.0, -1.0, 1.0],
-            "rotation": [0.0, 90.0, 0.0],
-            "scale": [2.0, 2.0, 2.0]
-        },
-        "texture": "metal",
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [1.0, 1.0, 1.0],
-                "roughness": 0.5,
-                "metallic": 0.0
-            }
-        }
-    }
+    ]
 }

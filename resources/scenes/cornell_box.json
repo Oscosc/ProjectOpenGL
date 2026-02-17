@@ -1,150 +1,165 @@
 {
-    "main_camera": {
-        "type": "camera",
-        "transform": {
-            "position": [0.0, 2.5, 9.5],
-            "rotation": [0.0, 0.0, -90.0],
-            "scale":    [1.0, 1.0, 1.0]
-        }
-    },
-
-    "ceiling_light": {
-        "type": "point light",
-        "transform": {
-            "position": [0.0, 4.5, 0.0],
-            "rotation": [0.0, 0.0, 0.0],
-            "scale":    [0.0, 0.0, 0.0]
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 2.5, 9.5],
+                "rotation": [0.0, 0.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
         },
-        "radius": 10.0,
-        "material": {
+        {
+            "name": "ceiling_light",
+            "type": "point_light",
+            "transform": {
+                "position": [0.0, 4.5, 0.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.0, 0.0, 0.0]
+            },
+            "radius": 10.0,
             "color": [1.0, 1.0, 1.0],
             "intensity": 1.0
-        }
-    },
-
-    "floor": {
-        "type": "mesh",
-        "file": "resources/objects/1x1_tile.obj",
-        "transform": {
-            "position": [-2.5, 0.0, -2.5],
-            "rotation": [90.0, 0.0, 0.0],
-            "scale": [5.0, 5.0, 5.0]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.73, 0.73],
+        {
+            "name": "floor",
+            "type": "object",
+            "transform": {
+                "position": [-2.5, 0.0, -2.5],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/1x1_tile.obj"
+            },
+            "material": {
+                "name": "grey_floor",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
                 "roughness": 0.8,
                 "metallic": 0.0
             }
-        }
-    },
-
-    "ceiling": {
-        "type": "mesh",
-        "file": "resources/objects/1x1_tile.obj",
-        "transform": {
-            "position": [-2.5, 5.0, -2.5],
-            "rotation": [90.0, 0.0, 0.0],
-            "scale": [5.0, 5.0, 5.0]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.73, 0.73],
+        {
+            "name": "ceiling",
+            "type": "object",
+            "transform": {
+                "position": [-2.5, 5.0, -2.5],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/1x1_tile.obj"
+            },
+            "material": {
+                "name": "grey_ceiling",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
                 "roughness": 0.8,
                 "metallic": 0.0
             }
-        }
-    },
-
-    "back_wall": {
-        "type": "mesh",
-        "file": "resources/objects/1x1_tile.obj",
-        "transform": {
-            "position": [-2.5, 0.0, -2.5],
-            "rotation": [0.0, 0.0, 0.0],
-            "scale": [5.0, 5.0, 5.0]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.73, 0.73],
+        {
+            "name": "back_wall",
+            "type": "object",
+            "transform": {
+                "position": [-2.5, 0.0, -2.5],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/1x1_tile.obj"
+            },
+            "material": {
+                "name": "grey_wall",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
                 "roughness": 0.8,
                 "metallic": 0.0
             }
-        }
-    },
-
-    "left_wall_red": {
-        "type": "mesh",
-        "file": "resources/objects/1x1_tile.obj",
-        "transform": {
-            "position": [-2.5, 0.0, -2.5],
-            "rotation": [0.0, -90.0, 0.0],
-            "scale": [5.0, 5.0, 5.0]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.63, 0.06, 0.04],
+        {
+            "name": "left_wall_red",
+            "type": "object",
+            "transform": {
+                "position": [-2.5, 0.0, -2.5],
+                "rotation": [0.0, -90.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/1x1_tile.obj"
+            },
+            "material": {
+                "name": "red_wall",
+                "type": "PBR",
+                "albedo": [0.63, 0.06, 0.04],
                 "roughness": 0.8,
                 "metallic": 0.0
             }
-        }
-    },
-
-    "right_wall_green": {
-        "type": "mesh",
-        "file": "resources/objects/1x1_tile.obj",
-        "transform": {
-            "position": [2.5, 0.0, 2.5],
-            "rotation": [0.0, 90.0, 0.0],
-            "scale": [5.0, 5.0, 5.0]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.15, 0.48, 0.09],
+        {
+            "name": "right_wall_green",
+            "type": "object",
+            "transform": {
+                "position": [2.5, 0.0, 2.5],
+                "rotation": [0.0, 90.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/1x1_tile.obj"
+            },
+            "material": {
+                "name": "green_wall",
+                "type": "PBR",
+                "albedo": [0.15, 0.48, 0.09],
                 "roughness": 0.8,
                 "metallic": 0.0
             }
-        }
-    },
-
-    "tall_box": {
-        "type": "mesh",
-        "file": "resources/objects/cube.obj",
-        "transform": {
-            "position": [-0.85, 1.5, -0.85],
-            "rotation": [0.0, -17.0, 0.0],
-            "scale": [1.5, 3.0, 1.5]
         },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.73, 0.73],
+        {
+            "name": "tall_box",
+            "type": "object",
+            "transform": {
+                "position": [-0.85, 1.5, -0.85],
+                "rotation": [0.0, -17.0, 0.0],
+                "scale":    [1.5, 3.0, 1.5]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/cube.obj"
+            },
+            "material": {
+                "name": "grey_box",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
+                "roughness": 0.5,
+                "metallic": 0.0
+            }
+        },
+        {
+            "name": "short_box",
+            "type": "object",
+            "transform": {
+                "position": [0.85, 0.75, 0.85],
+                "rotation": [0.0, 17.0, 0.0],
+                "scale":    [1.5, 1.5, 1.5]
+            },
+            "geometry": {
+                "type": "mesh",
+                "path": "resources/objects/cube.obj"
+            },
+            "material": {
+                "name": "grey_box",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
                 "roughness": 0.5,
                 "metallic": 0.0
             }
         }
-    },
-
-    "short_box": {
-        "type": "mesh",
-        "file": "resources/objects/cube.obj",
-        "transform": {
-            "position": [0.85, 0.75, 0.85],
-            "rotation": [0.0, 17.0, 0.0],
-            "scale": [1.5, 1.5, 1.5]
-        },
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.73, 0.73],
-                "roughness": 0.5,
-                "metallic": 0.0
-            }
-        }
-    }
+    ]
 }

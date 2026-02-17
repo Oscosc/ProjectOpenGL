@@ -1,42 +1,48 @@
 {
-    "main_camera": {
-        "type": "camera",
-        "transform": {
-            "position": [0.0, 0.0, 3.5],
-            "rotation": [0.0, 0.0, -90.0],
-            "scale":    [1.0, 1.0, 1.0]
-        }
-    },
-
-    "sun_light": {
-        "type": "dir light",
-        "transform": {
-            "position": [0.0, 0.0, 0.0],
-            "rotation": [-45.0, 45.0, 0.0],
-            "scale":    [0.0, 0.0, 0.0]
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 0.0, 3.5],
+                "rotation": [0.0, 0.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
         },
-        "material": {
+        {
+            "name": "sun_light",
+            "type": "directional_light",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [-45.0, 45.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
             "color": [1.0, 1.0, 1.0],
             "intensity": 1.0
-        }
-    },
-
-    "sphere_test": {
-        "type": "sphere",
-        "size": 1.0,
-        "transform": {
-            "position": [0.0, 0.0, 0.0],
-            "rotation": [90.0, 0.0, 0.0],
-            "scale": [1.0, 1.0, 1.0]
         },
-        "texture": "ceres",
-        "material": {
-            "shader": "lighted",
-            "shader material": {
-                "color": [0.73, 0.1, 0.0],
+        {
+            "name": "sphere_test",
+            "type": "object",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [0.73, 0.1, 0.0], 
                 "roughness": 0.5,
-                "metallic": 0.0
+                "metallic": 0.0,
+                "textures": {
+                    "albedo": "resources/textures/4k_ceres.jpg"
+                }
             }
         }
-    }
+    ]
 }

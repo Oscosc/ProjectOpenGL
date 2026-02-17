@@ -49,7 +49,6 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
     for (auto& node : jFile["nodes"]) {
         try {
             std::string type = node.value("type", "object");
-            Logger::logPerf("Trying to load node '" + node.value("name", "unnamed") + "' of type '" + type + "'.");
 
             Node* newNode = nullptr;
 
