@@ -3,6 +3,7 @@
 #include <fstream>
 #include <ProjectIGAI/graphics/ObjLoader.hpp>
 #include <ProjectIGAI/geometry/Splines.hpp>
+#include <ProjectIGAI/core/Logger.hpp>
 
 void GeometryFactory::createSphere(const float radius, const int segments,
     std::vector<Vertex>& vertices, std::vector<unsigned int>& indexes)

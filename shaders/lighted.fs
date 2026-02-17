@@ -67,7 +67,7 @@ uniform sampler2D objectTexture; // Optional texture
 uniform samplerCube skybox;      // Cubemap
 uniform Material material;       // Material of the fragment
 
-bool global_textureOn = true;
+bool PBR_ONLY = true;
 
 
 #if NB_POINT_LIGHTS > 0
@@ -208,7 +208,7 @@ vec4 PBR()
     vec3 N = normalize(Normal);
     
     vec3 albedo = material.albedo;
-    if(material.hasAlbedoMap) albedo = albedo * texture(material.albedoMap, UV).rgb; 
+    if(material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb; 
 
     albedo = pow(albedo, vec3(2.2));
 
@@ -298,7 +298,7 @@ void main()
     switch (renderingMode)
     {
     case 0: // PBR + texture
-        global_textureOn = true;
+        PBR_ONLY = false;
         FragColor = PBR();
         break;
 
@@ -311,7 +311,7 @@ void main()
         break;
     
     case 3: // PBR only
-        global_textureOn = false;
+        PBR_ONLY = true;
         FragColor = PBR();
         break;
 

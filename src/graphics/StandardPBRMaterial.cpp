@@ -1,11 +1,16 @@
 #include <ProjectIGAI/graphics/StandardPBRMaterial.hpp>
 
 #include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
+#include <ProjectIGAI/core/Scene.hpp>
 
 void StandardPBRMaterial::bind(Scene* scene)
 {
     // Activation shader
     m_shader->use();
+
+    // Light updating
+    scene->updateLigth(m_shader);
 
     // Ecriture des éléments principaux PBR
     m_shader->setVec3("material.albedo", albedo);
@@ -25,7 +30,7 @@ void StandardPBRMaterial::bind(Scene* scene)
     // Ecriture éventuelle de la roughnessMap si existante
     if(roughnessMap) {
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, albedoMap);
+        glBindTexture(GL_TEXTURE_2D, roughnessMap);
         m_shader->setInt("material.roughnessMap", 1);
         m_shader->setBool("material.hasRoughnessMap", true);
     } else {
@@ -35,12 +40,18 @@ void StandardPBRMaterial::bind(Scene* scene)
     // Ecriture éventuelle de la metallicMap si existante
     if(metallicMap) {
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, albedoMap);
+        glBindTexture(GL_TEXTURE_2D, metallicMap);
         m_shader->setInt("material.metallicMap", 2);
         m_shader->setBool("material.hasMetallicMap", true);
     } else {
         m_shader->setBool("material.hasMetallicMap", false);
     }
+
+    // Binding de la skybox
+    glActiveTexture(GL_TEXTURE10);
+    GLuint skyboxID = *CubemapManager::getInstance().getResource("Lake"); 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
+    m_shader->setInt("skybox", 10);
 }
 
 void StandardPBRMaterial::setAlbedoTexture(const std::string &path)
