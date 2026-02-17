@@ -1,55 +1,43 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 
 #include <ProjectIGAI/core/Logger.hpp>
-#include <ProjectIGAI/graphics/CubemapManager.hpp>
 
-void Object::debugMaterial() const
+Object::Object(const std::string& name) : m_geometry(nullptr), Node(DEFAULT_TRANSFORM, name)
 {
-    std::cout << "  |- Color     : " << glm::to_string(getMaterial().matShader.color) << std::endl;
-    std::cout << "  |- Roughness : " << getMaterial().matShader.roughness << std::endl;
-    std::cout << "  |- Metallic  : " << getMaterial().matShader.metallic << std::endl;
 }
 
-glm::mat4 Object::getModelMatrix() const
+Object::~Object()
 {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, this->m_transform.position);
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
-    model = glm::scale(model, this->m_transform.scale);
-
-    return model;
 }
 
-void Object::addTexture(std::string name)
+void Object::setGeometry(Geometry *geometry)
 {
-    m_texture = *TextureManager::getInstance().getResource(name);
-    if(m_texture)
-        m_hasTexture = true;
-}
-
-void Object::bindTexture(Shader* shader, Scene* scene) const
-{
-    shader->setInt("objectTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-
-    if(m_hasTexture)
-        glBindTexture(GL_TEXTURE_2D, m_texture);
-    
+    if(!geometry)
+        Logger::logWarning("Trying to attach an empty geometry to an object");
     else
-        glBindTexture(GL_TEXTURE_2D, TextureManager::getInstance().getDefaultTexture());
-
-    shader->setInt("skybox", 1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, *CubemapManager::getInstance().getResource(scene->skyboxName()));
+        m_geometry = geometry;
 }
 
-void Object::updateMaterial(Shader *shader) const
+Geometry *Object::getGeometry() const
 {
-    shader->use();
-    
-    shader->setVec3("material.color", this->getMaterial().matShader.color);
-    shader->setFloat("material.roughness", this->getMaterial().matShader.roughness);
-    shader->setFloat("material.metallic", this->getMaterial().matShader.metallic);
+    return m_geometry;
+}
+
+void Object::setMaterial(Material *material)
+{
+    if(!material)
+        Logger::logWarning("Trying to attach an empty material to an object");
+    else
+        m_material = material;
+}
+
+Material *Object::getMaterial() const
+{
+    return m_material;
+}
+
+void Object::draw(Scene *scene)
+{
+    m_material->bind(scene);
+    m_geometry->draw();
 }

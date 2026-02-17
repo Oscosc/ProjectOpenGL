@@ -1,6 +1,5 @@
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
-#include <ProjectIGAI/graphics/Sphere.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
 
 Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
@@ -101,16 +100,6 @@ Light *Scene::getLight(unsigned int index, unsigned int type) const
     case SPOT_LIGHT_INDEX:  return m_lights.spotLights.at(index);
     default: return nullptr;
     }
-}
-
-std::vector<Sphere *> Scene::getSpheresRT() const
-{
-    std::vector<Sphere*> spheres;
-    for(auto obj : m_objects) {
-        Sphere* s = dynamic_cast<Sphere*>(obj);
-        if(s != nullptr) spheres.push_back(s);
-    }
-    return spheres;
 }
 
 Camera *Scene::getActiveCamera() const

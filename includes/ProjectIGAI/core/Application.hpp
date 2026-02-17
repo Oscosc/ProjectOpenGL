@@ -11,7 +11,6 @@
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/core/BaseWindow.hpp>
 #include <ProjectIGAI/graphics/HUD.hpp>
-#include <ProjectIGAI/raytracing/RayTracer.hpp>
 
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
