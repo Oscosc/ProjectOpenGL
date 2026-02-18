@@ -37,7 +37,8 @@ void GeometryFactory::createSphere(const float radius, const int segments,
             vertices.push_back({
                 glm::vec3(x, y, z), // Position
                 glm::normalize(glm::vec3(x, y, z)), // Normal
-                glm::vec3(float(j)/sectorCount, float(i)/stackCount, 0.0f) // UV
+                glm::normalize(glm::vec3(-sinf(sectorAngle), cosf(sectorAngle), 0.f)), // Tangent
+                glm::vec2(float(j)*5/sectorCount, float(i)*3/stackCount) // UV
             });
         }
     }
@@ -87,6 +88,7 @@ void GeometryFactory::createBezierCurve(const vec3Array &controlPoints, const un
     for(int i = 0; i < nbPoints; ++i) {
         vertices[i] = {
             Splines::Bezier::getValue((float)i / (nbPoints - 1), controlPoints),
+            glm::vec3(0.f),
             glm::vec3(0.f),
             glm::vec2(0.f)
         };

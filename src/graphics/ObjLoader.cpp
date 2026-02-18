@@ -183,6 +183,7 @@ void ObjLoader::computeUniques(
             Vertex item {
                 (index.position != -1) ? positions[index.position] : glm::vec3(0.0f),
                 (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f),
+                glm::vec3(0.f), // Fixme
                 (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
             };
 

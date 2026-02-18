@@ -47,11 +47,27 @@ void StandardPBRMaterial::bind(Scene* scene)
         m_shader->setBool("material.hasMetallicMap", false);
     }
 
+    // Ecriture de la normalMap si existante
+    if(normalMap) {
+        glad_glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, normalMap);
+        m_shader->setInt("material.normalMap", 3);
+        m_shader->setBool("material.hasNormalMap", true);
+    } else {
+        m_shader->setBool("material.hasNormalMap", false);
+    }
+
     // Binding de la skybox
-    glActiveTexture(GL_TEXTURE10);
-    GLuint skyboxID = *CubemapManager::getInstance().getResource("Lake"); 
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
     m_shader->setInt("skybox", 10);
+    if(scene->skyboxActive()) {
+        glActiveTexture(GL_TEXTURE10);
+        GLuint skyboxID = *CubemapManager::getInstance().getResource(scene->skyboxName()); 
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
+        m_shader->setBool("hasSkybox", true);
+    } else {
+        m_shader->setVec3("background", scene->getBackgroundColor());
+        m_shader->setBool("hasSkybox", false);
+    }
 }
 
 void StandardPBRMaterial::setAlbedoTexture(const std::string &path)
@@ -67,4 +83,9 @@ void StandardPBRMaterial::setRoughnessTexture(const std::string &path)
 void StandardPBRMaterial::setMetallicTexture(const std::string &path)
 {
     this->metallicMap = TextureManager::getInstance().loadTexture(path);
+}
+
+void StandardPBRMaterial::setNormalTexture(const std::string &path)
+{
+    this->normalMap = TextureManager::getInstance().loadTexture(path);
 }

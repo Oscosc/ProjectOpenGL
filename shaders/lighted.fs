@@ -27,6 +27,10 @@ struct Material {
     bool hasAlbedoMap;
     bool hasRoughnessMap;
     bool hasMetallicMap;
+
+    sampler2D normalMap;
+
+    bool hasNormalMap;
 };
 
 struct PointLight {
@@ -61,10 +65,13 @@ out vec4 FragColor;              // Visible color of the fragment after computat
 
 in vec3 FragPos;                 // World's position of the fragment
 in vec3 Normal;                  // Normal of the fragment
+in vec3 Tangent;
 in vec2 UV;                      // UV value of the fragment (for textures)
 
-uniform sampler2D objectTexture; // Optional texture
 uniform samplerCube skybox;      // Cubemap
+uniform bool hasSkybox;
+uniform vec3 background;
+
 uniform Material material;       // Material of the fragment
 
 bool PBR_ONLY = true;
@@ -206,6 +213,16 @@ vec4 PBR()
 {
     vec3 V = normalize(viewPos - FragPos);
     vec3 N = normalize(Normal);
+    vec3 T = normalize(Tangent);
+
+    // Recalcul de la normal selon la normalMap
+    if(material.hasNormalMap) {
+        vec3 B = cross(T, N); // Bitangent
+        mat3 TBN = mat3(T, B, N);
+        vec3 normal = texture(material.normalMap, UV).rgb;
+        normal = normal * 2.0 - 1.0;
+        N = normalize(TBN * normal);
+    }
     
     vec3 albedo = material.albedo;
     if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
@@ -277,10 +294,14 @@ vec4 PBR()
     vec3 ambientDiffuse = kD * albedo;
 
     vec3 R = reflect(-V, N);
-    vec3 prefilteredColor = textureLod(skybox, R, roughness * 10.0).rgb; 
+
+    // Switch entre skybox et background
+    vec3 prefilteredColor = vec3(0.0);
+    if(hasSkybox) prefilteredColor = textureLod(skybox, R, roughness * 10.0).rgb;
+    else prefilteredColor = background;
+    // accumulatedColor += MicrofacetsBRDF(N, V, R, prefilteredColor, albedo, roughness, metallic);
+
     vec3 ambientSpecular = prefilteredColor * kS;
-
-
     accumulatedColor += (ambientDiffuse + ambientSpecular);
 
     // ACES (instead of tone mapping) : Academic Color Encoding System

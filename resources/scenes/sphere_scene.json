@@ -40,9 +40,10 @@
                 "roughness": 1.0,
                 "metallic": 1.0,
                 "textures": {
-                    "albedo":    "resources/textures/slum-wall/albedo.png",
-                    "roughness": "resources/textures/slum-wall/roughness.png",
-                    "metallic":  "resources/textures/slum-wall/metallic.png"
+                    "albedo":    "resources/textures/used-stainless-steel/albedo.png",
+                    "roughness": "resources/textures/used-stainless-steel/roughness.png",
+                    "metallic":  "resources/textures/used-stainless-steel/metallic.png",
+                    "normal":    "resources/textures/used-stainless-steel/normal.png"
                 }
             }
         }

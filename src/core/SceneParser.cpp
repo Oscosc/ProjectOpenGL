@@ -188,6 +188,11 @@ Object* SceneParser::parseObject(const json& node)
                 std::string path = texData["metallic"];
                 mat->metallicMap = TextureManager::getInstance().loadTexture(path);
             }
+
+            if(texData.contains("normal")) {
+                std::string path = texData["normal"];
+                mat->normalMap = TextureManager::getInstance().loadTexture(path);
+            }
         }
 
         obj->setMaterial(mat);

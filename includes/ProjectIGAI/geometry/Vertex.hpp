@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <vector>
 
 /** Names to easily identify arrays/matrix of vectors */
 using vec3Array = std::vector<glm::vec3>;
@@ -15,6 +16,7 @@ using vec3Grid = std::vector<std::vector<glm::vec3>>;
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
+    glm::vec3 tangent;
     glm::vec2 uv;
 
     /**

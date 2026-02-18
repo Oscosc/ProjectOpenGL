@@ -17,7 +17,8 @@ RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsi
 void RasterWindow::subClassRendering()
 {
     // Rendering skybox/cubemap
-    CubemapManager::getInstance().drawCubemap(m_scene->skyboxName(), m_scene);
+    if(m_scene->skyboxActive())
+        CubemapManager::getInstance().drawCubemap(m_scene->skyboxName(), m_scene);
 
     for(Object* object : m_scene->getAllObjects()) {
         object->draw(m_scene);
@@ -40,7 +41,10 @@ void RasterWindow::drawImGuiFrame()
     ImGui::Begin("Project IGAI configuration");
 
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
-
+    bool tmpSkyboxActive = m_scene->skyboxActive();
+    if(ImGui::Checkbox("Skybox ?", &tmpSkyboxActive)) {
+        m_scene->setSkyboxActive(tmpSkyboxActive);
+    }
     ImGuiWidgets::mapSelector(CubemapManager::getInstance().getAll(), "Skybox", &m_scene->skyboxAttr(), &m_scene->skyboxName());
 
     const char* items[] = {"PBR & Texture", "Normals", "UVs", "PBR Only", "Texture Only"};

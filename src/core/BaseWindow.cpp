@@ -93,7 +93,7 @@ void BaseWindow::render()
     this->m_lastFrame = currentFrame;
 
     // Clearing buffer before drawing
-    glm::vec4 bgColor = m_scene->getBackgroundColor();
+    glm::vec4 bgColor = glm::vec4(m_scene->getBackgroundColor(), 1.f);
     glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

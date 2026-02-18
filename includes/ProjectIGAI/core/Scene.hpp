@@ -208,7 +208,7 @@ public:
      * 
      * @return background color
      */
-    const glm::vec4 getBackgroundColor() const { return m_backgroundColor; }
+    const glm::vec3 getBackgroundColor() const { return m_backgroundColor; }
 
     /**
      * @brief Set the background color.
@@ -217,14 +217,19 @@ public:
      */
     void setBackgroundColor(const glm::vec4 color) { m_backgroundColor = color; }
 
+
     std::string& skyboxName() { return m_skyboxName; }
 
     int& skyboxAttr() { return m_skybox; }
 
+    bool skyboxActive() const { return m_skyboxActive; }
+
+    void setSkyboxActive(const bool value) { m_skyboxActive = value; }
+
 private:
 
     /** Background color */
-    glm::vec4 m_backgroundColor = {0.0f, 0.1f, 0.2f, 1.0};
+    glm::vec3 m_backgroundColor = {0.0f, 0.1f, 0.2f};
 
     /** ID of active camera */
     unsigned int m_activeCamera;
@@ -243,6 +248,6 @@ private:
 
     /** Skybox */
     int m_skybox;
+    bool m_skyboxActive = false;
     std::string m_skyboxName = "Lake";
-
 };

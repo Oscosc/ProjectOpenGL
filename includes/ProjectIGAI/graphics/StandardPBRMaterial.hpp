@@ -18,6 +18,9 @@ public:
     GLuint roughnessMap = 0;
     GLuint metallicMap  = 0;
 
+    // Other maps
+    GLuint normalMap = 0;
+
     void bind(Scene* scene) override;
 
     void setAlbedoTexture(const std::string& path);
@@ -25,4 +28,6 @@ public:
     void setRoughnessTexture(const std::string& path);
 
     void setMetallicTexture(const std::string& path);
+
+    void setNormalTexture(const std::string& path);
 };
