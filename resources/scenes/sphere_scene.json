@@ -36,11 +36,13 @@
             "material": {
                 "name": "rough_sphere",
                 "type": "PBR",
-                "albedo": [0.73, 0.1, 0.0], 
-                "roughness": 0.5,
-                "metallic": 0.0,
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
                 "textures": {
-                    "albedo": "resources/textures/4k_ceres.jpg"
+                    "albedo":    "resources/textures/slum-wall/albedo.png",
+                    "roughness": "resources/textures/slum-wall/roughness.png",
+                    "metallic":  "resources/textures/slum-wall/metallic.png"
                 }
             }
         }

@@ -208,12 +208,18 @@ vec4 PBR()
     vec3 N = normalize(Normal);
     
     vec3 albedo = material.albedo;
-    if(material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb; 
+    if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
+
+    float roughness = material.roughness;
+    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).x;
+
+    float metallic = material.metallic;
+    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).x;
 
     albedo = pow(albedo, vec3(2.2));
 
     vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, material.metallic);
+    F0 = mix(F0, albedo, metallic);
 
     vec3 accumulatedColor = vec3(0.0);
 
@@ -227,7 +233,7 @@ vec4 PBR()
         float attenuation = WindowedAttenuation(d, pointLights[i].radius);
         vec3 radiance = pointLights[i].color * pointLights[i].intensity * attenuation;
 
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
     }
 
 #endif
@@ -242,7 +248,7 @@ vec4 PBR()
         vec3 radiance = dirLights[i].color * dirLights[i].intensity;
 
 
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
     }
 
 #endif
@@ -260,18 +266,18 @@ vec4 PBR()
         float distAtt = WindowedAttenuation(d, spotLights[i].radius);
         vec3 radiance = spotLights[i].color * spotLights[i].intensity * angleAtt * distAtt;
 
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, material.roughness, material.metallic);
+        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
     }
 
 #endif
 
-    vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, material.roughness);
+    vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     vec3 kD = 1.0 - kS;
-    kD *= (1.0 - material.metallic);
+    kD *= (1.0 - metallic);
     vec3 ambientDiffuse = kD * albedo;
 
     vec3 R = reflect(-V, N);
-    vec3 prefilteredColor = textureLod(skybox, R, material.roughness * 10.0).rgb; 
+    vec3 prefilteredColor = textureLod(skybox, R, roughness * 10.0).rgb; 
     vec3 ambientSpecular = prefilteredColor * kS;
 
 
