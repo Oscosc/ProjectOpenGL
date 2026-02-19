@@ -58,6 +58,7 @@ in vec3 Tangent;
 in vec2 UV;                      // UV value of the fragment (for textures)
 
 uniform samplerCube skybox;      // Cubemap
+uniform sampler2D brdfLUT;
 uniform bool hasSkybox;
 uniform vec3 background;
 
@@ -97,6 +98,11 @@ uniform int renderingMode;
 vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -170,7 +176,7 @@ vec3 PBR(vec3 radiance, vec3 L, vec3 V, vec3 N,
     
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;	  
+    kD *= 1.0 - metallic;
     
     vec3 numerator    = NDF * G * F;
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -235,8 +241,25 @@ void main()
         Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
     }
 #endif
-  
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = vec3(0.03);
+    if(hasSkybox)irradiance = texture(skybox, N).rgb;
+    else irradiance = background;
+    vec3 diffuse = irradiance * albedo;
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 R = reflect(-V, N);
+    vec3 prefilteredColor = textureLod(skybox, R,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+    vec3 ambient = (kD * diffuse + specular) * ao;
+
     vec3 color = ambient + Lo;
 	
     color = color / (color + vec3(1.0));

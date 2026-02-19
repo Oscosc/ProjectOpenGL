@@ -79,6 +79,12 @@ void StandardPBRMaterial::bind(Scene* scene)
         m_shader->setVec3("background", scene->getBackgroundColor());
         m_shader->setBool("hasSkybox", false);
     }
+
+    // Specular de la skymap
+    m_shader->setInt("brdfLUT", 11);
+    glActiveTexture(GL_TEXTURE11);
+    GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png"); 
+    glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
 }
 
 void StandardPBRMaterial::setAlbedoTexture(const std::string &path)

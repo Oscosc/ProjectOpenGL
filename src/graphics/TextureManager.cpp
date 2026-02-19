@@ -9,7 +9,6 @@ GLuint TextureManager::loadTexture(const std::string& path)
     unsigned int texture;
 
     if(m_textures.find(path) != m_textures.end()) {
-        Logger::logPerf("Existing instance of '" + path + "' texture found !");
         return m_textures[path];
     }
 
