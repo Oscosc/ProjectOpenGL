@@ -69,22 +69,26 @@ void StandardPBRMaterial::bind(Scene* scene)
     }
 
     // Binding de la skybox
-    m_shader->setInt("skybox", 10);
-    if(scene->skyboxActive()) {
-        glActiveTexture(GL_TEXTURE10);
-        GLuint skyboxID = *CubemapManager::getInstance().getResource(scene->skyboxName()); 
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
-        m_shader->setBool("hasSkybox", true);
-    } else {
-        m_shader->setVec3("background", scene->getBackgroundColor());
-        m_shader->setBool("hasSkybox", false);
-    }
+    m_shader->setInt("skybox.irradianceMap", 10);
+    m_shader->setInt("skybox.environmentMap", 11);
+    m_shader->setInt("skybox.brdfLUT", 12);
 
-    // Specular de la skymap
-    m_shader->setInt("brdfLUT", 11);
-    glActiveTexture(GL_TEXTURE11);
-    GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png"); 
-    glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
+    if(scene->skyboxActive()) {
+        Cubemap* skyboxID = CubemapManager::getInstance().getResource(scene->skyboxName());
+        glActiveTexture(GL_TEXTURE10);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID->irradiance);
+        glActiveTexture(GL_TEXTURE11);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID->environment);
+
+        glActiveTexture(GL_TEXTURE12);
+        GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png"); 
+        glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
+
+        m_shader->setBool("skybox.hasSkybox", true);
+    } else {
+        m_shader->setVec3("skybox.background", scene->getBackgroundColor());
+        m_shader->setBool("skybox.hasSkybox", false);
+    }
 }
 
 void StandardPBRMaterial::setAlbedoTexture(const std::string &path)

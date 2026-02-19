@@ -6,27 +6,21 @@
 
 #define PI 3.14159265359
 
-
-/*************************************************************************************************
- *                                      STRUCTURES SECTION                                       *
- *************************************************************************************************/
-
-/**
- * Material as defined in gLTF documentation :
- * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
- */
 struct Material {
     vec3 albedo;
     float roughness;
     float metallic;
+    float ao;
 
     sampler2D albedoMap;
     sampler2D roughnessMap;
     sampler2D metallicMap;
+    sampler2D aoMap;
 
     bool hasAlbedoMap;
     bool hasRoughnessMap;
     bool hasMetallicMap;
+    bool hasAOMap;
 
     sampler2D normalMap;
 
@@ -56,10 +50,15 @@ struct SpotLight {
     float radius;
 };
 
+struct Skybox {
+    samplerCube irradianceMap;
+    samplerCube environmentMap;
+    sampler2D brdfLUT;
 
-/*************************************************************************************************
- *                                      PARAMETERS SECTION                                       *
- *************************************************************************************************/
+    vec3 background;
+
+    bool hasSkybox;
+};
 
 out vec4 FragColor;              // Visible color of the fragment after computation
 
@@ -68,13 +67,11 @@ in vec3 Normal;                  // Normal of the fragment
 in vec3 Tangent;
 in vec2 UV;                      // UV value of the fragment (for textures)
 
-uniform samplerCube skybox;      // Cubemap
-uniform bool hasSkybox;
-uniform vec3 background;
+uniform Skybox skybox;           // Skybox informations
 
 uniform Material material;       // Material of the fragment
 
-bool PBR_ONLY = true;
+bool PBR_ONLY = false;
 
 
 #if NB_POINT_LIGHTS > 0
@@ -105,52 +102,9 @@ uniform vec3 viewPos; // Camera position in the world space
  */
 uniform int renderingMode;
 
-
-/*************************************************************************************************
- *                                    VARIOUS OTHER FUNCTIONS                                    *
- *************************************************************************************************/
-
-/**
- * Code from : https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
- * Page 12 : Lighting Model
- */
-float WindowedAttenuation(float dist, float lightRadius)
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
-    // Physical attenuation
-    float attenuation = 1.0 / (dist * dist);
-
-    // Windowed factor attenuation
-    float factor = dist / lightRadius;
-    float factor4 = factor * factor * factor * factor;
-    float fallOff = clamp(1.0 - factor4, 0.0, 1.0);
-    fallOff = fallOff * fallOff;
-
-    // Final product
-    return attenuation * fallOff;
-}
-
-/*************************************************************************************************
- *                               BRDF/MICROFACETS FUNCTIONS SECTION                              *
- *************************************************************************************************/
-
-float DistributionTrowbridgeReitzGGX(vec3 N, vec3 H, float alpha2)
-{
-    float NdotH = max(dot(N, H), 0.0);
-    float denominator = (NdotH * NdotH * (alpha2 - 1.0) + 1.0);
-
-    return alpha2 / (PI * denominator * denominator);
-}
-
-float SeparatedSmithJoint(float NdotX, float alpha2)
-{
-    float denominator = abs(NdotX) + sqrt(alpha2 + (1.0 - alpha2) * NdotX * NdotX);
-
-    return (2.0 * abs(NdotX)) / denominator;
-}
-
-vec3 FresnelSchlick(float HdotV, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - HdotV, 0.0, 1.0), 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
@@ -158,64 +112,95 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-/**
- * @brief Main microfacets/BRDF function. Describe how light is reflected based on parameters.
- * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-b-brdf-implementation
- *
- * @param N Surface normal vector (world space)
- * @param V Normalized view vector, from fragment position to camera position (world space)
- * @param L Normalized light vector, from fragment position to light position (world space)
- * @param color Color of the fragment, part of the material (range 0 -> 1 for each element)
- * @param roughness Roughness of the fragment, part of the material (range 0 -> 1)
- * @param metallic Metallic level of the fragment, part of the material (range 0 -> 1)
- */
-vec3 MicrofacetsBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 albedo, float roughness, float metallic)
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-    // To avoid division by zero
-    roughness = max(roughness, 0.05);
-
-    // Check for "no light angle"
-    vec3 H = normalize(V + L);
-    float NdotL = max(dot(N, L), 0.0);
-    float NdotV = max(dot(N, V), 0.0);
-
-    // if (NdotL <= 0.0 || NdotV <= 0.0) return vec3(0.0); // ==> Un bug/artefact apparait avec ce code
-
-    // Material "preparation"
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, albedo, metallic);
-
-    // Specular
-    float alpha = roughness * roughness;
-    float alpha2 = alpha * alpha;
-    
-    float D = DistributionTrowbridgeReitzGGX(N, H, alpha2);
-    float G = SeparatedSmithJoint(NdotL, alpha2) * SeparatedSmithJoint(NdotV, alpha2);
-    vec3 F  = FresnelSchlick(max(dot(H, V), 0.0), F0);
-    
-    vec3 numerator = D * G * F;
-    float denominator = 4.0 * NdotL * NdotV + 0.00001;
-    vec3 specular = numerator / denominator;
-
-    // Diffuse
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= (1.0 - metallic);
-    
-    vec3 diffuse = kD * albedo / PI;
-
-    // Final color
-    return (diffuse + specular) * radiance * NdotL;
+    float a      = roughness*roughness;
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+	
+    float num   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return num / denom;
 }
 
-// Physically Based Rendering main function
-vec4 PBR()
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
-    vec3 V = normalize(viewPos - FragPos);
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return num / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
+}
+
+vec3 PointRadiance(PointLight light)
+{
+    float distance    = length(light.position - FragPos);
+    float attenuation = 1.0 / (distance * distance);
+    return light.color * attenuation * light.intensity; // Radiance
+}
+
+vec3 DirRadiance(DirLight light)
+{
+    return light.color * light.intensity; // Radiance
+}
+
+vec3 SpotRadiance(SpotLight light, vec3 L)
+{
+    float d = length(light.position - FragPos);
+    float cosTheta = dot(normalize(light.direction), -L);
+
+    float angleAtt = clamp((cosTheta - light.outerCos) / (light.innerCos - light.outerCos), 0.0, 1.0);
+    float distance = length(light.position - FragPos);
+    float distAtt = 1.0 / (distance * distance);
+    return light.color * light.intensity * angleAtt * distAtt; // Radiance
+}
+
+vec3 PBR(vec3 radiance, vec3 L, vec3 V, vec3 N,
+         vec3 albedo, float roughness, float metallic,
+         vec3 F0)
+{  
+    vec3 H = normalize(V + L);
+
+    // cook-torrance brdf
+    float NDF = DistributionGGX(N, H, roughness); 
+    float G   = GeometrySmith(N, V, L, roughness);
+    vec3 F    = FresnelSchlick(max(dot(H, V), 0.0), F0);
+    
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+    
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+    vec3 specular     = numerator / denominator;  
+        
+    // add to outgoing radiance Lo
+    float NdotL = max(dot(N, L), 0.0);
+    return (kD * albedo / PI + specular) * radiance * NdotL;
+}
+
+void main()
+{
     vec3 N = normalize(Normal);
     vec3 T = normalize(Tangent);
+    vec3 V = normalize(viewPos - FragPos);
 
-    // Recalcul de la normal selon la normalMap
+    // Material selection
     if(material.hasNormalMap) {
         vec3 B = cross(T, N); // Bitangent
         mat3 TBN = mat3(T, B, N);
@@ -228,125 +213,66 @@ vec4 PBR()
     if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
 
     float roughness = material.roughness;
-    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).x;
+    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).r;
 
     float metallic = material.metallic;
-    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).x;
+    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).r;
 
-    albedo = pow(albedo, vec3(2.2));
+    float ao = material.ao;
+    if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, UV).r;
 
-    vec3 F0 = vec3(0.04);
+    vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
-
-    vec3 accumulatedColor = vec3(0.0);
+	           
+    // reflectance equation
+    vec3 Lo = vec3(0.0);
 
 #ifdef POINT_LIGHTS
-
-    // phase 1: Point lights
-    for(int i = 0; i < NB_POINT_LIGHTS; i++) {
-        vec3 L = normalize(pointLights[i].position - FragPos);
-        float d = length(pointLights[i].position - FragPos);
-
-        float attenuation = WindowedAttenuation(d, pointLights[i].radius);
-        vec3 radiance = pointLights[i].color * pointLights[i].intensity * attenuation;
-
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
+    for(int i = 0; i < NB_POINT_LIGHTS; ++i) {
+        vec3 L = normalize(pointLights[i].position - FragPos); 
+        vec3 radiance = PointRadiance(pointLights[i]);   
+        Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
     }
-
 #endif
-
 #ifdef DIR_LIGHTS
-
-    // phase 2: Directional lights
-    for(int i = 0; i < NB_DIR_LIGHTS; i++) {
-        vec3 L = normalize(-dirLights[i].direction);
-
-        // No attenuation
-        vec3 radiance = dirLights[i].color * dirLights[i].intensity;
-
-
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
+    for(int i = 0; i < NB_DIR_LIGHTS; ++i) {
+        vec3 L = normalize(dirLights[i].direction); 
+        vec3 radiance = DirRadiance(dirLights[i]);     
+        Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
     }
-
 #endif
-
 #ifdef SPOT_LIGHTS
-
-    // phase 3: Spot lights
-    for(int i = 0; i < NB_SPOT_LIGHTS; i++) {
-        vec3 L = normalize(spotLights[i].position - FragPos);
-        float d = length(spotLights[i].position - FragPos);
-        float cosTheta = dot(normalize(spotLights[i].direction), -L);
-
-        float angleAtt = clamp((cosTheta - spotLights[i].outerCos) /
-            (spotLights[i].innerCos - spotLights[i].outerCos), 0.0, 1.0);
-        float distAtt = WindowedAttenuation(d, spotLights[i].radius);
-        vec3 radiance = spotLights[i].color * spotLights[i].intensity * angleAtt * distAtt;
-
-        accumulatedColor += MicrofacetsBRDF(N, V, L, radiance, albedo, roughness, metallic);
+    for(int i = 0; i < NB_SPOT_LIGHTS; ++i) {
+        vec3 L = normalize(spotLights[i].position - FragPos); 
+        vec3 radiance = SpotRadiance(spotLights[i], L);      
+        Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
     }
-
 #endif
 
-    vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
     vec3 kD = 1.0 - kS;
-    kD *= (1.0 - metallic);
-    vec3 ambientDiffuse = kD * albedo;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = vec3(0.03);
+    if(skybox.hasSkybox)irradiance = texture(skybox.irradianceMap, N).rgb;
+    else irradiance = skybox.background;
+    vec3 diffuse = irradiance * albedo;
 
     vec3 R = reflect(-V, N);
-
-    // Switch entre skybox et background
-    vec3 prefilteredColor = vec3(0.0);
-    if(hasSkybox) prefilteredColor = textureLod(skybox, R, roughness * 10.0).rgb;
-    else prefilteredColor = background;
-
-    vec3 ambientSpecular = prefilteredColor * kS;
-    accumulatedColor += (ambientDiffuse + ambientSpecular);
-
-    // ACES (instead of tone mapping) : Academic Color Encoding System
-    vec3 color = accumulatedColor;
-    color = (color * (2.51 * color + 0.03)) / (color * (2.43 * color + 0.59) + 0.14);
-    color = clamp(color, 0.0, 1.0);
-
-    // Gamma correction
-    vec3 correctedGamma = pow(color, vec3(1.0 / 2.2));
-
-    return vec4(correctedGamma, 1.0);
-}
-
-
-/*************************************************************************************************
- *                                         MAIN SECTION                                          *
- *************************************************************************************************/
-
-void main()
-{
-    switch (renderingMode)
-    {
-    case 0: // PBR + texture
-        PBR_ONLY = false;
-        FragColor = PBR();
-        break;
-
-    case 1: // Normals
-        FragColor = vec4((normalize(Normal) + vec3(1.0)) * 0.5, 1.0);
-        break;
-
-    case 2: // UVs
-        FragColor = vec4(UV, 0.0, 1.0);
-        break;
     
-    case 3: // PBR only
-        PBR_ONLY = true;
-        FragColor = PBR();
-        break;
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   
+    vec2 envBRDF  = texture(skybox.brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+    
+    vec3 ambient = (kD * diffuse + specular) * ao;
 
-    case 4: // Texture only
-        if(material.hasAlbedoMap) {
-            FragColor = texture(material.albedoMap, UV);
-        } else {
-            FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        }
-        break;
-    }
+    vec3 color = ambient + Lo;
+	
+    color = color / (color + vec3(1.0)); // Tone mapping
+    color = pow(color, vec3(1.0/2.2));   // Gama correction
+   
+    FragColor = vec4(color, 1.0);
 }

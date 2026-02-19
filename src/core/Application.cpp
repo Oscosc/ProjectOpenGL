@@ -81,12 +81,12 @@ void Application::initShaders(const std::string& sceneFile)
     unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
     unsigned int spotLights = sceneCount[SceneParser::SPOT_LIGHT];
 
-    ShaderManager::getInstance().loadResource(ShaderParam("lighted", "shaders/lighted.vs", "shaders/lighted2.fs", pointLights, dirLights, spotLights));
+    ShaderManager::getInstance().loadResource(ShaderParam("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights));
     ShaderManager::getInstance().loadResource(ShaderParam("quad", "shaders/quad.vs", "shaders/quad.fs"));
     ShaderManager::getInstance().loadResource(ShaderParam("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs"));
 
-    CubemapManager::getInstance().loadResource(CubemapParam("Lake"));
-    CubemapManager::getInstance().loadResource(CubemapParam("Storforsen"));
+    CubemapManager::getInstance().loadResource(CubemapParam("Bell-Tower",
+        "resources/cubemaps/bell_tower_8k.hdr"), 512);
 }
 
 void Application::initScene(const std::string& sceneFile)
