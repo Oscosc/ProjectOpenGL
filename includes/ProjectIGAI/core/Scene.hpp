@@ -229,7 +229,7 @@ public:
 private:
 
     /** Background color */
-    glm::vec3 m_backgroundColor = {0.0f, 0.1f, 0.2f};
+    glm::vec3 m_backgroundColor = {0.1f, 0.1f, 0.1f};
 
     /** ID of active camera */
     unsigned int m_activeCamera;
@@ -249,5 +249,5 @@ private:
     /** Skybox */
     int m_skybox;
     bool m_skyboxActive = false;
-    std::string m_skyboxName = "Lake";
+    std::string m_skyboxName = "Bell-Tower";
 };

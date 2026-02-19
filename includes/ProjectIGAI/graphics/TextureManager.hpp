@@ -16,7 +16,7 @@ class TextureManager : public Singleton<TextureManager>
 
 public:
 
-    GLuint loadTexture(const std::string& path);
+    GLuint loadTexture(const std::string& path, const int mode = GL_REPEAT);
 
 private:
 

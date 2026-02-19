@@ -40,11 +40,11 @@
                 "roughness": 1.0,
                 "metallic": 1.0,
                 "textures": {
-                    "albedo":    "resources/textures/slum-wall/albedo.png",
-                    "roughness": "resources/textures/slum-wall/roughness.png",
-                    "metallic":  "resources/textures/slum-wall/metallic.png",
-                    "normal":    "resources/textures/slum-wall/normal.png",
-                    "ao":        "resources/textures/slum-wall/ao.png"
+                    "albedo":    "resources/textures/rock-wall/albedo.png",
+                    "roughness": "resources/textures/rock-wall/roughness.png",
+                    "metallic":  "resources/textures/rock-wall/metallic.png",
+                    "normal":    "resources/textures/rock-wall/normal.png",
+                    "ao":        "resources/textures/rock-wall/ao.png"
                 }
             }
         }

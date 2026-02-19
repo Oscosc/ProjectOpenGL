@@ -256,16 +256,18 @@ void main()
     kD *= 1.0 - metallic;	  
     
     vec3 irradiance = vec3(0.03);
-    if(skybox.hasSkybox)irradiance = texture(skybox.irradianceMap, N).rgb;
+    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb;
     else irradiance = skybox.background;
     vec3 diffuse = irradiance * albedo;
 
     vec3 R = reflect(-V, N);
     
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   
+    const float MAX_REFLECTION_LOD = 10.0;
+    vec3 prefilteredColor = vec3(0.03);
+    if(skybox.hasSkybox) prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
+    else prefilteredColor = skybox.background; 
     vec2 envBRDF  = texture(skybox.brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+    vec3 specular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
     
     vec3 ambient = (kD * diffuse + specular) * ao;
 

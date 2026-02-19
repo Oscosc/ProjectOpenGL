@@ -50,9 +50,9 @@ void StandardPBRMaterial::bind(Scene* scene)
 
     // Ecriture éventuelle de la metallicMap si existante
     if(aoMap) {
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, aoMap);
-        m_shader->setInt("material.aoMap", 2);
+        m_shader->setInt("material.aoMap", 3);
         m_shader->setBool("material.hasAOMap", true);
     } else {
         m_shader->setBool("material.hasAOMap", false);
@@ -60,9 +60,9 @@ void StandardPBRMaterial::bind(Scene* scene)
 
     // Ecriture de la normalMap si existante
     if(normalMap) {
-        glad_glActiveTexture(GL_TEXTURE3);
+        glad_glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, normalMap);
-        m_shader->setInt("material.normalMap", 3);
+        m_shader->setInt("material.normalMap", 4);
         m_shader->setBool("material.hasNormalMap", true);
     } else {
         m_shader->setBool("material.hasNormalMap", false);
@@ -81,7 +81,7 @@ void StandardPBRMaterial::bind(Scene* scene)
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID->environment);
 
         glActiveTexture(GL_TEXTURE12);
-        GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png"); 
+        GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png", GL_CLAMP_TO_EDGE); 
         glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
 
         m_shader->setBool("skybox.hasSkybox", true);
