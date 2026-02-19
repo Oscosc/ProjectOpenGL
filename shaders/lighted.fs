@@ -299,7 +299,6 @@ vec4 PBR()
     vec3 prefilteredColor = vec3(0.0);
     if(hasSkybox) prefilteredColor = textureLod(skybox, R, roughness * 10.0).rgb;
     else prefilteredColor = background;
-    // accumulatedColor += MicrofacetsBRDF(N, V, R, prefilteredColor, albedo, roughness, metallic);
 
     vec3 ambientSpecular = prefilteredColor * kS;
     accumulatedColor += (ambientDiffuse + ambientSpecular);

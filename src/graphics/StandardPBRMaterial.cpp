@@ -16,6 +16,7 @@ void StandardPBRMaterial::bind(Scene* scene)
     m_shader->setVec3("material.albedo", albedo);
     m_shader->setFloat("material.roughness", roughness);
     m_shader->setFloat("material.metallic", metallic);
+    m_shader->setFloat("material.ao", 1.0f);
 
     // Ecriture éventuelle de l'albedoMap si existante
     if(albedoMap) {
@@ -45,6 +46,16 @@ void StandardPBRMaterial::bind(Scene* scene)
         m_shader->setBool("material.hasMetallicMap", true);
     } else {
         m_shader->setBool("material.hasMetallicMap", false);
+    }
+
+    // Ecriture éventuelle de la metallicMap si existante
+    if(aoMap) {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, aoMap);
+        m_shader->setInt("material.aoMap", 2);
+        m_shader->setBool("material.hasAOMap", true);
+    } else {
+        m_shader->setBool("material.hasAOMap", false);
     }
 
     // Ecriture de la normalMap si existante
@@ -88,4 +99,9 @@ void StandardPBRMaterial::setMetallicTexture(const std::string &path)
 void StandardPBRMaterial::setNormalTexture(const std::string &path)
 {
     this->normalMap = TextureManager::getInstance().loadTexture(path);
+}
+
+void StandardPBRMaterial::setAOTexture(const std::string &path)
+{
+    this->aoMap = TextureManager::getInstance().loadTexture(path);
 }

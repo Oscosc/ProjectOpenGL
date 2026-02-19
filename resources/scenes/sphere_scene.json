@@ -13,8 +13,8 @@
             "name": "sun_light",
             "type": "directional_light",
             "transform": {
-                "position": [0.0, 0.0, 0.0],
-                "rotation": [-45.0, 45.0, 0.0],
+                "position": [1.0, 0.0, 2.0],
+                "rotation": [45.0, -45.0, 0.0],
                 "scale":    [1.0, 1.0, 1.0]
             },
             "color": [1.0, 1.0, 1.0],
@@ -43,7 +43,8 @@
                     "albedo":    "resources/textures/used-stainless-steel/albedo.png",
                     "roughness": "resources/textures/used-stainless-steel/roughness.png",
                     "metallic":  "resources/textures/used-stainless-steel/metallic.png",
-                    "normal":    "resources/textures/used-stainless-steel/normal.png"
+                    "normal":    "resources/textures/used-stainless-steel/normal.png",
+                    "ao":        "resources/textures/used-stainless-steel/ao.png"
                 }
             }
         }

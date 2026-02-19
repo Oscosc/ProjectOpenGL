@@ -17,6 +17,7 @@ public:
     GLuint albedoMap    = 0;
     GLuint roughnessMap = 0;
     GLuint metallicMap  = 0;
+    GLuint aoMap        = 0;
 
     // Other maps
     GLuint normalMap = 0;
@@ -30,4 +31,6 @@ public:
     void setMetallicTexture(const std::string& path);
 
     void setNormalTexture(const std::string& path);
+
+    void setAOTexture(const std::string& path);
 };
