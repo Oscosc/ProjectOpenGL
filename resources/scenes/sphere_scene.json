@@ -103,6 +103,90 @@
                     "ao":        "resources/textures/used-stainless-steel/ao.png"
                 }
             }
+        },
+        {
+            "name": "sphere_testD",
+            "type": "object",
+            "transform": {
+                "position": [-2.1, 2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/rusty-metal/albedo.png",
+                    "roughness": "resources/textures/rusty-metal/roughness.png",
+                    "metallic":  "resources/textures/rusty-metal/metallic.png",
+                    "normal":    "resources/textures/rusty-metal/normal.png",
+                    "ao":        "resources/textures/rusty-metal/ao.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testE",
+            "type": "object",
+            "transform": {
+                "position": [0.0, 2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/diamond-inlay-tile/albedo.png",
+                    "roughness": "resources/textures/diamond-inlay-tile/roughness.png",
+                    "metallic":  "resources/textures/diamond-inlay-tile/metallic.png",
+                    "normal":    "resources/textures/diamond-inlay-tile/normal.png",
+                    "ao":        "resources/textures/diamond-inlay-tile/ao.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testF",
+            "type": "object",
+            "transform": {
+                "position": [2.1, 2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/peeling-painted-metal/albedo.png",
+                    "roughness": "resources/textures/peeling-painted-metal/roughness.png",
+                    "metallic":  "resources/textures/peeling-painted-metal/metallic.png",
+                    "normal":    "resources/textures/peeling-painted-metal/normal.png",
+                    "ao":        "resources/textures/peeling-painted-metal/ao.png"
+                }
+            }
         }
     ]
 }

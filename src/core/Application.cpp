@@ -8,20 +8,7 @@
 #include <ProjectIGAI/graphics/CubemapManager.hpp>
 #include <ProjectIGAI/graphics/PointLight.hpp>
 #include <ProjectIGAI/core/RasterWindow.hpp>
-
-// ------------------------------------------------------------------------------------------------
-#include <chrono>
-namespace Timer {
-    using Time = std::chrono::steady_clock;
-    using float_sec = std::chrono::duration<float>;
-    using float_time_point = std::chrono::time_point<Time, float_sec>;
-
-    float_time_point
-    getCurrentTime() {
-        return Time::now();
-    }
-}
-// ------------------------------------------------------------------------------------------------
+#include <ProjectIGAI/core/utils.hpp>
 
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight), m_activeWindowsCount(0)

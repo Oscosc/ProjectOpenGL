@@ -194,7 +194,33 @@ vec3 PBR(vec3 radiance, vec3 L, vec3 V, vec3 N,
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-void main()
+vec3 AmbientPBR(vec3 N, vec3 V, vec3 F0, vec3 albedo, float roughness, float metallic, float ao)
+{
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = vec3(0.03);
+    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb;
+    else irradiance = skybox.background;
+    vec3 diffuse = irradiance * albedo;
+
+    vec3 R = reflect(-V, N);
+    
+    const float MAX_REFLECTION_LOD = 10.0;
+    vec3 prefilteredColor = vec3(0.03);
+    if(skybox.hasSkybox) prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
+    else prefilteredColor = skybox.background; 
+    vec2 envBRDF  = texture(skybox.brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
+    
+    vec3 ambient = (kD * diffuse + specular) * ao;
+    return ambient;
+}
+
+void FullRendering()
 {
     vec3 N = normalize(Normal);
     vec3 T = normalize(Tangent);
@@ -249,27 +275,7 @@ void main()
     }
 #endif
 
-    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
-    vec3 kS = F;
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
-    
-    vec3 irradiance = vec3(0.03);
-    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb;
-    else irradiance = skybox.background;
-    vec3 diffuse = irradiance * albedo;
-
-    vec3 R = reflect(-V, N);
-    
-    const float MAX_REFLECTION_LOD = 10.0;
-    vec3 prefilteredColor = vec3(0.03);
-    if(skybox.hasSkybox) prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
-    else prefilteredColor = skybox.background; 
-    vec2 envBRDF  = texture(skybox.brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
-    
-    vec3 ambient = (kD * diffuse + specular) * ao;
+    vec3 ambient = AmbientPBR(N, V, F0, albedo, roughness, metallic, ao);
 
     vec3 color = ambient + Lo;
 	
@@ -277,4 +283,69 @@ void main()
     color = pow(color, vec3(1.0/2.2));   // Gama correction
    
     FragColor = vec4(color, 1.0);
+}
+
+
+
+/*************************************************************************************************
+ *                                         MAIN SECTION                                          *
+ *************************************************************************************************/
+
+#define M_PBR           0
+
+#define M_NORMALS       1
+#define M_TANGENT       2
+#define M_UVS           3
+
+#define M_ALBEDO        4
+#define M_ROUGHNESS     5
+#define M_METALLIC      6
+#define M_AO            7
+
+#define M_LIGHT_PBR     8
+#define M_AMBIENT_PBR   9
+
+void main() {
+    switch (renderingMode)
+    {
+    case M_PBR:
+        FullRendering();
+        break;
+
+    case M_NORMALS:
+        FragColor = vec4((normalize(Normal) + vec3(1.0)) * 0.5, 1.0);
+        break;
+
+    case M_TANGENT:
+        FragColor = vec4((normalize(Tangent) + vec3(1.0)) * 0.5, 1.0);
+        break;
+
+    case M_UVS:
+        FragColor = vec4(UV, 0.0, 1.0);
+        break;
+
+    case M_ALBEDO:
+        vec3 albedo = material.albedo;
+        if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
+        FragColor = vec4(albedo, 1.0);
+        break;
+
+    case M_ROUGHNESS:
+        float roughness = material.roughness;
+        if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).r;
+        FragColor = vec4(vec3(roughness), 1.0);
+        break;
+
+    case M_METALLIC:
+        float metallic = material.metallic;
+        if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).r;
+        FragColor = vec4(vec3(metallic), 1.0);
+        break;
+
+    case M_AO:
+        float ao = material.ao;
+        if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, UV).r;
+        FragColor = vec4(vec3(ao), 1.0);
+        break;
+    }
 }

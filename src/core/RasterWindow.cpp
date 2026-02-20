@@ -47,7 +47,9 @@ void RasterWindow::drawImGuiFrame()
     }
     ImGuiWidgets::mapSelector(CubemapManager::getInstance().getAll(), "Skybox", &m_scene->skyboxAttr(), &m_scene->skyboxName());
 
-    const char* items[] = {"PBR & Texture", "Normals", "UVs", "PBR Only", "Texture Only"};
+    const char* items[] = {"PBR",
+        "Normals", "Tangents", "UVs",
+        "Albedo", "Roughness", "Metallic", "AO"};
     ImGui::Combo("Render mode", &m_renderingMode, items, IM_ARRAYSIZE(items));
 
     if (ImGui::CollapsingHeader("Scene"))

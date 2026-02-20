@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <extern/stb_image.h>
 #include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/core/utils.hpp>
 
 GLuint TextureManager::loadTexture(const std::string& path, const int mode)
 {
@@ -11,6 +12,8 @@ GLuint TextureManager::loadTexture(const std::string& path, const int mode)
     if(m_textures.find(path) != m_textures.end()) {
         return m_textures[path];
     }
+
+    auto timerStart = Timer::getCurrentTime();
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -32,6 +35,9 @@ GLuint TextureManager::loadTexture(const std::string& path, const int mode)
         Logger::logError("Failed to load texture '" + path + "'");
     }
     stbi_image_free(data);
+
+    float execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logPerf(std::to_string(execTime) + " ms for loading resource '" + path + "'");
 
     m_textures[path] = texture;
     return texture;

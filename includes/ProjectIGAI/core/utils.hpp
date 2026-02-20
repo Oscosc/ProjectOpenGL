@@ -17,6 +17,17 @@
 #include <stdexcept>
 #include <glm/glm.hpp>
 
+// ------------------------------------------------------------------------------------------------
+#include <chrono>
+namespace Timer {
+    using Time = std::chrono::steady_clock;
+    using float_sec = std::chrono::duration<float>;
+    using float_time_point = std::chrono::time_point<Time, float_sec>;
+
+    float_time_point getCurrentTime();
+}
+// ------------------------------------------------------------------------------------------------
+
 /**
  * @brief Renvoie la liste des entiers de 0 (inclus) à n (exclus) à la mnière de la fonction
  * range() en Python.

@@ -6,7 +6,6 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
 
-
 std::vector<unsigned int> Range(unsigned int n)
 {
     std::vector<unsigned int> rangeVector;
@@ -145,4 +144,9 @@ float reflectance(const float &cosine, const float &refractionIndex)
     float r0 = (1 - refractionIndex) / (1 + refractionIndex);
     r0 *= r0; // Squared
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
+}
+
+Timer::float_time_point Timer::getCurrentTime()
+{
+    return Time::now();
 }
