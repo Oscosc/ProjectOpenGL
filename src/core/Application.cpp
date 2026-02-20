@@ -9,9 +9,19 @@
 #include <ProjectIGAI/graphics/PointLight.hpp>
 #include <ProjectIGAI/core/RasterWindow.hpp>
 
+// ------------------------------------------------------------------------------------------------
 #include <chrono>
-#define timer std::chrono::high_resolution_clock
-#define duration std::chrono::duration_cast<std::chrono::nanoseconds>
+namespace Timer {
+    using Time = std::chrono::steady_clock;
+    using float_sec = std::chrono::duration<float>;
+    using float_time_point = std::chrono::time_point<Time, float_sec>;
+
+    float_time_point
+    getCurrentTime() {
+        return Time::now();
+    }
+}
+// ------------------------------------------------------------------------------------------------
 
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight), m_activeWindowsCount(0)
@@ -98,10 +108,6 @@ void Application::initScene(const std::string& sceneFile)
     this->getMainWindow()->setSceneRef(m_scene);
 
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
-
-    // this->m_scene->addObject(new Grid());
-
-    Logger::logInfo("Scene builded with " + std::to_string(m_scene->objectsCount()) + " visible objects in it");
 }
 
 void Application::postInitComponents()
@@ -130,24 +136,46 @@ void Application::loop()
 
 void Application::run(const std::string& sceneFile)
 {
+    auto timerStart = Timer::getCurrentTime();
+    float execTime;
+
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initGLContext();
-    Logger::logInfo("OpenGL correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tOpenGL correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initMainWindow();
-    Logger::logInfo("Main window correctly created");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tMain window correctly created");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initGLComponents();
-    Logger::logInfo("OpenGL/GLAD components correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\t\tOpenGL/GLAD components correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initShaders(sceneFile);
-    Logger::logInfo("Shaders correctly loaded and computed");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tShaders correctly loaded and computed");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initScene(sceneFile);
-    Logger::logInfo("Scene correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tScene correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     postInitComponents();
-    Logger::logInfo("Components are all fully initialized");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\t\tAll components fully initialized");
     
+    // --------------------------------------------------------------------------------------------
     Logger::logInfo("Starting application loop");
     loop();
     Logger::logInfo("Application closed");

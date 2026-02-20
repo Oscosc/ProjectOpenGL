@@ -21,10 +21,10 @@
             "intensity": 1.0
         },
         {
-            "name": "sphere_test",
+            "name": "sphere_testA",
             "type": "object",
             "transform": {
-                "position": [0.0, 0.0, 0.0],
+                "position": [2.1, 0.0, 0.0],
                 "rotation": [90.0, 0.0, 0.0],
                 "scale":    [1.0, 1.0, 1.0]
             },
@@ -45,6 +45,62 @@
                     "metallic":  "resources/textures/rock-wall/metallic.png",
                     "normal":    "resources/textures/rock-wall/normal.png",
                     "ao":        "resources/textures/rock-wall/ao.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testB",
+            "type": "object",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/slum-wall/albedo.png",
+                    "roughness": "resources/textures/slum-wall/roughness.png",
+                    "metallic":  "resources/textures/slum-wall/metallic.png",
+                    "normal":    "resources/textures/slum-wall/normal.png",
+                    "ao":        "resources/textures/slum-wall/ao.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testC",
+            "type": "object",
+            "transform": {
+                "position": [-2.1, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/used-stainless-steel/albedo.png",
+                    "roughness": "resources/textures/used-stainless-steel/roughness.png",
+                    "metallic":  "resources/textures/used-stainless-steel/metallic.png",
+                    "normal":    "resources/textures/used-stainless-steel/normal.png",
+                    "ao":        "resources/textures/used-stainless-steel/ao.png"
                 }
             }
         }
