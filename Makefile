@@ -4,7 +4,7 @@
 
 CXX = g++
 CC  = gcc
-LDFLAGS = -lglfw -ldl -g -lm -fopenmp
+LDFLAGS = -lglfw -ldl -g -lm -fopenmp -lassimp
 COMPFLAGS = -fopenmp -Iincludes -MMD -MP -fdiagnostics-color=always
 
 

@@ -62,3 +62,13 @@ Geometry *GeometryManager::getMesh(const std::string path)
     m_geometries[key] = newGeometry;
     return newGeometry;
 }
+
+Geometry *GeometryManager::getRawGeometry(const std::string &name,
+    const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indexes)
+{
+    Geometry* newGeometry = new Geometry(vertices, indexes);
+
+    // Storing and returning reference
+    m_geometries[name] = newGeometry;
+    return newGeometry;
+}
