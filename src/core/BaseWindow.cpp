@@ -75,6 +75,9 @@ void BaseWindow::initImGui()
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange; // Disable mouse control by ImGui
 
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.IndentSpacing = 5.0f;
+
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 }

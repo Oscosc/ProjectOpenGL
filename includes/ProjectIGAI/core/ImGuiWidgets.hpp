@@ -69,6 +69,8 @@ namespace ImGuiWidgets
 
     void objectsEditor(Scene* scene);
 
+    void nodeEditorRecursive(Node* node);
+
     void pointLightsEditor(Scene* scene);
 
     void dirLightsEditor(Scene* scene);

@@ -40,31 +40,51 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
     ImGui::PushID("Objects");
     ImGui::Indent();
 
-    const std::vector<Node*>& objects = scene->getAllObjects();
-    for(int i = 0; i < objects.size(); i++) {
+    const std::vector<Node*>& rootNodes = scene->getAllObjects(); 
+    
+    for(Node* rootNode : rootNodes) {
+        nodeEditorRecursive(rootNode);
+        ImGui::Separator();
+    }
 
-        ImGui::PushID(i);
-        ImGui::Text(objects.at(i)->getName().c_str());
+    ImGui::Unindent();
+    ImGui::PopID();
+}
 
-        Transform tmpTransform = objects.at(i)->getTransform();
+void ImGuiWidgets::nodeEditorRecursive(Node* node)
+{
+    if (node == nullptr) return;
+    ImGui::PushID(node); 
 
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    
+    if (node->getChildrens().empty()) {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+
+    bool nodeOpen = ImGui::TreeNodeEx(node->getName().c_str(), flags);
+
+    if (nodeOpen) {
+        Transform tmpTransform = node->getTransform();
         if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
-            objects.at(i)->setTransform(tmpTransform);
+            node->setTransform(tmpTransform);
         }
 
-        Object* realObject = static_cast<Object*>(objects[i]);
+        Object* realObject = dynamic_cast<Object*>(node);
         if(realObject != nullptr) {
             StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(realObject->getMaterial());
-            if(standardPBRMaterialEditor(tmpMaterial)) {
+            if(tmpMaterial != nullptr && standardPBRMaterialEditor(tmpMaterial)) {
                 realObject->setMaterial(tmpMaterial);
             }
         }
 
-        ImGui::Separator();
-        ImGui::PopID();
+        for (Node* child : node->getChildrens()) {
+            nodeEditorRecursive(child);
+        }
+
+        ImGui::TreePop(); 
     }
 
-    ImGui::Unindent();
     ImGui::PopID();
 }
 
