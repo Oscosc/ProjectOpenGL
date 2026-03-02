@@ -4,6 +4,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <string>
+#include <vector>
 
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_NAME "None"
@@ -86,10 +87,23 @@ public:
         return glm::normalize(rotationQuat * worldForward);
     }
 
+    void addChildren(Node& child) { m_childrens.push_back(&child); }
+
+    const std::vector<Node*> getChildrens() { return m_childrens; }
+
+    const Node* getParent() { return m_parent; }
+
+    void setParent(Node& parent) { m_parent = &parent; }
+
+    bool isRoot() { return m_parent == nullptr; }
+
 protected:
 
     /** Transformation of the node element */
     Transform m_transform;
+
+    Node* m_parent = nullptr;
+    std::vector<Node*> m_childrens;
 
     /** Name of the node */
     std::string m_name;
