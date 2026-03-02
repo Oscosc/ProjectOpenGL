@@ -91,22 +91,26 @@ bool PBR_ONLY = false;
 
 uniform vec3 viewPos; // Camera position in the world space
 
-
 /* UNIFORMS FOR DEBUGGING */
 
-/**
- * 0 = Standard mode (PBR)
- * 1 = Normals mode
- * 2 = UVs mode
- * 3 = Texture only
- */
 uniform int renderingMode;
 
+/**
+ * Fresnel-Schlick operator for calculating F value
+ * @param cosTheta cosinus of the angle
+ * @param F0 refraction index of the material (default is 0.04)
+ */
 vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+/**
+ * Fresnel-Schlick operator specified for roughness computation
+ * @param cosTheta cosinus of the angle
+ * @param F0 refraction index of the material (default is 0.04)
+ * @param roughness roughness of the material
+ */
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
