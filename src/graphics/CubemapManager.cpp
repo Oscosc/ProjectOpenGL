@@ -137,7 +137,7 @@ void CubemapManager::loadResource(const ResourceParam& params, int resolution)
 
 void CubemapManager::drawCubemap(const std::string &name, Scene* scene)
 {
-    glDepthFunc(GL_EQUAL);
+    glDepthFunc(GL_LEQUAL);
 
     Shader* shader = ShaderManager::getInstance().getResource("cubemap");
     shader->use();

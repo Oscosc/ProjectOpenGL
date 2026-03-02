@@ -84,6 +84,8 @@ void Application::initShaders(const std::string& sceneFile)
 
     CubemapManager::getInstance().loadResource(CubemapParam("Bell-Tower",
         "resources/cubemaps/bell_tower_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Rogland clear night",
+        "resources/cubemaps/rogland_clear_night_8k.hdr"), 512);
 }
 
 void Application::initScene(const std::string& sceneFile)
