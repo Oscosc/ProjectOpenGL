@@ -9,6 +9,7 @@
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 #include <ProjectIGAI/graphics/MaterialManager.hpp>
 #include <ProjectIGAI/graphics/StandardPBRMaterial.hpp>
+#include <ProjectIGAI/graphics/AssimpLoader.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
 #include <ProjectIGAI/core/utils.hpp>
 
@@ -52,7 +53,9 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
 
             Node* newNode = nullptr;
 
-            if (type == "object")
+            if(type == "model")
+                newNode = AssimpLoader::loadModel(node.value("path", ""));
+            else if (type == "object")
                 newNode = parseObject(node);
             else if (type == "directional_light")
                 newNode = parseDirectionalLight(node);
@@ -85,8 +88,8 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
                 scene->addCamera(cam);
             }
 
-            else if (auto* obj = dynamic_cast<Object*>(newNode)) {
-                scene->addObject(obj);
+            else {
+                scene->addNode(newNode);
             }
             
             //if(newNode) scene->addNode(newNode);

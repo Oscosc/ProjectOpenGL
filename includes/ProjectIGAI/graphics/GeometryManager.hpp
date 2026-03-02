@@ -17,6 +17,9 @@ public:
 
     Geometry* getMesh(const std::string path);
 
+    Geometry* getRawGeometry(const std::string& name,
+        const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indexes);
+
 private:
 
     /** Geometry manager constructor (private for Singleton) */

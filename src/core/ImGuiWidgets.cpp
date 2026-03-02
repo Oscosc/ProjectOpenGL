@@ -40,28 +40,51 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
     ImGui::PushID("Objects");
     ImGui::Indent();
 
-    const std::vector<Object*>& objects = scene->getAllObjects();
-    for(int i = 0; i < objects.size(); i++) {
-
-        ImGui::PushID(i);
-        ImGui::Text(objects.at(i)->getName().c_str());
-
-        Transform tmpTransform = objects.at(i)->getTransform();
-        StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(objects.at(i)->getMaterial());
-
-        if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
-            objects.at(i)->setTransform(tmpTransform);
-        }
-
-        if(standardPBRMaterialEditor(tmpMaterial)) {
-            objects.at(i)->setMaterial(tmpMaterial);
-        }
-
+    const std::vector<Node*>& rootNodes = scene->getAllObjects(); 
+    
+    for(Node* rootNode : rootNodes) {
+        nodeEditorRecursive(rootNode);
         ImGui::Separator();
-        ImGui::PopID();
     }
 
     ImGui::Unindent();
+    ImGui::PopID();
+}
+
+void ImGuiWidgets::nodeEditorRecursive(Node* node)
+{
+    if (node == nullptr) return;
+    ImGui::PushID(node); 
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    
+    if (node->getChildrens().empty()) {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+
+    bool nodeOpen = ImGui::TreeNodeEx(node->getName().c_str(), flags);
+
+    if (nodeOpen) {
+        Transform tmpTransform = node->getTransform();
+        if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
+            node->setTransform(tmpTransform);
+        }
+
+        Object* realObject = dynamic_cast<Object*>(node);
+        if(realObject != nullptr) {
+            StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(realObject->getMaterial());
+            if(tmpMaterial != nullptr && standardPBRMaterialEditor(tmpMaterial)) {
+                realObject->setMaterial(tmpMaterial);
+            }
+        }
+
+        for (Node* child : node->getChildrens()) {
+            nodeEditorRecursive(child);
+        }
+
+        ImGui::TreePop(); 
+    }
+
     ImGui::PopID();
 }
 

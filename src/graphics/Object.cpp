@@ -4,7 +4,7 @@
 #include <ProjectIGAI/graphics/ProjViewMatrix.hpp>
 #include <ProjectIGAI/core/Scene.hpp>
 
-Object::Object(const std::string& name) : m_geometry(nullptr), Node(DEFAULT_TRANSFORM, name)
+Object::Object(const std::string& name) : m_geometry(nullptr), m_material(nullptr), Node(DEFAULT_TRANSFORM, name)
 {
 }
 
@@ -38,29 +38,30 @@ Material *Object::getMaterial() const
     return m_material;
 }
 
-void Object::draw(Scene *scene)
+void Object::draw(Scene *scene, glm::mat4 parentTransform)
 {
-    // Material setup
-    m_material->bind(scene);
+    glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
+    if (m_material && m_geometry)
+    {
+        m_material->bind(scene);
 
-    // Transformation setup
-    Shader* shader = m_material->getShader();
-    if (!shader) return;
-    shader->use();
+        Shader* shader = m_material->getShader();
+        if (shader)
+        {
+            shader->use();
 
-    ProjViewMatrix pv = scene->getActiveCameraPV();
-    shader->setMat4("view", pv.view);
-    shader->setMat4("projection", pv.projection);
+            ProjViewMatrix pv = scene->getActiveCameraPV();
+            shader->setMat4("view", pv.view);
+            shader->setMat4("projection", pv.projection);
+            shader->setMat4("model", globalTransform);
 
-    Transform t = this->getTransform();
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, t.position);
-    model = glm::rotate(model, glm::radians(t.rotation.y), glm::vec3(0, 1, 0));
-    model = glm::rotate(model, glm::radians(t.rotation.x), glm::vec3(1, 0, 0));
-    model = glm::rotate(model, glm::radians(t.rotation.z), glm::vec3(0, 0, 1));
-    model = glm::scale(model, t.scale);
-    shader->setMat4("model", model);
+            m_geometry->draw();
+        }
+    }
 
-    // Drawing the geometry using shader
-    m_geometry->draw();
+    // Node propagation
+    for (Node* child : m_childrens)
+    {
+        child->draw(scene, globalTransform);
+    }
 }

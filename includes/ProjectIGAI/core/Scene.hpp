@@ -38,14 +38,6 @@ public:
     Scene() {}
 
     /**
-     * @brief Construct a new Scene with a default camera and multiples pre-constructed objects.
-     * 
-     * @param camera default camera
-     * @param objects list of scene objects
-     */
-    Scene(Camera* camera, std::vector<Object*> objects = std::vector<Object*>());
-
-    /**
      * @brief Default destructor for Scene object.
      */
     ~Scene() = default;
@@ -78,30 +70,6 @@ public:
      */
     ProjViewMatrix getActiveCameraPV() const;
 
-    void addNode(Node* node) {
-        if (!node) return;
-    
-        if (auto* light = dynamic_cast<PointLight*>(node)) {
-            addLight(light);
-        }
-
-        else if (auto* light = dynamic_cast<DirectionalLight*>(node)) {
-            addLight(light);
-        }
-
-        else if (auto* light = dynamic_cast<SpotLight*>(node)) {
-            addLight(light);
-        }
-
-        else if (auto* cam = dynamic_cast<Camera*>(node)) {
-            addCamera(cam);
-        }
-
-        else if (auto* obj = dynamic_cast<Object*>(node)) {
-            addObject(obj);
-        }
-    }
-
     /**
      * @brief Add a new camera to the scene.
      * 
@@ -117,7 +85,7 @@ public:
      * 
      * @param object element to add.
      */
-    void addObject(Object* object) { this->m_objects.push_back(object); }
+    void addNode(Node* node) { this->m_nodes.push_back(node); }
 
     /**
      * @brief Add a new point light to the scene.
@@ -156,7 +124,7 @@ public:
     /**
      * @brief Return the number of objects in the scene.
      */
-    const unsigned int objectsCount() const { return m_objects.size(); }
+    const unsigned int objectsCount() const { return m_nodes.size(); }
 
     /**
      * @brief Return the camera with identifier = index
@@ -178,7 +146,7 @@ public:
      * 
      * @param index index of the element to retrieve
      */
-    Object* getObject(unsigned int index) const { return m_objects.at(index); }
+    Node* getNode(unsigned int index) const { return m_nodes.at(index); }
 
     /**
      * @brief Return the 'index' light of type 'type'
@@ -194,7 +162,7 @@ public:
      * 
      * @return all scene objects
      */
-    std::vector<Object*> getAllObjects() { return m_objects; }
+    std::vector<Node*> getAllObjects() { return m_nodes; }
 
     /**
      * @brief Get a pointer on the scene background color for ImGui modification
@@ -226,6 +194,10 @@ public:
 
     void setSkyboxActive(const bool value) { m_skyboxActive = value; }
 
+    int getRenderingMode() const { return m_renderingMode; }
+
+    void setRenderingMode(const int mode) { m_renderingMode = mode; }
+
 private:
 
     /** Background color */
@@ -241,7 +213,7 @@ private:
     std::vector<Camera*> m_cameras;
 
     /** List of objects in the scene */
-    std::vector<Object*> m_objects;
+    std::vector<Node*> m_nodes;
 
     /** Tuple of lists of lights in the scene */
     LightGroup m_lights;
@@ -250,4 +222,6 @@ private:
     int m_skybox;
     bool m_skyboxActive = false;
     std::string m_skyboxName = "Bell-Tower";
+
+    int m_renderingMode;
 };

@@ -242,14 +242,16 @@ void FullRendering()
     vec3 albedo = material.albedo;
     if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
 
-    float roughness = material.roughness;
-    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).r;
-
-    float metallic = material.metallic;
-    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).r;
-
+    // Gestion de la norme ORM (Occlusion - Roughness - Metallic) ---------------------------------
     float ao = material.ao;
     if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, UV).r;
+
+    float roughness = material.roughness;
+    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).g;
+
+    float metallic = material.metallic;
+    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).b;
+    //---------------------------------------------------------------------------------------------
 
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
@@ -336,13 +338,13 @@ void main() {
 
     case M_ROUGHNESS:
         float roughness = material.roughness;
-        if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).r;
+        if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).g;
         FragColor = vec4(vec3(roughness), 1.0);
         break;
 
     case M_METALLIC:
         float metallic = material.metallic;
-        if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).r;
+        if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).b;
         FragColor = vec4(vec3(metallic), 1.0);
         break;
 

@@ -4,9 +4,12 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <string>
+#include <vector>
 
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_NAME "None"
+
+class Scene;
 
 /**
  * @brief Transformation of any element present in the world.
@@ -86,10 +89,47 @@ public:
         return glm::normalize(rotationQuat * worldForward);
     }
 
+    glm::mat4 getLocalModelMatrix() const
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, m_transform.position);
+        model = glm::rotate(model, glm::radians(m_transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(m_transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(m_transform.rotation.z), glm::vec3(0, 0, 1));
+        model = glm::scale(model, m_transform.scale);
+        return model;
+    }
+
+    virtual void draw(Scene* scene, glm::mat4 parentTransform = glm::mat4(1.0f))
+    {
+        glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
+
+        for (Node* child : m_childrens)
+        {
+            child->draw(scene, globalTransform);
+        }
+    }
+
+    void addChildren(Node& child) {
+        m_childrens.push_back(&child);
+        child.setParent(*this);
+    }
+
+    const std::vector<Node*> getChildrens() { return m_childrens; }
+
+    const Node* getParent() { return m_parent; }
+
+    void setParent(Node& parent) { m_parent = &parent; }
+
+    bool isRoot() { return m_parent == nullptr; }
+
 protected:
 
     /** Transformation of the node element */
     Transform m_transform;
+
+    Node* m_parent = nullptr;
+    std::vector<Node*> m_childrens;
 
     /** Name of the node */
     std::string m_name;

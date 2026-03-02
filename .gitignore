@@ -10,6 +10,7 @@ doc/*
 # Répertoire des objets et des textures
 resources/objects/*
 resources/textures/*
+resources/models/*
 
 # Exécutable
 igai_exe
