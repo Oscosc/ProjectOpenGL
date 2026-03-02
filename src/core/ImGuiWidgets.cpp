@@ -40,21 +40,24 @@ void ImGuiWidgets::objectsEditor(Scene *scene)
     ImGui::PushID("Objects");
     ImGui::Indent();
 
-    const std::vector<Object*>& objects = scene->getAllObjects();
+    const std::vector<Node*>& objects = scene->getAllObjects();
     for(int i = 0; i < objects.size(); i++) {
 
         ImGui::PushID(i);
         ImGui::Text(objects.at(i)->getName().c_str());
 
         Transform tmpTransform = objects.at(i)->getTransform();
-        StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(objects.at(i)->getMaterial());
 
         if(transformEditor(tmpTransform, OBJECT_FLAGS)) {
             objects.at(i)->setTransform(tmpTransform);
         }
 
-        if(standardPBRMaterialEditor(tmpMaterial)) {
-            objects.at(i)->setMaterial(tmpMaterial);
+        Object* realObject = static_cast<Object*>(objects[i]);
+        if(realObject != nullptr) {
+            StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(realObject->getMaterial());
+            if(standardPBRMaterialEditor(tmpMaterial)) {
+                realObject->setMaterial(tmpMaterial);
+            }
         }
 
         ImGui::Separator();

@@ -4,7 +4,7 @@
 #include <ProjectIGAI/graphics/ProjViewMatrix.hpp>
 #include <ProjectIGAI/core/Scene.hpp>
 
-Object::Object(const std::string& name) : m_geometry(nullptr), Node(DEFAULT_TRANSFORM, name)
+Object::Object(const std::string& name) : m_geometry(nullptr), m_material(nullptr), Node(DEFAULT_TRANSFORM, name)
 {
 }
 

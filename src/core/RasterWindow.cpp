@@ -20,9 +20,8 @@ void RasterWindow::subClassRendering()
     if(m_scene->skyboxActive())
         CubemapManager::getInstance().drawCubemap(m_scene->skyboxName(), m_scene);
 
-    for(Object* object : m_scene->getAllObjects()) {
-        object->draw(m_scene);
-        object->getMaterial()->getShader()->setInt("renderingMode", m_renderingMode);
+    for(Node* node : m_scene->getAllObjects()) {
+        node->draw(m_scene);
     }
 
     m_HUD->render();
@@ -50,7 +49,10 @@ void RasterWindow::drawImGuiFrame()
     const char* items[] = {"PBR",
         "Normals", "Tangents", "UVs",
         "Albedo", "Roughness", "Metallic", "AO"};
-    ImGui::Combo("Render mode", &m_renderingMode, items, IM_ARRAYSIZE(items));
+    int tmpRenderingMode = m_scene->getRenderingMode();
+    if(ImGui::Combo("Render mode", &tmpRenderingMode, items, IM_ARRAYSIZE(items))) {
+        m_scene->setRenderingMode(tmpRenderingMode);
+    }
 
     if (ImGui::CollapsingHeader("Scene"))
     {

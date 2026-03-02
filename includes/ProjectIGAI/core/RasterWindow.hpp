@@ -43,10 +43,6 @@ public:
      * @param height height if the screen
      */
     void onResize(int width, int height) override;
-
-    int getRenderingMode() const { return m_renderingMode; }
-
-    void setRenderingMode(const int mode) { m_renderingMode = mode; }
     
 private:
     
@@ -61,6 +57,4 @@ private:
     
     /** HUD of this window (green crosshair) */
     HUD* m_HUD;
-
-    int m_renderingMode;
 };

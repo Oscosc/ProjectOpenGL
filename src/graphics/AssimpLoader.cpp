@@ -6,7 +6,7 @@
 #include <ProjectIGAI/graphics/GeometryManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
 
-Node *AssimpLoader::loadModel(const std::string &path)
+Node* AssimpLoader::loadModel(const std::string &path)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,

@@ -55,7 +55,7 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
 
             if(type == "model")
                 newNode = AssimpLoader::loadModel(node.value("path", ""));
-            if (type == "object")
+            else if (type == "object")
                 newNode = parseObject(node);
             else if (type == "directional_light")
                 newNode = parseDirectionalLight(node);
@@ -88,8 +88,8 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
                 scene->addCamera(cam);
             }
 
-            else if (auto* obj = dynamic_cast<Object*>(newNode)) {
-                scene->addObject(obj);
+            else {
+                scene->addNode(newNode);
             }
             
             //if(newNode) scene->addNode(newNode);

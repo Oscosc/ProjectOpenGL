@@ -21,51 +21,9 @@
             "intensity": 1.0
         },
         {
-            "name": "sphere_demo",
-            "type": "object",
-            "transform": {
-                "position": [-3.0, 0.0, 0.0],
-                "rotation": [-90.0, 0.0, 60.0],
-                "scale":    [1.0, 1.0, 1.0]
-            },
-            "geometry": {
-                "type": "sphere",
-                "radius": 1.0,
-                "segments": 32
-            },
-            "material": {
-                "name": "earth",
-                "type": "PBR",
-                "albedo": [1.0, 1.0, 1.0], 
-                "roughness": 0.5,
-                "metallic": 0.0,
-                "textures": {
-                    "albedo": "resources/textures/8k_earth.jpg"
-                }
-            }
-        },
-        {
-            "name": "backpack_demo",
-            "type": "object",
-            "transform": {
-                "position": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [1.0, 1.0, 1.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/backpack.obj"
-            },
-            "material": {
-                "name": "earth",
-                "type": "PBR",
-                "albedo": [1.0, 1.0, 1.0],
-                "roughness": 0.5,
-                "metallic": 0.0,
-                "textures": {
-                    "albedo": "resources/textures/8k_earth.jpg"
-                }
-            }
+            "name": "helmet_demo",
+            "type": "model",
+            "path": "resources/models/DamagedHelmet/DamagedHelmet.gltf"
         }
     ]
 }

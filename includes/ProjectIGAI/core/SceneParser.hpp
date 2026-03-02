@@ -37,7 +37,8 @@ public:
         {"point_light", POINT_LIGHT},
         {"spot_light", SPOT_LIGHT},
         {"directional_light", DIR_LIGHT},
-        {"object", OBJECT}
+        {"object", OBJECT},
+        {"model", OBJECT}
     };
 
     /**

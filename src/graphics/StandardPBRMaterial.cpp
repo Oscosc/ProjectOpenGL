@@ -9,6 +9,8 @@ void StandardPBRMaterial::bind(Scene* scene)
     // Activation shader
     m_shader->use();
 
+    m_shader->setInt("renderingMode", scene->getRenderingMode());
+
     // Light updating
     scene->updateLigth(m_shader);
 
