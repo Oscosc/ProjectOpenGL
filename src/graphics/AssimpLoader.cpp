@@ -9,8 +9,13 @@
 Node* AssimpLoader::loadModel(const std::string &path)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path,
-        aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+
+    unsigned int importFlags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace;
+    std::string extension = path.substr(path.find_last_of(".") + 1);
+    if (extension == "obj" || extension == "OBJ") {
+        importFlags |= aiProcess_FlipUVs;
+    }
+    const aiScene* scene = importer.ReadFile(path, importFlags);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -109,6 +114,7 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
 
             // METALLIC
             std::string metallicPath = getTexturePath(aiTextureType_METALNESS);
+            if (metallicPath.empty()) metallicPath = getTexturePath(aiTextureType_SPECULAR);
             if (!metallicPath.empty()) mat->setMetallicTexture(metallicPath);
 
             // NORMAL

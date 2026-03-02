@@ -10,8 +10,8 @@ public:
 
     // Material values
     glm::vec3 albedo = glm::vec3(1.0);
-    float roughness = 0.5f;
-    float metallic = 0.0f;
+    float roughness = 1.0f;
+    float metallic = 1.0f;
 
     // Alternative : material maps
     GLuint albedoMap    = 0;
