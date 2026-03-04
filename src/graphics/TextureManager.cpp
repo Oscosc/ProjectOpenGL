@@ -57,3 +57,55 @@ GLuint TextureManager::loadTexture(const std::string& path, const int mode)
     m_textures[path] = texture;
     return texture;
 }
+
+GLuint TextureManager::loadTextureFromMemory(const unsigned char* dataBuffer, int length, const std::string& cacheKey, const int mode)
+{
+    // Vérifier si la texture n'est pas déjà dans le cache
+    if(m_textures.find(cacheKey) != m_textures.end()) {
+        return m_textures[cacheKey];
+    }
+
+    auto timerStart = Timer::getCurrentTime();
+
+    stbi_set_flip_vertically_on_load(true); 
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load_from_memory(dataBuffer, length, &width, &height, &nrChannels, 0);
+    
+    if (data)
+    {
+        GLenum format = GL_RGB;
+        if (nrChannels == 1) {
+            format = GL_RED;
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+        }
+        else if (nrChannels == 4) format = GL_RGBA;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        
+        m_textures[cacheKey] = texture;
+    }
+    else
+    {
+        Logger::logError("Failed to load embedded texture: " + cacheKey);
+        texture = 0;
+    }
+    
+    stbi_image_free(data);
+
+    float execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logPerf(std::to_string(execTime) + " ms for loading embedded resource '" + cacheKey + "'");
+
+    return texture;
+}

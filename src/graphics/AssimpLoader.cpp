@@ -134,37 +134,61 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
         if (mesh->mMaterialIndex >= 0) {
             aiMaterial* assimpMat = scene->mMaterials[mesh->mMaterialIndex];
 
-            auto getTexturePath = [&](aiTextureType type) -> std::string {
+            struct TextureResult {
+                std::string path;
+                GLuint id = 0;
+            };
+
+            auto getTextureInfo = [&](aiTextureType type) -> TextureResult {
+                TextureResult res;
                 aiString str;
                 if (assimpMat->GetTexture(type, 0, &str) == aiReturn_SUCCESS) {
-                    return dir + "/" + str.C_Str();
+                    const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(str.C_Str());
+                    
+                    if (embeddedTexture) {
+                        std::string cacheKey = dir + "::" + str.C_Str();
+                        if (embeddedTexture->mHeight == 0) {
+                            res.id = TextureManager::getInstance().loadTextureFromMemory(
+                                reinterpret_cast<const unsigned char*>(embeddedTexture->pcData),
+                                embeddedTexture->mWidth,
+                                cacheKey
+                            );
+                        }
+                    } else {
+                        res.path = dir + "/" + str.C_Str();
+                    }
                 }
-                return "";
+                return res;
             };
 
             // ALBEDO
-            std::string albedoPath = getTexturePath(aiTextureType_BASE_COLOR);
-            if (albedoPath.empty()) albedoPath = getTexturePath(aiTextureType_DIFFUSE);
-            if (!albedoPath.empty()) mat->setAlbedoTexture(albedoPath);
+            TextureResult albedoRes = getTextureInfo(aiTextureType_BASE_COLOR);
+            if (albedoRes.path.empty() && albedoRes.id == 0) albedoRes = getTextureInfo(aiTextureType_DIFFUSE);
+            if (albedoRes.id > 0) mat->setAlbedoMapID(albedoRes.id);
+            else if (!albedoRes.path.empty()) mat->setAlbedoTexture(albedoRes.path);
 
             // ROUGHNESS
-            std::string roughnessPath = getTexturePath(aiTextureType_DIFFUSE_ROUGHNESS);
-            if (!roughnessPath.empty()) mat->setRoughnessTexture(roughnessPath);
+            TextureResult roughnessRes = getTextureInfo(aiTextureType_DIFFUSE_ROUGHNESS);
+            if (roughnessRes.id > 0) mat->setRoughnessMapID(roughnessRes.id);
+            else if (!roughnessRes.path.empty()) mat->setRoughnessTexture(roughnessRes.path);
 
             // METALLIC
-            std::string metallicPath = getTexturePath(aiTextureType_METALNESS);
-            if (metallicPath.empty()) metallicPath = getTexturePath(aiTextureType_SPECULAR);
-            if (!metallicPath.empty()) mat->setMetallicTexture(metallicPath);
+            TextureResult metallicRes = getTextureInfo(aiTextureType_METALNESS);
+            if (metallicRes.path.empty() && metallicRes.id == 0) metallicRes = getTextureInfo(aiTextureType_SPECULAR);
+            if (metallicRes.id > 0) mat->setMetallicMapID(metallicRes.id);
+            else if (!metallicRes.path.empty()) mat->setMetallicTexture(metallicRes.path);
 
             // NORMAL
-            std::string normalPath = getTexturePath(aiTextureType_NORMALS);
-            if (normalPath.empty()) normalPath = getTexturePath(aiTextureType_HEIGHT);
-            if (!normalPath.empty()) mat->setNormalTexture(normalPath);
+            TextureResult normalRes = getTextureInfo(aiTextureType_NORMALS);
+            if (normalRes.path.empty() && normalRes.id == 0) normalRes = getTextureInfo(aiTextureType_HEIGHT);
+            if (normalRes.id > 0) mat->setNormalMapID(normalRes.id);
+            else if (!normalRes.path.empty()) mat->setNormalTexture(normalRes.path);
 
             // AMBIENT OCCLUSION
-            std::string aoPath = getTexturePath(aiTextureType_AMBIENT_OCCLUSION);
-            if (aoPath.empty()) aoPath = getTexturePath(aiTextureType_LIGHTMAP); 
-            if (!aoPath.empty()) mat->setAOTexture(aoPath);
+            TextureResult aoRes = getTextureInfo(aiTextureType_AMBIENT_OCCLUSION);
+            if (aoRes.path.empty() && aoRes.id == 0) aoRes = getTextureInfo(aiTextureType_LIGHTMAP);
+            if (aoRes.id > 0) mat->setAOMapID(aoRes.id);
+            else if (!aoRes.path.empty()) mat->setAOTexture(aoRes.path);
         }
         // ----------------------------------------------------------------------------------------
         

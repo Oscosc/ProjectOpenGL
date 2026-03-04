@@ -122,43 +122,13 @@
             }
         },
         {
-            "name": "tall_box",
-            "type": "object",
+            "name": "BrainStem",
+            "type": "model",
+            "path": "resources/models/CesiumMan.glb",
             "transform": {
-                "position": [-0.85, 1.5, -0.85],
-                "rotation": [0.0, -17.0, 0.0],
-                "scale":    [1.5, 3.0, 1.5]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/cube.obj"
-            },
-            "material": {
-                "name": "grey_box",
-                "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.5,
-                "metallic": 0.0
-            }
-        },
-        {
-            "name": "short_box",
-            "type": "object",
-            "transform": {
-                "position": [0.85, 0.75, 0.85],
-                "rotation": [0.0, 17.0, 0.0],
-                "scale":    [1.5, 1.5, 1.5]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/cube.obj"
-            },
-            "material": {
-                "name": "grey_box",
-                "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.5,
-                "metallic": 0.0
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [2.0, 2.0, 2.0]
             }
         }
     ]

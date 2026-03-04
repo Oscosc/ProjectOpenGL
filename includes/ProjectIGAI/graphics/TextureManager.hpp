@@ -18,6 +18,8 @@ public:
 
     GLuint loadTexture(const std::string& path, const int mode = GL_REPEAT);
 
+    GLuint loadTextureFromMemory(const unsigned char* dataBuffer, int length, const std::string& cacheKey, const int mode = GL_REPEAT);
+
 private:
 
     /** Texture manager constructor (private for Singleton) */
