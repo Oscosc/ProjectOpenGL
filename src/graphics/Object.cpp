@@ -45,10 +45,12 @@ void Object::draw(Scene *scene, glm::mat4 parentTransform)
     // Animation retrieving ---------------------
     Animator* animator = nullptr;
     Node* currentNode = this;
+    Node* animatorNode = nullptr;
 
     while (currentNode != nullptr) {
         if (currentNode->getAnimator() != nullptr) {
             animator = currentNode->getAnimator();
+            animatorNode = currentNode;
             break;
         }
         currentNode = const_cast<Node*>(currentNode->getParent());
@@ -77,7 +79,18 @@ void Object::draw(Scene *scene, glm::mat4 parentTransform)
             ProjViewMatrix pv = scene->getActiveCameraPV();
             shader->setMat4("view", pv.view);
             shader->setMat4("projection", pv.projection);
-            shader->setMat4("model", globalTransform);
+
+            glm::mat4 modelMatrix = globalTransform;
+            
+            if (animator && animatorNode) {
+                modelMatrix = glm::mat4(1.0f);
+                Node* tempNode = animatorNode;
+                while (tempNode != nullptr) {
+                    modelMatrix = tempNode->getLocalModelMatrix() * modelMatrix;
+                    tempNode = const_cast<Node*>(tempNode->getParent());
+                }
+            }
+            shader->setMat4("model", modelMatrix);
 
             m_geometry->draw();
         }
