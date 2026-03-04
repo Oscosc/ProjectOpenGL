@@ -7,8 +7,6 @@
 
 GLuint TextureManager::loadTexture(const std::string& path, const int mode)
 {
-    unsigned int texture;
-
     if(m_textures.find(path) != m_textures.end()) {
         return m_textures[path];
     }
@@ -17,6 +15,7 @@ GLuint TextureManager::loadTexture(const std::string& path, const int mode)
 
     stbi_set_flip_vertically_on_load(true);
 
+    unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -60,7 +59,6 @@ GLuint TextureManager::loadTexture(const std::string& path, const int mode)
 
 GLuint TextureManager::loadTextureFromMemory(const unsigned char* dataBuffer, int length, const std::string& cacheKey, const int mode)
 {
-    // Vérifier si la texture n'est pas déjà dans le cache
     if(m_textures.find(cacheKey) != m_textures.end()) {
         return m_textures[cacheKey];
     }
@@ -89,9 +87,13 @@ GLuint TextureManager::loadTextureFromMemory(const unsigned char* dataBuffer, in
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
         }
+        else if (nrChannels == 2) {
+            format = GL_RG;
+        }
         else if (nrChannels == 4) format = GL_RGBA;
 
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
         glGenerateMipmap(GL_TEXTURE_2D);
         
         m_textures[cacheKey] = texture;

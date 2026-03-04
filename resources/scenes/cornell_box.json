@@ -124,11 +124,11 @@
         {
             "name": "BrainStem",
             "type": "model",
-            "path": "resources/models/CesiumMan.glb",
+            "path": "resources/models/MechDrone/mech_drone.glb",
             "transform": {
                 "position": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [2.0, 2.0, 2.0]
+                "rotation": [0.0, 180.0, 0.0],
+                "scale":    [7.0, 7.0, 7.0]
             }
         }
     ]

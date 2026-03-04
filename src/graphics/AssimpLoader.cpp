@@ -5,6 +5,7 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 #include <ProjectIGAI/graphics/GeometryManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <ProjectIGAI/core/Logger.hpp>
 #include <extern/assimp_glm_helpers.h>
 
 Node* AssimpLoader::loadModel(const std::string &path)
@@ -134,6 +135,22 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
         if (mesh->mMaterialIndex >= 0) {
             aiMaterial* assimpMat = scene->mMaterials[mesh->mMaterialIndex];
 
+            aiColor4D color(1.0f, 1.0f, 1.0f, 1.0f);
+            if (aiReturn_SUCCESS == assimpMat->Get(AI_MATKEY_BASE_COLOR, color) || 
+                aiReturn_SUCCESS == assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
+                mat->albedo = glm::vec3(color.r, color.g, color.b);
+            }
+
+            float roughnessFactor = 1.0f;
+            if (aiReturn_SUCCESS == assimpMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughnessFactor)) {
+                mat->roughness = roughnessFactor;
+            }
+
+            float metallicFactor = 0.0f;
+            if (aiReturn_SUCCESS == assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor)) {
+                mat->metallic = metallicFactor;
+            }
+
             struct TextureResult {
                 std::string path;
                 GLuint id = 0;
@@ -143,11 +160,14 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
                 TextureResult res;
                 aiString str;
                 if (assimpMat->GetTexture(type, 0, &str) == aiReturn_SUCCESS) {
+
                     const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(str.C_Str());
                     
                     if (embeddedTexture) {
+
                         std::string cacheKey = dir + "::" + str.C_Str();
                         if (embeddedTexture->mHeight == 0) {
+
                             res.id = TextureManager::getInstance().loadTextureFromMemory(
                                 reinterpret_cast<const unsigned char*>(embeddedTexture->pcData),
                                 embeddedTexture->mWidth,
