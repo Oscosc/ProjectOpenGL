@@ -43,11 +43,11 @@
         {
             "name": "vampire_demo",
             "type": "model",
-            "path": "resources/models/vampire/dancing_vampire.dae",
+            "path": "resources/models/BrainStem/BrainStem.glb",
             "transform": {
                 "position": [-8.0, 1.0, 0.0],
                 "rotation": [0.0, 0.0, 0.0],
-                "scale":    [1.0, 1.0, 1.0]
+                "scale":    [2.0, 2.0, 2.0]
             }
         }
     ]
