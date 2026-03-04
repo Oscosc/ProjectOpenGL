@@ -10,125 +10,43 @@
             }
         },
         {
-            "name": "ceiling_light",
-            "type": "point_light",
+            "name": "Boulder",
+            "type": "model",
+            "path": "resources/models/Boulder/namaqualand_boulder_02_4k.gltf",
             "transform": {
-                "position": [0.0, 4.5, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [0.0, 0.0, 0.0]
-            },
-            "radius": 10.0,
-            "color": [1.0, 1.0, 1.0],
-            "intensity": 1.0
-        },
-        {
-            "name": "floor",
-            "type": "object",
-            "transform": {
-                "position": [-2.5, 0.0, -2.5],
-                "rotation": [90.0, 0.0, 0.0],
-                "scale":    [5.0, 5.0, 5.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/1x1_tile.obj"
-            },
-            "material": {
-                "name": "grey_floor",
-                "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.8,
-                "metallic": 0.0
-            }
-        },
-        {
-            "name": "ceiling",
-            "type": "object",
-            "transform": {
-                "position": [-2.5, 5.0, -2.5],
-                "rotation": [90.0, 0.0, 0.0],
-                "scale":    [5.0, 5.0, 5.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/1x1_tile.obj"
-            },
-            "material": {
-                "name": "grey_ceiling",
-                "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.8,
-                "metallic": 0.0
-            }
-        },
-        {
-            "name": "back_wall",
-            "type": "object",
-            "transform": {
-                "position": [-2.5, 0.0, -2.5],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [5.0, 5.0, 5.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/1x1_tile.obj"
-            },
-            "material": {
-                "name": "grey_wall",
-                "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.8,
-                "metallic": 0.0
-            }
-        },
-        {
-            "name": "left_wall_red",
-            "type": "object",
-            "transform": {
-                "position": [-2.5, 0.0, -2.5],
-                "rotation": [0.0, -90.0, 0.0],
-                "scale":    [5.0, 5.0, 5.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/1x1_tile.obj"
-            },
-            "material": {
-                "name": "red_wall",
-                "type": "PBR",
-                "albedo": [0.63, 0.06, 0.04],
-                "roughness": 0.8,
-                "metallic": 0.0
-            }
-        },
-        {
-            "name": "right_wall_green",
-            "type": "object",
-            "transform": {
-                "position": [2.5, 0.0, 2.5],
-                "rotation": [0.0, 90.0, 0.0],
-                "scale":    [5.0, 5.0, 5.0]
-            },
-            "geometry": {
-                "type": "mesh",
-                "path": "resources/objects/1x1_tile.obj"
-            },
-            "material": {
-                "name": "green_wall",
-                "type": "PBR",
-                "albedo": [0.15, 0.48, 0.09],
-                "roughness": 0.8,
-                "metallic": 0.0
+                "position": [3.6, -5.4, -6.3],
+                "rotation": [0.0, 58.4, 0.0],
+                "scale":    [10.0, 10.0, 10.0]
             }
         },
         {
             "name": "BrainStem",
             "type": "model",
+            "path": "resources/models/reap_the_whirlwind.glb",
+            "transform": {
+                "position": [0.0, 0.0, -1.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.005, 0.005, 0.005]
+            }
+        },
+        {
+            "name": "MechDrone",
+            "type": "model",
             "path": "resources/models/MechDrone/mech_drone.glb",
             "transform": {
-                "position": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 180.0, 0.0],
-                "scale":    [7.0, 7.0, 7.0]
+                "position": [5.5, 1.0, -3.7],
+                "rotation": [0.0, 135.0, 0.0],
+                "scale":    [5.0, 5.0, 5.0]
+            }
+        },
+        {
+            "name": "Helmet",
+            "type": "model",
+            "path": "resources/models/DamagedHelmet/DamagedHelmet.gltf",
+            "transform": {
+                "position": [0.6, 1.0, -4.3],
+                "rotation": [-41.0, 1.9, -0.5],
+                "scale":    [1.0, 1.0, 1.0]
             }
         }
     ]
