@@ -5,6 +5,7 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 #include <ProjectIGAI/graphics/GeometryManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <extern/assimp_glm_helpers.h>
 
 Node* AssimpLoader::loadModel(const std::string &path)
 {
@@ -25,13 +26,24 @@ Node* AssimpLoader::loadModel(const std::string &path)
     
     Node* rootNode = new Node(DEFAULT_TRANSFORM, path);
 
+    std::map<std::string, BoneInfo> boneInfoMap;
+    int boneCount = 0;
+
     std::string directory = path.substr(0, path.find_last_of('/'));
-    processNode(scene->mRootNode, scene, rootNode, directory);
+    processNode(scene->mRootNode, scene, rootNode, directory, boneInfoMap, boneCount);
+
+    if (scene->HasAnimations()) {
+        aiAnimation* firstAnimation = scene->mAnimations[0];
+        Animation* animation = new Animation(firstAnimation, scene->mRootNode, boneInfoMap, boneCount); 
+        Animator* animator = new Animator(animation);
+        rootNode->setAnimator(animator);
+    }
     
     return rootNode;
 }
 
-void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *parentNode, std::string dir)
+void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *parentNode, std::string dir,
+    std::map<std::string, BoneInfo>& boneInfoMap, int& boneCount)
 {
     // Transformation construction ----------------------------------------------------------------
     aiMatrix4x4 aiMat = assimpNode->mTransformation;
@@ -85,6 +97,33 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
                 indices.push_back(face.mIndices[j]);        
         }
 
+        // Bones extraction (SKELETAL ANIMATION) --------------------------------------------------
+        for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+            int boneID = -1;
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+
+            if (boneInfoMap.find(boneName) == boneInfoMap.end()) {
+                BoneInfo newBoneInfo;
+                newBoneInfo.id = boneCount;
+                newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+                boneInfoMap[boneName] = newBoneInfo;
+                boneID = boneCount;
+                boneCount++;
+            } else {
+                boneID = boneInfoMap[boneName].id;
+            }
+
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex) {
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                vertices[vertexId].addBoneData(boneID, weight);
+            }
+        }
+        // ----------------------------------------------------------------------------------------
+
         std::string name = dir + "::" + assimpNode->mName.C_Str();
         Geometry* geo = GeometryManager::getInstance().getRawGeometry(name, vertices, indices);
         // ----------------------------------------------------------------------------------------
@@ -137,6 +176,6 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
     }
 
     for(unsigned int i = 0; i < assimpNode->mNumChildren; i++) {
-        processNode(assimpNode->mChildren[i], scene, localNode, dir);
+        processNode(assimpNode->mChildren[i], scene, localNode, dir, boneInfoMap, boneCount);
     }
 }

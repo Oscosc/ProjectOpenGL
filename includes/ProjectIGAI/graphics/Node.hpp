@@ -6,10 +6,13 @@
 #include <string>
 #include <vector>
 
+#include <ProjectIGAI/animation/Animator.hpp>
+
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_NAME "None"
 
 class Scene;
+class Animator;
 
 /**
  * @brief Transformation of any element present in the world.
@@ -123,6 +126,21 @@ public:
 
     bool isRoot() { return m_parent == nullptr; }
 
+    void setAnimator(Animator* animator) { m_animator = animator; }
+
+    Animator* getAnimator() const { return m_animator; }
+
+    virtual void update(float dt)
+    {
+        if (m_animator) {
+            m_animator->UpdateAnimation(dt);
+        }
+
+        for (Node* child : m_childrens) {
+            child->update(dt);
+        }
+    }
+
 protected:
 
     /** Transformation of the node element */
@@ -133,5 +151,8 @@ protected:
 
     /** Name of the node */
     std::string m_name;
+
+    /** For animation purposes */
+    Animator* m_animator = nullptr;
 
 };
