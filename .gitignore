@@ -11,6 +11,7 @@ doc/*
 resources/objects/*
 resources/textures/*
 resources/models/*
+resources/cubemaps/*
 
 # Exécutable
 igai_exe
