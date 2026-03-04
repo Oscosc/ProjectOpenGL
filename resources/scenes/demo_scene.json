@@ -21,28 +21,23 @@
             "intensity": 1.0
         },
         {
-            "name": "backpack_demo",
-            "type": "model",
-            "path": "resources/models/backpack/backpack.obj"
-        },
-        {
             "name": "helmet_demo",
             "type": "model",
             "path": "resources/models/DamagedHelmet/DamagedHelmet.gltf",
             "transform": {
-                "position": [0.0, 5.0, 0.0],
+                "position": [2.5, 1.0, 0.0],
                 "rotation": [0.0, 0.0, 0.0],
                 "scale":    [2.0, 2.0, 2.0]
             }
         },
         {
-            "name": "corset_demo",
+            "name": "megaphone_demo",
             "type": "model",
-            "path": "resources/models/Corset/Corset.gltf",
+            "path": "resources/models/Megaphone/Megaphone_01_4k.gltf",
             "transform": {
-                "position": [0.0, -5.0, 0.0],
+                "position": [-2.5, 1.0, 0.0],
                 "rotation": [0.0, 0.0, 0.0],
-                "scale":    [50.0, 50.0, 50.0]
+                "scale":    [10.0, 10.0, 10.0]
             }
         }
     ]

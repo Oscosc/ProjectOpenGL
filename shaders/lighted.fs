@@ -240,7 +240,7 @@ void FullRendering()
     }
     
     vec3 albedo = material.albedo;
-    if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
+    if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * pow(texture(material.albedoMap, UV).rgb, vec3(2.2));
 
     // Gestion de la norme ORM (Occlusion - Roughness - Metallic) ---------------------------------
     float ao = material.ao;

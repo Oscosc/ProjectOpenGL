@@ -1,0 +1,23 @@
+{
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 4.0, 10.0],
+                "rotation": [0.0, -15.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "chessboard",
+            "type": "model",
+            "path": "resources/models/ABeautifulGame/ABeautifulGame.gltf",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [10.0, 10.0, 10.0]
+            }
+        }
+    ]
+}
