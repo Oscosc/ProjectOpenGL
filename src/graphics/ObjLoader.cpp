@@ -180,12 +180,11 @@ void ObjLoader::computeUniques(
 
         // Sinon, construction du vertex
         else {
-            Vertex item {
-                (index.position != -1) ? positions[index.position] : glm::vec3(0.0f),
-                (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f),
-                glm::vec3(0.f), // Fixme
-                (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f)
-            };
+            Vertex item;
+            item.position = (index.position != -1) ? positions[index.position] : glm::vec3(0.0f);
+            item.normal = (index.normal != -1) ? normals[index.normal] : glm::vec3(0.0f);
+            item.tangent = glm::vec3(0.f); // Fixme
+            item.uv = (index.uv != -1) ? uvs[index.uv] : glm::vec2(0.0f);
 
             unsigned int newIndex = (unsigned int)vertexBuffer.size();
             vertexBuffer.push_back(item);

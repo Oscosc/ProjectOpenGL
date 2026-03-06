@@ -41,19 +41,56 @@ Material *Object::getMaterial() const
 void Object::draw(Scene *scene, glm::mat4 parentTransform)
 {
     glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
-    if (m_material && m_geometry)
-    {
-        m_material->bind(scene);
 
-        Shader* shader = m_material->getShader();
-        if (shader)
+    // Animation retrieving ---------------------
+    Animator* animator = nullptr;
+    Node* currentNode = this;
+    Node* animatorNode = nullptr;
+
+    while (currentNode != nullptr) {
+        if (currentNode->getAnimator() != nullptr) {
+            animator = currentNode->getAnimator();
+            animatorNode = currentNode;
+            break;
+        }
+        currentNode = const_cast<Node*>(currentNode->getParent());
+    }
+    // ------------------------------------------
+
+    Shader* shader = m_material->getShader();
+    if (shader)
+    {
+        shader->use();
+
+        if (animator) {
+            auto transforms = animator->GetFinalBoneMatrices();
+            for (int i = 0; i < transforms.size(); ++i) {
+                shader->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+            }
+            shader->setBool("hasBones", true); 
+        } else {
+            shader->setBool("hasBones", false);
+        }
+
+        if (m_material && m_geometry)
         {
-            shader->use();
+            m_material->bind(scene);
 
             ProjViewMatrix pv = scene->getActiveCameraPV();
             shader->setMat4("view", pv.view);
             shader->setMat4("projection", pv.projection);
-            shader->setMat4("model", globalTransform);
+
+            glm::mat4 modelMatrix = globalTransform;
+            
+            if (animator && animatorNode) {
+                modelMatrix = glm::mat4(1.0f);
+                Node* tempNode = animatorNode;
+                while (tempNode != nullptr) {
+                    modelMatrix = tempNode->getLocalModelMatrix() * modelMatrix;
+                    tempNode = const_cast<Node*>(tempNode->getParent());
+                }
+            }
+            shader->setMat4("model", modelMatrix);
 
             m_geometry->draw();
         }

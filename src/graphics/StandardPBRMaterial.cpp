@@ -71,20 +71,23 @@ void StandardPBRMaterial::bind(Scene* scene)
     }
 
     // Binding de la skybox
+    Cubemap* skyboxID = CubemapManager::getInstance().getResource(scene->skyboxName());
+
     m_shader->setInt("skybox.irradianceMap", 10);
     m_shader->setInt("skybox.environmentMap", 11);
+    
     m_shader->setInt("skybox.brdfLUT", 12);
+    glActiveTexture(GL_TEXTURE12);
+    GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png", GL_CLAMP_TO_EDGE); 
+    glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
+
+    m_shader->setFloat("skybox.exposure", skyboxID->exposure);
 
     if(scene->skyboxActive()) {
-        Cubemap* skyboxID = CubemapManager::getInstance().getResource(scene->skyboxName());
         glActiveTexture(GL_TEXTURE10);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID->irradiance);
         glActiveTexture(GL_TEXTURE11);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID->environment);
-
-        glActiveTexture(GL_TEXTURE12);
-        GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png", GL_CLAMP_TO_EDGE); 
-        glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
 
         m_shader->setBool("skybox.hasSkybox", true);
     } else {

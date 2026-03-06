@@ -100,6 +100,9 @@ void BaseWindow::render()
     glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Animation Process
+    m_scene->update(m_deltaTime);
+
     // Calling window-specific rendering logic
     subClassRendering();
 

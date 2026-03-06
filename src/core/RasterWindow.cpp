@@ -39,13 +39,16 @@ void RasterWindow::drawImGuiFrame()
     // Modules part
     ImGui::Begin("Project IGAI configuration");
 
+    // Skybox
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
     bool tmpSkyboxActive = m_scene->skyboxActive();
     if(ImGui::Checkbox("Skybox ?", &tmpSkyboxActive)) {
         m_scene->setSkyboxActive(tmpSkyboxActive);
     }
     ImGuiWidgets::mapSelector(CubemapManager::getInstance().getAll(), "Skybox", &m_scene->skyboxAttr(), &m_scene->skyboxName());
+    ImGui::SliderFloat("Exposure", &CubemapManager::getInstance().getResource(m_scene->skyboxName())->exposure, 0.0f, 1.0f);
 
+    // Rendering mode
     const char* items[] = {"PBR",
         "Normals", "Tangents", "UVs",
         "Albedo", "Roughness", "Metallic", "AO"};

@@ -198,6 +198,8 @@ public:
 
     void setRenderingMode(const int mode) { m_renderingMode = mode; }
 
+    void update(float dt);
+
 private:
 
     /** Background color */

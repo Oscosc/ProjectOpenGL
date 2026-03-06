@@ -76,7 +76,7 @@ const glm::vec3 Scene::lightsCount() const {
     return glm::vec3(m_lights.pointLights.size(), m_lights.dirLights.size(), m_lights.spotLights.size());
 }
 
-Light *Scene::getLight(unsigned int index, unsigned int type) const
+Light* Scene::getLight(unsigned int index, unsigned int type) const
 {
     switch (type)
     {
@@ -87,7 +87,7 @@ Light *Scene::getLight(unsigned int index, unsigned int type) const
     }
 }
 
-Camera *Scene::getActiveCamera() const
+Camera* Scene::getActiveCamera() const
 {
     return this->m_cameras.at(this->m_activeCamera);
 }
@@ -95,4 +95,12 @@ Camera *Scene::getActiveCamera() const
 ProjViewMatrix Scene::getActiveCameraPV() const
 {
     return this->m_activeCameraPV;
+}
+
+void Scene::update(float dt)
+{
+    for (Node* node : m_nodes)
+    {
+        node->update(dt);
+    }
 }

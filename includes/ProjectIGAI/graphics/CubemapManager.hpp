@@ -22,6 +22,7 @@ struct CubemapParam : public ResourceParam {
 struct Cubemap {
     GLuint environment;
     GLuint irradiance;
+    float exposure = 1.f;
 };
 
 class CubemapManager : public IResourceManager<Cubemap>, public Singleton<CubemapManager>

@@ -25,12 +25,14 @@ public:
     void bind(Scene* scene) override;
 
     void setAlbedoTexture(const std::string& path);
-
     void setRoughnessTexture(const std::string& path);
-
     void setMetallicTexture(const std::string& path);
-
     void setNormalTexture(const std::string& path);
-
     void setAOTexture(const std::string& path);
+
+    void setAlbedoMapID(GLuint id) { this->albedoMap = id; }
+    void setRoughnessMapID(GLuint id) { this->roughnessMap = id; }
+    void setMetallicMapID(GLuint id) { this->metallicMap = id; }
+    void setNormalMapID(GLuint id) { this->normalMap = id; }
+    void setAOMapID(GLuint id) { this->aoMap = id; }
 };

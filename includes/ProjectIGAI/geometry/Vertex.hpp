@@ -9,6 +9,8 @@ using vec3Array = std::vector<glm::vec3>;
 using vec2Array = std::vector<glm::vec2>;
 using vec3Grid = std::vector<std::vector<glm::vec3>>;
 
+#define MAX_BONE_INFLUENCE 4
+
 /**
  * @brief Complete representation of a vertice in a graphic sense.
  * Contain position, normal, uv and equality operator.
@@ -18,6 +20,26 @@ struct Vertex {
     glm::vec3 normal;
     glm::vec3 tangent;
     glm::vec2 uv;
+
+    int boneIDs[MAX_BONE_INFLUENCE];
+    float weights[MAX_BONE_INFLUENCE];
+
+    Vertex() {
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+            boneIDs[i] = -1;
+            weights[i] = 0.0f;
+        }
+    }
+
+    void addBoneData(int boneID, float weight) {
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+            if (boneIDs[i] < 0) {
+                weights[i] = weight;
+                boneIDs[i] = boneID;
+                break;
+            }
+        }
+    }
 
     /**
      * @brief Implementation of the equality operator for Vertices.
