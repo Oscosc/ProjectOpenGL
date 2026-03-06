@@ -132,6 +132,8 @@ public:
 
     virtual void update(float dt)
     {
+        if(!m_animated) return;
+
         if (m_animator) {
             m_animator->UpdateAnimation(dt);
         }
@@ -140,6 +142,9 @@ public:
             child->update(dt);
         }
     }
+
+    bool isAnimated() const { return m_animated; }
+    void setAnimated(bool value) { m_animated = value; }
 
 protected:
 
@@ -154,5 +159,6 @@ protected:
 
     /** For animation purposes */
     Animator* m_animator = nullptr;
+    bool m_animated = true;
 
 };

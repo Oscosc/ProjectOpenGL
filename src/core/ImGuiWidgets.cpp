@@ -70,6 +70,13 @@ void ImGuiWidgets::nodeEditorRecursive(Node* node)
             node->setTransform(tmpTransform);
         }
 
+        if(node->getAnimator() != nullptr) {
+            bool tmpAnimated = node->isAnimated();
+            if(ImGui::Checkbox("Animation", &tmpAnimated)) {
+                node->setAnimated(tmpAnimated);
+            }
+        }
+
         Object* realObject = dynamic_cast<Object*>(node);
         if(realObject != nullptr) {
             StandardPBRMaterial* tmpMaterial = dynamic_cast<StandardPBRMaterial*>(realObject->getMaterial());
