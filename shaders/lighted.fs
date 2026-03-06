@@ -58,6 +58,7 @@ struct Skybox {
     vec3 background;
 
     bool hasSkybox;
+    float exposure;
 };
 
 out vec4 FragColor;              // Visible color of the fragment after computation
@@ -207,21 +208,32 @@ vec3 AmbientPBR(vec3 N, vec3 V, vec3 F0, vec3 albedo, float roughness, float met
     kD *= 1.0 - metallic;	  
     
     vec3 irradiance = vec3(0.03);
-    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb;
-    else irradiance = skybox.background;
+    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb * skybox.exposure;
+    else irradiance = skybox.background * skybox.exposure;
     vec3 diffuse = irradiance * albedo;
 
     vec3 R = reflect(-V, N);
     
     const float MAX_REFLECTION_LOD = 10.0;
     vec3 prefilteredColor = vec3(0.03);
-    if(skybox.hasSkybox) prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
-    else prefilteredColor = skybox.background; 
+    if(skybox.hasSkybox) prefilteredColor = textureLod(skybox.environmentMap, R,  roughness * MAX_REFLECTION_LOD).rgb * skybox.exposure;  
+    else prefilteredColor = skybox.background * skybox.exposure; 
     vec2 envBRDF  = texture(skybox.brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
+    vec3 specular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y); // * vec3(0.03) => Idée attenuation a verif
     
     vec3 ambient = (kD * diffuse + specular) * ao;
     return ambient;
+}
+
+// Approximation de la courbe ACES Filmic
+vec3 ACES(vec3 x)
+{
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
 }
 
 void FullRendering()
@@ -285,7 +297,7 @@ void FullRendering()
 
     vec3 color = ambient + Lo;
 	
-    color = color / (color + vec3(1.0)); // Tone mapping
+    color = ACES(color); // Academy Color Encoding System
     color = pow(color, vec3(1.0/2.2));   // Gama correction
    
     FragColor = vec4(color, 1.0);
@@ -332,7 +344,7 @@ void main() {
 
     case M_ALBEDO:
         vec3 albedo = material.albedo;
-        if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * texture(material.albedoMap, UV).rgb;
+        if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * pow(texture(material.albedoMap, UV).rgb, vec3(2.2));
         FragColor = vec4(albedo, 1.0);
         break;
 

@@ -52,8 +52,8 @@ void main()
 
     gl_Position = projection * view * model * totalPosition;
     
-    FragPos = vec3(model * vec4(aPos, 1.0));
-    Normal  = mat3(transpose(inverse(model))) * aNormal;
+    FragPos = vec3(model * totalPosition);
+    Normal  = mat3(transpose(inverse(model))) * totalNormal;
     Tangent = mat3(model) * aTangent;
     UV = aUV;
 }

@@ -82,8 +82,8 @@ void Application::initShaders(const std::string& sceneFile)
     ShaderManager::getInstance().loadResource(ShaderParam("quad", "shaders/quad.vs", "shaders/quad.fs"));
     ShaderManager::getInstance().loadResource(ShaderParam("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs"));
 
-    CubemapManager::getInstance().loadResource(CubemapParam("Bell-Tower",
-        "resources/cubemaps/bell_tower_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Sunset pure sky",
+        "resources/cubemaps/kloppenheim_06_puresky_8k.hdr"), 512);
     CubemapManager::getInstance().loadResource(CubemapParam("Rogland clear night",
         "resources/cubemaps/rogland_clear_night_8k.hdr"), 512);
 }
