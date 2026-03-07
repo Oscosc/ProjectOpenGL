@@ -208,7 +208,7 @@ vec3 AmbientPBR(vec3 N, vec3 V, vec3 F0, vec3 albedo, float roughness, float met
     kD *= 1.0 - metallic;	  
     
     vec3 irradiance = vec3(0.03);
-    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb * skybox.exposure;
+    if(skybox.hasSkybox) irradiance = texture(skybox.irradianceMap, N).rgb;
     else irradiance = skybox.background * skybox.exposure;
     vec3 diffuse = irradiance * albedo;
 

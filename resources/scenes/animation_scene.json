@@ -1,0 +1,40 @@
+{
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 2.5, 9.5],
+                "rotation": [0.0, 0.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "floor",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [-5.0, 0.0, -5.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [10.0, 10.0, 10.0]
+            },
+            "material": {
+                "name": "grey_floor",
+                "type": "PBR",
+                "albedo": [0.73, 0.73, 0.73],
+                "roughness": 0.8,
+                "metallic": 0.0
+            }
+        },
+        {
+            "name": "BoxingRobot",
+            "type": "model",
+            "path": "resources/models/reap_the_whirlwind.glb",
+            "transform": {
+                "position": [0.0, 0.0, -1.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.005, 0.005, 0.005]
+            }
+        }
+    ]
+}

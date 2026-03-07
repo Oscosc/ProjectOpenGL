@@ -86,6 +86,8 @@ void Application::initShaders(const std::string& sceneFile)
         "resources/cubemaps/kloppenheim_06_puresky_8k.hdr"), 512);
     CubemapManager::getInstance().loadResource(CubemapParam("Rogland clear night",
         "resources/cubemaps/rogland_clear_night_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Studio", "resources/cubemaps/ferndale_studio_12_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Park", "resources/cubemaps/suburban_soccer_park_8k.hdr"), 512);
 }
 
 void Application::initScene(const std::string& sceneFile)
