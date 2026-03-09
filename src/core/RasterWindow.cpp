@@ -39,6 +39,8 @@ void RasterWindow::drawImGuiFrame()
     // Modules part
     ImGui::Begin("Project IGAI configuration");
 
+    ImGui::Text((std::to_string(1.f / m_deltaTime) + " FPS").c_str());
+
     // Skybox
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
     bool tmpSkyboxActive = m_scene->skyboxActive();

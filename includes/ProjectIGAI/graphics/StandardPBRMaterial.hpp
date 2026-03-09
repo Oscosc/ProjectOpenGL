@@ -6,7 +6,7 @@ class StandardPBRMaterial : public Material
 {
 public:
 
-    StandardPBRMaterial() : Material(ShaderManager::getInstance().getResource("lighted")) {}
+    StandardPBRMaterial();
 
     // Material values
     glm::vec3 albedo = glm::vec3(1.0);
@@ -35,4 +35,9 @@ public:
     void setMetallicMapID(GLuint id) { this->metallicMap = id; }
     void setNormalMapID(GLuint id) { this->normalMap = id; }
     void setAOMapID(GLuint id) { this->aoMap = id; }
+
+private:
+
+    GLuint m_brdfLUT_ID;
+
 };

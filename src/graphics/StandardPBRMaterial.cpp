@@ -4,7 +4,12 @@
 #include <ProjectIGAI/graphics/CubemapManager.hpp>
 #include <ProjectIGAI/core/Scene.hpp>
 
-void StandardPBRMaterial::bind(Scene* scene)
+StandardPBRMaterial::StandardPBRMaterial() :
+    Material(ShaderManager::getInstance().getResource("lighted")),
+    m_brdfLUT_ID(TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png", GL_CLAMP_TO_EDGE))
+{}
+
+void StandardPBRMaterial::bind(Scene *scene)
 {
     // Activation shader
     m_shader->use();
@@ -77,9 +82,8 @@ void StandardPBRMaterial::bind(Scene* scene)
     m_shader->setInt("skybox.environmentMap", 11);
     
     m_shader->setInt("skybox.brdfLUT", 12);
-    glActiveTexture(GL_TEXTURE12);
-    GLuint brdfLUT_ID = TextureManager::getInstance().loadTexture("resources/textures/ibl_brdf_lut.png", GL_CLAMP_TO_EDGE); 
-    glBindTexture(GL_TEXTURE_2D, brdfLUT_ID);
+    glActiveTexture(GL_TEXTURE12); 
+    glBindTexture(GL_TEXTURE_2D, m_brdfLUT_ID);
 
     m_shader->setFloat("skybox.exposure", skyboxID->exposure);
 
