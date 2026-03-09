@@ -200,7 +200,13 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
 
             // NORMAL
             TextureResult normalRes = getTextureInfo(aiTextureType_NORMALS);
-            if (normalRes.path.empty() && normalRes.id == 0) normalRes = getTextureInfo(aiTextureType_HEIGHT);
+            bool normalUsedHeightType = false;
+            if (normalRes.path.empty() && normalRes.id == 0) {
+                normalRes = getTextureInfo(aiTextureType_HEIGHT);
+                if (normalRes.id > 0 || !normalRes.path.empty()) {
+                    normalUsedHeightType = true;
+                }
+            }
             if (normalRes.id > 0) mat->setNormalMapID(normalRes.id);
             else if (!normalRes.path.empty()) mat->setNormalTexture(normalRes.path);
 
@@ -210,10 +216,13 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
             if (aoRes.id > 0) mat->setAOMapID(aoRes.id);
             else if (!aoRes.path.empty()) mat->setAOTexture(aoRes.path);
 
-            // HEIGHT
-            TextureResult heightRes = getTextureInfo(aiTextureType_HEIGHT);
+            // HEIGHT (Parallax displacement)
+            TextureResult heightRes = getTextureInfo(aiTextureType_DISPLACEMENT);
+            if (heightRes.path.empty() && heightRes.id == 0 && !normalUsedHeightType) {
+                heightRes = getTextureInfo(aiTextureType_HEIGHT);
+            }
             if (heightRes.id > 0) mat->setHeightMapID(heightRes.id);
-            else if (!heightRes.path.empty()) mat->setAOTexture(heightRes.path);
+            else if (!heightRes.path.empty()) mat->setHeightTexture(heightRes.path);
         }
         // ----------------------------------------------------------------------------------------
         
