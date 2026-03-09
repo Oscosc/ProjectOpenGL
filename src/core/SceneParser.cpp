@@ -197,6 +197,11 @@ Object* SceneParser::parseObject(const json& node)
                 mat->normalMap = TextureManager::getInstance().loadTexture(path);
             }
 
+            if(texData.contains("ao")) {
+                std::string path = texData["ao"];
+                mat->aoMap = TextureManager::getInstance().loadTexture(path);
+            }
+
             if(texData.contains("height")) {
                 std::string path = texData["height"];
                 mat->heightMap = TextureManager::getInstance().loadTexture(path);

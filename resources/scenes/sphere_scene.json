@@ -218,7 +218,6 @@
                     "roughness": "resources/textures/charcoal/roughness.png",
                     "metallic":  "resources/textures/charcoal/metallic.png",
                     "normal":    "resources/textures/charcoal/normal.png",
-                    "ao":        "resources/textures/charcoal/ao.png",
                     "height":    "resources/textures/charcoal/height.png"
                 }
             }
@@ -243,11 +242,12 @@
                 "roughness": 1.0,
                 "metallic": 1.0,
                 "textures": {
-                    "albedo":    "resources/textures/fleshy-granite/albedo.png",
-                    "roughness": "resources/textures/fleshy-granite/roughness.png",
-                    "metallic":  "resources/textures/fleshy-granite/metallic.png",
-                    "normal":    "resources/textures/fleshy-granite/normal.png",
-                    "ao":        "resources/textures/fleshy-granite/ao.png"
+                    "albedo":    "resources/textures/red-scifi-metal/albedo.png",
+                    "roughness": "resources/textures/red-scifi-metal/roughness.png",
+                    "metallic":  "resources/textures/red-scifi-metal/metallic.png",
+                    "normal":    "resources/textures/red-scifi-metal/normal.png",
+                    "ao":        "resources/textures/red-scifi-metal/ao.png",
+                    "height":    "resources/textures/red-scifi-metal/height.png"
                 }
             }
         },
