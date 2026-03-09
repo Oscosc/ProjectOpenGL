@@ -44,7 +44,8 @@
                     "roughness": "resources/textures/rock-wall/roughness.png",
                     "metallic":  "resources/textures/rock-wall/metallic.png",
                     "normal":    "resources/textures/rock-wall/normal.png",
-                    "ao":        "resources/textures/rock-wall/ao.png"
+                    "ao":        "resources/textures/rock-wall/ao.png",
+                    "height":    "resources/textures/rock-wall/height.png"
                 }
             }
         },
@@ -72,7 +73,8 @@
                     "roughness": "resources/textures/slum-wall/roughness.png",
                     "metallic":  "resources/textures/slum-wall/metallic.png",
                     "normal":    "resources/textures/slum-wall/normal.png",
-                    "ao":        "resources/textures/slum-wall/ao.png"
+                    "ao":        "resources/textures/slum-wall/ao.png",
+                    "height":    "resources/textures/slum-wall/height.png"
                 }
             }
         },
@@ -100,7 +102,8 @@
                     "roughness": "resources/textures/used-stainless-steel/roughness.png",
                     "metallic":  "resources/textures/used-stainless-steel/metallic.png",
                     "normal":    "resources/textures/used-stainless-steel/normal.png",
-                    "ao":        "resources/textures/used-stainless-steel/ao.png"
+                    "ao":        "resources/textures/used-stainless-steel/ao.png",
+                    "height":    "resources/textures/used-stainless-steel/height.png"
                 }
             }
         },
@@ -128,7 +131,8 @@
                     "roughness": "resources/textures/rusty-metal/roughness.png",
                     "metallic":  "resources/textures/rusty-metal/metallic.png",
                     "normal":    "resources/textures/rusty-metal/normal.png",
-                    "ao":        "resources/textures/rusty-metal/ao.png"
+                    "ao":        "resources/textures/rusty-metal/ao.png",
+                    "height":    "resources/textures/rusty-metal/height.png"
                 }
             }
         },
@@ -156,7 +160,8 @@
                     "roughness": "resources/textures/diamond-inlay-tile/roughness.png",
                     "metallic":  "resources/textures/diamond-inlay-tile/metallic.png",
                     "normal":    "resources/textures/diamond-inlay-tile/normal.png",
-                    "ao":        "resources/textures/diamond-inlay-tile/ao.png"
+                    "ao":        "resources/textures/diamond-inlay-tile/ao.png",
+                    "height":    "resources/textures/diamond-inlay-tile/height.png"
                 }
             }
         },
@@ -184,7 +189,94 @@
                     "roughness": "resources/textures/peeling-painted-metal/roughness.png",
                     "metallic":  "resources/textures/peeling-painted-metal/metallic.png",
                     "normal":    "resources/textures/peeling-painted-metal/normal.png",
-                    "ao":        "resources/textures/peeling-painted-metal/ao.png"
+                    "ao":        "resources/textures/peeling-painted-metal/ao.png",
+                    "height":    "resources/textures/peeling-painted-metal/height.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testG",
+            "type": "object",
+            "transform": {
+                "position": [-2.1, -2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/charcoal/albedo.png",
+                    "roughness": "resources/textures/charcoal/roughness.png",
+                    "metallic":  "resources/textures/charcoal/metallic.png",
+                    "normal":    "resources/textures/charcoal/normal.png",
+                    "ao":        "resources/textures/charcoal/ao.png",
+                    "height":    "resources/textures/charcoal/height.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testH",
+            "type": "object",
+            "transform": {
+                "position": [0.0, -2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/fleshy-granite/albedo.png",
+                    "roughness": "resources/textures/fleshy-granite/roughness.png",
+                    "metallic":  "resources/textures/fleshy-granite/metallic.png",
+                    "normal":    "resources/textures/fleshy-granite/normal.png",
+                    "ao":        "resources/textures/fleshy-granite/ao.png"
+                }
+            }
+        },
+        {
+            "name": "sphere_testI",
+            "type": "object",
+            "transform": {
+                "position": [2.1, -2.1, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/fiberous-plaster/albedo.png",
+                    "roughness": "resources/textures/fiberous-plaster/roughness.png",
+                    "metallic":  "resources/textures/fiberous-plaster/metallic.png",
+                    "normal":    "resources/textures/fiberous-plaster/normal.png",
+                    "ao":        "resources/textures/fiberous-plaster/ao.png",
+                    "height":    "resources/textures/fiberous-plaster/height.png"
                 }
             }
         }

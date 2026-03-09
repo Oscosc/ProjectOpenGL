@@ -209,6 +209,11 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
             if (aoRes.path.empty() && aoRes.id == 0) aoRes = getTextureInfo(aiTextureType_LIGHTMAP);
             if (aoRes.id > 0) mat->setAOMapID(aoRes.id);
             else if (!aoRes.path.empty()) mat->setAOTexture(aoRes.path);
+
+            // HEIGHT
+            TextureResult heightRes = getTextureInfo(aiTextureType_HEIGHT);
+            if (heightRes.id > 0) mat->setHeightMapID(heightRes.id);
+            else if (!heightRes.path.empty()) mat->setAOTexture(heightRes.path);
         }
         // ----------------------------------------------------------------------------------------
         

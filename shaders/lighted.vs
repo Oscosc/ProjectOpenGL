@@ -14,15 +14,21 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec3 viewPos;
+
 out vec3 FragPos;
 out vec3 Normal;
 out vec3 Tangent;
 out vec2 UV;
 
+out vec3 TangentFragPos;
+out vec3 TangentViewPos;
+
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
     vec3 totalNormal = vec3(0.0f);
+    vec3 totalTangent = vec3(0.0f);
     
     bool hasBones = false; 
 
@@ -43,17 +49,32 @@ void main()
         
         vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * aNormal;
         totalNormal += localNormal * weights[i];
+
+        vec3 localTangent = mat3(finalBonesMatrices[boneIds[i]]) * aTangent;
+        totalTangent += localTangent * weights[i];
     }
     
     if(!hasBones) {
         totalPosition = vec4(aPos, 1.0f);
         totalNormal = aNormal;
+        totalTangent = aTangent;
     }
 
     gl_Position = projection * view * model * totalPosition;
     
     FragPos = vec3(model * totalPosition);
     Normal  = mat3(transpose(inverse(model))) * totalNormal;
-    Tangent = mat3(model) * aTangent;
+    Tangent = mat3(model) * totalTangent;
     UV = aUV;
+
+
+    // Parallax mapping
+    vec3 T = normalize(mat3(model) * totalTangent); 
+    vec3 N = normalize(mat3(model) * totalNormal);
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    TangentFragPos = TBN * vec3(model * totalPosition); 
+    TangentViewPos = TBN * viewPos;
 }

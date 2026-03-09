@@ -23,7 +23,8 @@ void StandardPBRMaterial::bind(Scene *scene)
     m_shader->setVec3("material.albedo", albedo);
     m_shader->setFloat("material.roughness", roughness);
     m_shader->setFloat("material.metallic", metallic);
-    m_shader->setFloat("material.ao", 1.0f);
+    m_shader->setFloat("material.ao", ao);
+    m_shader->setFloat("material.height", height);
 
     // Ecriture éventuelle de l'albedoMap si existante
     if(albedoMap) {
@@ -55,7 +56,7 @@ void StandardPBRMaterial::bind(Scene *scene)
         m_shader->setBool("material.hasMetallicMap", false);
     }
 
-    // Ecriture éventuelle de la metallicMap si existante
+    // Ecriture éventuelle de la aoMap si existante
     if(aoMap) {
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, aoMap);
@@ -73,6 +74,16 @@ void StandardPBRMaterial::bind(Scene *scene)
         m_shader->setBool("material.hasNormalMap", true);
     } else {
         m_shader->setBool("material.hasNormalMap", false);
+    }
+
+    // Ecriture éventuelle de la heightMap si existante
+    if(heightMap) {
+        glad_glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, heightMap);
+        m_shader->setInt("material.heightMap", 5);
+        m_shader->setBool("material.hasHeightMap", true);
+    } else {
+        m_shader->setBool("material.hasHeightMap", false);
     }
 
     // Binding de la skybox
@@ -123,4 +134,9 @@ void StandardPBRMaterial::setNormalTexture(const std::string &path)
 void StandardPBRMaterial::setAOTexture(const std::string &path)
 {
     this->aoMap = TextureManager::getInstance().loadTexture(path);
+}
+
+void StandardPBRMaterial::setHeightTexture(const std::string &path)
+{
+    this->heightMap = TextureManager::getInstance().loadTexture(path);
 }

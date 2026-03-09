@@ -53,7 +53,7 @@ void RasterWindow::drawImGuiFrame()
     // Rendering mode
     const char* items[] = {"PBR",
         "Normals", "Tangents", "UVs",
-        "Albedo", "Roughness", "Metallic", "AO"};
+        "Albedo", "Roughness", "Metallic", "AO", "Height"};
     int tmpRenderingMode = m_scene->getRenderingMode();
     if(ImGui::Combo("Render mode", &tmpRenderingMode, items, IM_ARRAYSIZE(items))) {
         m_scene->setRenderingMode(tmpRenderingMode);

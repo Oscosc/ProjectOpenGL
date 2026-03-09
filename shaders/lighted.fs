@@ -11,19 +11,20 @@ struct Material {
     float roughness;
     float metallic;
     float ao;
+    float height;
 
     sampler2D albedoMap;
     sampler2D roughnessMap;
     sampler2D metallicMap;
     sampler2D aoMap;
+    sampler2D heightMap;
+    sampler2D normalMap;
 
     bool hasAlbedoMap;
     bool hasRoughnessMap;
     bool hasMetallicMap;
     bool hasAOMap;
-
-    sampler2D normalMap;
-
+    bool hasHeightMap;
     bool hasNormalMap;
 };
 
@@ -67,6 +68,9 @@ in vec3 FragPos;                 // World's position of the fragment
 in vec3 Normal;                  // Normal of the fragment
 in vec3 Tangent;
 in vec2 UV;                      // UV value of the fragment (for textures)
+
+in vec3 TangentFragPos;
+in vec3 TangentViewPos;
 
 uniform Skybox skybox;           // Skybox informations
 
@@ -236,33 +240,72 @@ vec3 ACES(vec3 x)
     return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
 }
 
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+    const float minLayers = 8.0;
+    const float maxLayers = 32.0;
+    float numLayers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), viewDir), 0.0));
+
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+
+    vec2 P = viewDir.xy * material.height;
+    vec2 deltaTexCoords = P / numLayers;
+
+    vec2 currentTexCoords = texCoords;
+    float currentDepthMapValue = 1.0 - texture(material.heightMap, currentTexCoords).r;
+
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = 1.0 - texture(material.heightMap, currentTexCoords).r;
+        currentLayerDepth += layerDepth;
+    }
+
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = (1.0 - texture(material.heightMap, prevTexCoords).r) - currentLayerDepth + layerDepth;
+    
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
 void FullRendering()
 {
     vec3 N = normalize(Normal);
     vec3 T = normalize(Tangent);
     vec3 V = normalize(viewPos - FragPos);
 
+    // Parallax mapping
+    vec2 texCoords = UV;
+    if(material.hasHeightMap) {
+        vec3 tangentViewDir = normalize(TangentViewPos - TangentFragPos);
+        texCoords = ParallaxMapping(UV, tangentViewDir);
+    }
+
     // Material selection
     if(material.hasNormalMap) {
         vec3 B = cross(T, N); // Bitangent
         mat3 TBN = mat3(T, B, N);
-        vec3 normal = texture(material.normalMap, UV).rgb;
+        vec3 normal = texture(material.normalMap, texCoords).rgb;
         normal = normal * 2.0 - 1.0;
         N = normalize(TBN * normal);
     }
     
     vec3 albedo = material.albedo;
-    if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * pow(texture(material.albedoMap, UV).rgb, vec3(2.2));
+    if (material.hasAlbedoMap && !PBR_ONLY) albedo = albedo * pow(texture(material.albedoMap, texCoords).rgb, vec3(2.2));
 
     // Gestion de la norme ORM (Occlusion - Roughness - Metallic) ---------------------------------
     float ao = material.ao;
-    if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, UV).r;
+    if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, texCoords).r;
 
     float roughness = material.roughness;
-    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, UV).g;
+    if (material.hasRoughnessMap && !PBR_ONLY) roughness = roughness * texture(material.roughnessMap, texCoords).g;
 
     float metallic = material.metallic;
-    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, UV).b;
+    if (material.hasMetallicMap && !PBR_ONLY) metallic = metallic * texture(material.metallicMap, texCoords).b;
     //---------------------------------------------------------------------------------------------
 
     vec3 F0 = vec3(0.04); 
@@ -319,9 +362,7 @@ void FullRendering()
 #define M_ROUGHNESS     5
 #define M_METALLIC      6
 #define M_AO            7
-
-#define M_LIGHT_PBR     8
-#define M_AMBIENT_PBR   9
+#define M_HEIGHT        8
 
 void main() {
     switch (renderingMode)
@@ -365,5 +406,10 @@ void main() {
         if (material.hasAOMap && !PBR_ONLY) ao = ao * texture(material.aoMap, UV).r;
         FragColor = vec4(vec3(ao), 1.0);
         break;
+    
+    case M_HEIGHT:
+        float height = material.height;
+        if (material.hasHeightMap && !PBR_ONLY) height = texture(material.heightMap, UV).r;
+        FragColor = vec4(vec3(height), 1.0);
     }
 }

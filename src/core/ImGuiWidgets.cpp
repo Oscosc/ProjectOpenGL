@@ -21,6 +21,8 @@ bool ImGuiWidgets::standardPBRMaterialEditor(StandardPBRMaterial* material)
         changed |= ImGui::ColorEdit3("Color", glm::value_ptr(material->albedo));
         changed |= ImGui::SliderFloat("Roughness", &material->roughness, 0.0f,  1.0f);
         changed |= ImGui::SliderFloat("Metallic",  &material->metallic,  0.0f,  1.0f);
+        changed |= ImGui::SliderFloat("Ambient occlusion",  &material->ao,  0.0f,  1.0f);
+        changed |= ImGui::SliderFloat("Height level",  &material->height,  0.0f,  1.0f);
         return changed;
     });
 }
