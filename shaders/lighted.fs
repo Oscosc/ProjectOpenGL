@@ -277,7 +277,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5; // Normalisation [-1; 1] ==> [0; 1]
 
-    if(projCoords.z > 1.0)
+    if(projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
         return 0.0;
 
     float closestDepth = texture(shadowMap, projCoords.xy).r;
@@ -315,7 +315,7 @@ void FullRendering()
 
     // Material selection
     if(material.hasNormalMap) {
-        vec3 B = cross(N, T); // Bitangent
+        vec3 B = cross(T, N); // Bitangent
         mat3 TBN = mat3(T, B, N);
         vec3 normal = texture(material.normalMap, texCoords).rgb;
         normal = normal * 2.0 - 1.0;
@@ -351,8 +351,8 @@ void FullRendering()
 #endif
 #ifdef DIR_LIGHTS // Including Shadow map for DirLight[0]
     for(int i = 0; i < NB_DIR_LIGHTS; ++i) {
-        vec3 L = normalize(dirLights[i].direction); 
-        vec3 radiance = DirRadiance(dirLights[i]);     
+        vec3 L = normalize(-dirLights[i].direction); 
+        vec3 radiance = DirRadiance(dirLights[i]);
 
         // Shadow mapping
         if(i == 0) {

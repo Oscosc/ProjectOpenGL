@@ -13,8 +13,8 @@
             "name": "sun_light",
             "type": "directional_light",
             "transform": {
-                "position": [0.0, 0.0, 0.0],
-                "rotation": [90.0, 0.0, 0.0],
+                "position": [0.0, 20.0, 0.0],
+                "rotation": [270.0, 0.0, 0.0],
                 "scale":    [1.0, 1.0, 1.0]
             },
             "color": [1.0, 1.0, 1.0],
@@ -45,6 +45,35 @@
                 "position": [0.0, 0.0, -1.0],
                 "rotation": [0.0, 0.0, 0.0],
                 "scale":    [0.005, 0.005, 0.005]
+            }
+        },
+        {
+            "name": "sphere_testA",
+            "type": "object",
+            "transform": {
+                "position": [2.1, 5.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/rock-wall/albedo.png",
+                    "roughness": "resources/textures/rock-wall/roughness.png",
+                    "metallic":  "resources/textures/rock-wall/metallic.png",
+                    "normal":    "resources/textures/rock-wall/normal.png",
+                    "ao":        "resources/textures/rock-wall/ao.png",
+                    "height":    "resources/textures/rock-wall/height.png"
+                }
             }
         }
     ]

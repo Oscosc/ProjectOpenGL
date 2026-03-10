@@ -17,6 +17,7 @@ RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsi
 void RasterWindow::subClassRendering()
 {
     // Shadow map rendering
+    glEnable(GL_CULL_FACE);
     DirectionalLight* sun = m_scene->getMainDirectionalLight(); 
     if (sun != nullptr) 
     {
@@ -40,6 +41,7 @@ void RasterWindow::subClassRendering()
         lightedShader->setInt("shadowMap", 9);
         lightedShader->setMat4("lightSpaceMatrix", sun->getLightSpaceMatrix());
     }
+    glDisable(GL_CULL_FACE);
 
     // Rendering skybox/cubemap
     if(m_scene->skyboxActive())
