@@ -315,7 +315,7 @@ void FullRendering()
 
     // Material selection
     if(material.hasNormalMap) {
-        vec3 B = cross(T, N); // Bitangent
+        vec3 B = cross(N, T); // Bitangent
         mat3 TBN = mat3(T, B, N);
         vec3 normal = texture(material.normalMap, texCoords).rgb;
         normal = normal * 2.0 - 1.0;
@@ -357,7 +357,7 @@ void FullRendering()
         // Shadow mapping
         if(i == 0) {
             float shadow = ShadowCalculation(FragPosLightSpace, N, L);
-            Lo = (1.0 - shadow) * PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
+            Lo += (1.0 - shadow) * PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
         } else {
             Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
         }

@@ -13,12 +13,12 @@
             "name": "sun_light",
             "type": "directional_light",
             "transform": {
-                "position": [1.0, 0.0, 2.0],
-                "rotation": [45.0, -45.0, 0.0],
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
                 "scale":    [1.0, 1.0, 1.0]
             },
             "color": [1.0, 1.0, 1.0],
-            "intensity": 1.0
+            "intensity": 8.0
         },
         {
             "name": "floor",
