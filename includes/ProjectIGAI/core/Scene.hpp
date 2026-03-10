@@ -157,6 +157,8 @@ public:
      */
     Light* getLight(unsigned int index, unsigned int type) const;
 
+    DirectionalLight* getMainDirectionalLight() { return m_lights.dirLights[0]; }
+
     /**
      * @brief Return all the scene objects
      * 

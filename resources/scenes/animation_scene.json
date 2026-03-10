@@ -10,6 +10,17 @@
             }
         },
         {
+            "name": "sun_light",
+            "type": "directional_light",
+            "transform": {
+                "position": [1.0, 0.0, 2.0],
+                "rotation": [45.0, -45.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 1.0
+        },
+        {
             "name": "floor",
             "type": "model",
             "path": "resources/objects/1x1_tile.obj",

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <ProjectIGAI/animation/Animator.hpp>
+#include <extern/shader.hpp>
 
 #define DEFAULT_TRANSFORM {glm::vec3(0.0), glm::vec3(1.0), glm::vec3(0.0)}
 #define DEFAULT_NAME "None"
@@ -103,13 +104,13 @@ public:
         return model;
     }
 
-    virtual void draw(Scene* scene, glm::mat4 parentTransform = glm::mat4(1.0f))
+    virtual void draw(Scene* scene, Shader* overrideShader = nullptr, glm::mat4 parentTransform = glm::mat4(1.0f))
     {
         glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
 
         for (Node* child : m_childrens)
         {
-            child->draw(scene, globalTransform);
+            child->draw(scene, overrideShader, globalTransform);
         }
     }
 

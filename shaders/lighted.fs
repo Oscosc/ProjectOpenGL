@@ -72,9 +72,7 @@ in vec2 UV;                      // UV value of the fragment (for textures)
 in vec3 TangentFragPos;
 in vec3 TangentViewPos;
 
-uniform Skybox skybox;           // Skybox informations
-
-uniform Material material;       // Material of the fragment
+in vec4 FragPosLightSpace;
 
 bool PBR_ONLY = false;
 
@@ -94,11 +92,13 @@ bool PBR_ONLY = false;
     uniform SpotLight spotLights[NB_SPOT_LIGHTS];
 #endif
 
-uniform vec3 viewPos; // Camera position in the world space
 
-/* UNIFORMS FOR DEBUGGING */
-
+uniform Skybox skybox;           // Skybox informations
+uniform Material material;       // Material of the fragment
+uniform vec3 viewPos;            // Camera position in the world space
+uniform sampler2D shadowMap;
 uniform int renderingMode;
+
 
 /**
  * Fresnel-Schlick operator for calculating F value
@@ -272,6 +272,34 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     return finalTexCoords;
 }
 
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
+{
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5; // Normalisation [-1; 1] ==> [0; 1]
+
+    if(projCoords.z > 1.0)
+        return 0.0;
+
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+    // Shadow acne
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+
+    // With PCF (Percentage-Closer Filtering)
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    return shadow;
+}
+
 void FullRendering()
 {
     vec3 N = normalize(Normal);
@@ -321,11 +349,18 @@ void FullRendering()
         Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
     }
 #endif
-#ifdef DIR_LIGHTS
+#ifdef DIR_LIGHTS // Including Shadow map for DirLight[0]
     for(int i = 0; i < NB_DIR_LIGHTS; ++i) {
         vec3 L = normalize(dirLights[i].direction); 
         vec3 radiance = DirRadiance(dirLights[i]);     
-        Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
+
+        // Shadow mapping
+        if(i == 0) {
+            float shadow = ShadowCalculation(FragPosLightSpace, N, L);
+            Lo = (1.0 - shadow) * PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
+        } else {
+            Lo += PBR(radiance, L, V, N, albedo, roughness, metallic, F0);
+        }
     }
 #endif
 #ifdef SPOT_LIGHTS
@@ -363,6 +398,8 @@ void FullRendering()
 #define M_METALLIC      6
 #define M_AO            7
 #define M_HEIGHT        8
+
+#define M_SHADOW        9
 
 void main() {
     switch (renderingMode)
@@ -411,5 +448,15 @@ void main() {
         float height = material.height;
         if (material.hasHeightMap && !PBR_ONLY) height = texture(material.heightMap, UV).r;
         FragColor = vec4(vec3(height), 1.0);
+
+    case M_SHADOW:
+        float shadow = 0.0;
+        #ifdef DIR_LIGHTS
+            vec3 N = normalize(Normal);
+            vec3 L = normalize(dirLights[0].direction); 
+            shadow = ShadowCalculation(FragPosLightSpace, N, L);
+        #endif
+        FragColor = vec4(vec3(1.0 - shadow), 1.0);
+        break;
     }
 }

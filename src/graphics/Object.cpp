@@ -38,7 +38,7 @@ Material *Object::getMaterial() const
     return m_material;
 }
 
-void Object::draw(Scene *scene, glm::mat4 parentTransform)
+void Object::draw(Scene *scene, Shader* overrideShader, glm::mat4 parentTransform)
 {
     glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
 
@@ -57,48 +57,45 @@ void Object::draw(Scene *scene, glm::mat4 parentTransform)
     }
     // ------------------------------------------
 
-    Shader* shader = m_material->getShader();
-    if (shader)
+    Shader* activeShader = overrideShader ? overrideShader : (m_material ? m_material->getShader() : nullptr);
+
+    if (activeShader && m_geometry)
     {
-        shader->use();
+        activeShader->use();
 
         if (animator) {
             auto transforms = animator->GetFinalBoneMatrices();
             for (int i = 0; i < transforms.size(); ++i) {
-                shader->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+                activeShader->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
             }
-            shader->setBool("hasBones", true); 
-        } else {
-            shader->setBool("hasBones", false);
         }
 
-        if (m_material && m_geometry)
+        glm::mat4 modelMatrix = globalTransform;
+        if (animator && animatorNode) {
+            modelMatrix = glm::mat4(1.0f);
+            Node* tempNode = animatorNode;
+            while (tempNode != nullptr) {
+                modelMatrix = tempNode->getLocalModelMatrix() * modelMatrix;
+                tempNode = const_cast<Node*>(tempNode->getParent());
+            }
+        }
+        activeShader->setMat4("model", modelMatrix);
+
+        if (overrideShader == nullptr && m_material)
         {
             m_material->bind(scene);
 
             ProjViewMatrix pv = scene->getActiveCameraPV();
-            shader->setMat4("view", pv.view);
-            shader->setMat4("projection", pv.projection);
-
-            glm::mat4 modelMatrix = globalTransform;
-            
-            if (animator && animatorNode) {
-                modelMatrix = glm::mat4(1.0f);
-                Node* tempNode = animatorNode;
-                while (tempNode != nullptr) {
-                    modelMatrix = tempNode->getLocalModelMatrix() * modelMatrix;
-                    tempNode = const_cast<Node*>(tempNode->getParent());
-                }
-            }
-            shader->setMat4("model", modelMatrix);
-
-            m_geometry->draw();
+            activeShader->setMat4("view", pv.view);
+            activeShader->setMat4("projection", pv.projection);
         }
+
+        m_geometry->draw();
     }
 
-    // Node propagation
+    // Propagation aux enfants
     for (Node* child : m_childrens)
     {
-        child->draw(scene, globalTransform);
+        child->draw(scene, overrideShader, globalTransform);
     }
 }

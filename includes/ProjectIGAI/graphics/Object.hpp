@@ -22,7 +22,7 @@ public:
 
     Material* getMaterial() const;
 
-    void draw(Scene* scene, glm::mat4 parentTransform = glm::mat4(1.0f)) override;
+    void draw(Scene* scene, Shader* overrideShader = nullptr, glm::mat4 parentTransform = glm::mat4(1.0f)) override;
 
 private:
 

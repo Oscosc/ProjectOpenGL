@@ -16,6 +16,31 @@ RasterWindow::RasterWindow(Scene *refScene, const unsigned int width, const unsi
 
 void RasterWindow::subClassRendering()
 {
+    // Shadow map rendering
+    DirectionalLight* sun = m_scene->getMainDirectionalLight(); 
+    if (sun != nullptr) 
+    {
+        sun->computeLightSpaceMatrix();
+        sun->beginShadowPass();
+        
+        Shader* shadowShader = sun->getShadowShader();
+
+        for(Node* node : m_scene->getAllObjects()) {
+            node->draw(m_scene, shadowShader);
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, m_screenWidth, m_screenHeight);
+
+        Shader* lightedShader = ShaderManager::getInstance().getResource("lighted");
+        lightedShader->use();
+        
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, sun->getDepthMap());
+        lightedShader->setInt("shadowMap", 9);
+        lightedShader->setMat4("lightSpaceMatrix", sun->getLightSpaceMatrix());
+    }
+
     // Rendering skybox/cubemap
     if(m_scene->skyboxActive())
         CubemapManager::getInstance().drawCubemap(m_scene->skyboxName(), m_scene);
@@ -53,7 +78,8 @@ void RasterWindow::drawImGuiFrame()
     // Rendering mode
     const char* items[] = {"PBR",
         "Normals", "Tangents", "UVs",
-        "Albedo", "Roughness", "Metallic", "AO", "Height"};
+        "Albedo", "Roughness", "Metallic", "AO", "Height",
+        "Shadow"};
     int tmpRenderingMode = m_scene->getRenderingMode();
     if(ImGui::Combo("Render mode", &tmpRenderingMode, items, IM_ARRAYSIZE(items))) {
         m_scene->setRenderingMode(tmpRenderingMode);

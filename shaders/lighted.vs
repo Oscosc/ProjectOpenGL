@@ -16,6 +16,8 @@ uniform mat4 projection;
 
 uniform vec3 viewPos;
 
+uniform mat4 lightSpaceMatrix;
+
 out vec3 FragPos;
 out vec3 Normal;
 out vec3 Tangent;
@@ -23,6 +25,8 @@ out vec2 UV;
 
 out vec3 TangentFragPos;
 out vec3 TangentViewPos;
+
+out vec4 FragPosLightSpace;
 
 void main()
 {
@@ -77,4 +81,7 @@ void main()
 
     TangentFragPos = TBN * vec3(model * totalPosition); 
     TangentViewPos = TBN * viewPos;
+
+    // Shadows
+    FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 }
