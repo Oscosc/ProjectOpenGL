@@ -68,7 +68,7 @@ void main()
     
     FragPos = vec3(model * totalPosition);
     Normal  = mat3(transpose(inverse(model))) * totalNormal;
-    Tangent = mat3(model) * totalTangent;
+    Tangent = mat3(transpose(inverse(model))) * totalTangent;
     UV = aUV;
 
 

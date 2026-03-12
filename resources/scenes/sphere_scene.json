@@ -14,11 +14,11 @@
             "type": "directional_light",
             "transform": {
                 "position": [1.0, 0.0, 2.0],
-                "rotation": [45.0, -45.0, 0.0],
+                "rotation": [225.0, -96.5, 0.0],
                 "scale":    [1.0, 1.0, 1.0]
             },
-            "color": [1.0, 1.0, 1.0],
-            "intensity": 1.0
+            "color": [0.6, 0.305, 0.05],
+            "intensity": 8.0
         },
         {
             "name": "sphere_testA",

@@ -30,11 +30,19 @@
                 "scale":    [10.0, 10.0, 10.0]
             },
             "material": {
-                "name": "grey_floor",
+                "name": "ground_mat",
                 "type": "PBR",
-                "albedo": [0.73, 0.73, 0.73],
-                "roughness": 0.8,
-                "metallic": 0.0
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/rock-wall/albedo.png",
+                    "roughness": "resources/textures/rock-wall/roughness.png",
+                    "metallic":  "resources/textures/rock-wall/metallic.png",
+                    "normal":    "resources/textures/rock-wall/normal.png",
+                    "ao":        "resources/textures/rock-wall/ao.png",
+                    "height":    "resources/textures/rock-wall/height.png"
+                }
             }
         },
         {
@@ -45,6 +53,16 @@
                 "position": [0.0, 0.0, -1.0],
                 "rotation": [0.0, 0.0, 0.0],
                 "scale":    [0.005, 0.005, 0.005]
+            }
+        },
+        {
+            "name": "BoxingRobot",
+            "type": "model",
+            "path": "resources/models/cyber_warrior.glb",
+            "transform": {
+                "position": [-4.0, 0.0, -1.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.02, 0.02, 0.02]
             }
         },
         {
@@ -67,12 +85,12 @@
                 "roughness": 1.0,
                 "metallic": 1.0,
                 "textures": {
-                    "albedo":    "resources/textures/rock-wall/albedo.png",
-                    "roughness": "resources/textures/rock-wall/roughness.png",
-                    "metallic":  "resources/textures/rock-wall/metallic.png",
-                    "normal":    "resources/textures/rock-wall/normal.png",
-                    "ao":        "resources/textures/rock-wall/ao.png",
-                    "height":    "resources/textures/rock-wall/height.png"
+                    "albedo":    "resources/textures/rusty-metal/albedo.png",
+                    "roughness": "resources/textures/rusty-metal/roughness.png",
+                    "metallic":  "resources/textures/rusty-metal/metallic.png",
+                    "normal":    "resources/textures/rusty-metal/normal.png",
+                    "ao":        "resources/textures/rusty-metal/ao.png",
+                    "height":    "resources/textures/rusty-metal/height.png"
                 }
             }
         }
