@@ -150,6 +150,11 @@ void ImGuiWidgets::dirLightsEditor(Scene *scene)
         if(transformEditor(tmpTransform, DIR_LIGHT_FLAGS)) {
             light->setTransform(tmpTransform);
         }
+
+        float tmpShadowRange = light->getShadowRange();
+        if(ImGui::SliderFloat("Shadow range", &tmpShadowRange, 0.0f, 50.0f)) {
+            light->setShadowRange(tmpShadowRange);
+        }
         ImGui::Unindent();
         
         ImGui::Separator();

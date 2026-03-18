@@ -4,8 +4,8 @@
             "name": "main_camera",
             "type": "camera",
             "transform": {
-                "position": [0.0, 4.0, 10.0],
-                "rotation": [0.0, -15.0, -90.0],
+                "position": [0.5, 1.0, -3.0],
+                "rotation": [0.0, -5.0, 90.0],
                 "scale":    [1.0, 1.0, 1.0]
             }
         },
@@ -14,30 +14,160 @@
             "type": "directional_light",
             "transform": {
                 "position": [0.0, 0.0, 0.0],
-                "rotation": [-90.0, 0.0, 0.0],
+                "rotation": [-71.6, 36.0, 0.0],
                 "scale":    [0.0, 0.0, 0.0]
             },
-            "color": [1.0, 1.0, 1.0],
-            "intensity": 1.0
+            "color": [0.913, 0.647, 0.274],
+            "intensity": 4.0
         },
         {
-            "name": "helmet_demo",
+            "name": "floorAA",
             "type": "model",
-            "path": "resources/models/DamagedHelmet/DamagedHelmet.gltf",
+            "path": "resources/objects/1x1_tile.obj",
             "transform": {
-                "position": [2.5, 1.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [2.0, 2.0, 2.0]
+                "position": [-1.0, 0.0, -1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
             }
         },
         {
-            "name": "megaphone_demo",
+            "name": "floorAB",
             "type": "model",
-            "path": "resources/models/Megaphone/Megaphone_01_4k.gltf",
+            "path": "resources/objects/1x1_tile.obj",
             "transform": {
-                "position": [-2.5, 1.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "scale":    [10.0, 10.0, 10.0]
+                "position": [0.0, 0.0, -1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "floorAC",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [1.0, 0.0, -1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "floorBA",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [-1.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "floorBB",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [0.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "floorBC",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [1.0, 0.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallA",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [1.0, 1.0, 1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallB",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [0.0, 1.0, 1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallC",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [-1.0, 1.0, 1.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallD",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [-1.0, 1.0, 0.0],
+                "rotation": [90.0, 270.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallE",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [-1.0, 1.0, -1.0],
+                "rotation": [90.0, 270.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallF",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [2.0, 1.0, 0.0],
+                "rotation": [90.0, 270.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "wallG",
+            "type": "model",
+            "path": "resources/objects/1x1_wall.obj",
+            "transform": {
+                "position": [2.0, 1.0, -1.0],
+                "rotation": [90.0, 270.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "drawer",
+            "type": "model",
+            "path": "resources/models/wooden_drawer/vintage_wooden_drawer_01_4k.gltf",
+            "transform": {
+                "position": [1.5, 0.0, 0.780],
+                "rotation": [0.0, 180.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "sofa",
+            "type": "model",
+            "path": "resources/models/Sofa/sofa_03_4k.gltf",
+            "transform": {
+                "position": [-0.76, 0.0, 0.0],
+                "rotation": [0.0, 90.0, 0.0],
+                "scale":    [0.5, 0.5, 0.5]
             }
         }
     ]

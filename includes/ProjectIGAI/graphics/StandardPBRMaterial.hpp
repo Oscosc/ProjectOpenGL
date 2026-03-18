@@ -13,7 +13,7 @@ public:
     float roughness = 1.0f;
     float metallic = 1.0f;
     float ao = 1.0f;
-    float height = 0.05f;
+    float height = 0.f;
 
     // Alternative : material maps
     GLuint albedoMap    = 0;

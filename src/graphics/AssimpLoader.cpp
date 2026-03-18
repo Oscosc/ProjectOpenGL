@@ -213,6 +213,7 @@ void AssimpLoader::processNode(aiNode *assimpNode, const aiScene *scene, Node *p
             // AMBIENT OCCLUSION
             TextureResult aoRes = getTextureInfo(aiTextureType_AMBIENT_OCCLUSION);
             if (aoRes.path.empty() && aoRes.id == 0) aoRes = getTextureInfo(aiTextureType_LIGHTMAP);
+            if (aoRes.path.empty() && aoRes.id == 0) aoRes = getTextureInfo(aiTextureType_AMBIENT);
             if (aoRes.id > 0) mat->setAOMapID(aoRes.id);
             else if (!aoRes.path.empty()) mat->setAOTexture(aoRes.path);
 

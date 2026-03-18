@@ -22,7 +22,7 @@ public:
     DirectionalLight(Transform transform = DEFAULT_TRANSFORM,
         std::string name = DEFAULT_NAME,
         LightProperties material = DEFAULT_LIGHT_PROPERTIES)
-    : Light(transform, name, material)
+    : Light(transform, name, material), m_shadowRange(10.f)
     {
         // Shader instanciation
         ShaderManager::getInstance().loadResource(ShaderParam("shadow", "shaders/shadow.vs", "shaders/shadow.fs"));
@@ -54,8 +54,12 @@ public:
     }
 
     void computeLightSpaceMatrix()
-    {
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 25.0f);
+    {   
+        glm::mat4 lightProjection = glm::ortho(-1.0f * m_shadowRange,
+                                                1.0f * m_shadowRange,
+                                               -1.0f * m_shadowRange,
+                                                1.0f * m_shadowRange,
+                                                1.0f, 25.0f);
         
         glm::quat q = glm::quat(glm::radians(m_transform.rotation));
         glm::vec3 lightDir = glm::normalize(q * glm::vec3(0.0f, 0.0f, -1.0f));
@@ -79,8 +83,13 @@ public:
         m_shadowShader->use();
         m_shadowShader->setMat4("lightSpaceMatrix", m_lightSpaceMatrix);
     }
+
+    const float getShadowRange() { return m_shadowRange; }
+    void setShadowRange(float range) { m_shadowRange = range; }
     
 private:
+
+    float m_shadowRange;
 
     GLuint m_depthMapFBO;
     GLuint m_depthMap;

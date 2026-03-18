@@ -225,7 +225,7 @@ private:
     /** Skybox */
     int m_skybox;
     bool m_skyboxActive = false;
-    std::string m_skyboxName = "Bell-Tower";
+    std::string m_skyboxName = "Sunset pure sky";
 
     int m_renderingMode;
 };
