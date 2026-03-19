@@ -15,6 +15,8 @@ void StandardPBRMaterial::bind(Scene *scene)
     m_shader->use();
 
     m_shader->setInt("renderingMode", scene->getRenderingMode());
+    m_shader->setBool("toneMappingOn", scene->toneMappingOn());
+    m_shader->setBool("gammaCorrectionOn", scene->gammaCorrectionOn());
 
     // Light updating
     scene->updateLigth(m_shader);

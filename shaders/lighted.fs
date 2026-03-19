@@ -153,11 +153,13 @@ bool PBR_ONLY = false;
     uniform SpotLight spotLights[NB_SPOT_LIGHTS];
 #endif
 
-uniform Skybox skybox;
-uniform Material material;
-uniform vec3 viewPos;
+uniform Skybox    skybox;
+uniform Material  material;
+uniform vec3      viewPos;
 uniform sampler2D shadowMap;
-uniform int renderingMode;
+uniform int       renderingMode;
+uniform bool      toneMappingOn;
+uniform bool      gammaCorrectionOn;
 
 
 /*************************************************************************************************
@@ -618,8 +620,11 @@ void FullRendering()
 
     vec3 color = ambient + Lo;
 	
-    color = ACES(color); // Academy Color Encoding System
-    color = pow(color, vec3(1.0/2.2));   // Gama correction
+    if(toneMappingOn)
+        color = ACES(color); // Academy Color Encoding System
+    
+    if(gammaCorrectionOn)
+        color = pow(color, vec3(1.0/2.2));   // Gama correction
    
     FragColor = vec4(color, 1.0);
 }

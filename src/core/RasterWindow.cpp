@@ -66,7 +66,13 @@ void RasterWindow::drawImGuiFrame()
     // Modules part
     ImGui::Begin("Project IGAI configuration");
 
+    // FPS
     ImGui::Text((std::to_string(1.f / m_deltaTime) + " FPS").c_str());
+
+    // Shader options
+    bool tmpToneMapping = m_scene->toneMappingOn(), tmpGammaCorrection = m_scene->gammaCorrectionOn();
+    if(ImGui::Checkbox("Tone mapping", &tmpToneMapping)) m_scene->setToneMappingActive(tmpToneMapping);
+    if(ImGui::Checkbox("Gamma correction", &tmpGammaCorrection)) m_scene->setGammaCorrectionActive(tmpGammaCorrection);
 
     // Skybox
     ImGui::ColorEdit3("Background", m_scene->getBackgroundColorPointer());
@@ -91,6 +97,7 @@ void RasterWindow::drawImGuiFrame()
     {
         ImGui::Indent();
         if (ImGui::CollapsingHeader("Lights")) {
+
             // Point lights
             ImGuiWidgets::pointLightsEditor(m_scene);
 

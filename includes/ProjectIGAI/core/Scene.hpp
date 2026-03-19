@@ -200,6 +200,14 @@ public:
 
     void setRenderingMode(const int mode) { m_renderingMode = mode; }
 
+    bool toneMappingOn() const { return m_toneMappingActive; }
+
+    void setToneMappingActive(const bool mode) { m_toneMappingActive = mode; }
+
+    bool gammaCorrectionOn() const { return m_gammaCorrectionActive; }
+
+    void setGammaCorrectionActive(const bool mode) { m_gammaCorrectionActive = mode; }
+
     void update(float dt);
 
 private:
@@ -228,4 +236,6 @@ private:
     std::string m_skyboxName = "Sunset pure sky";
 
     int m_renderingMode;
+    bool m_toneMappingActive = true;
+    bool m_gammaCorrectionActive = true;
 };

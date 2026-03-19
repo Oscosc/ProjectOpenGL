@@ -169,6 +169,78 @@
                 "rotation": [0.0, 90.0, 0.0],
                 "scale":    [0.5, 0.5, 0.5]
             }
+        },
+        {
+            "name": "table",
+            "type": "model",
+            "path": "resources/models/gothic_coffee_table/gothic_coffee_table_4k.gltf",
+            "transform": {
+                "position": [0.04, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.5, 0.5, 0.5]
+            }
+        },
+        {
+            "name": "light1",
+            "type": "model",
+            "path": "resources/models/industrial_light/industrial_wall_sconce_4k.gltf",
+            "transform": {
+                "position": [1.54, 0.6, 1.0],
+                "rotation": [0.0, 180.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "light1_attached",
+            "type": "spot_light",
+            "transform": {
+                "position": [1.54, 0.7, 0.8],
+                "rotation": [-90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 0.5
+        },
+        {
+            "name": "light2",
+            "type": "model",
+            "path": "resources/models/industrial_light/industrial_wall_sconce_4k.gltf",
+            "transform": {
+                "position": [-0.54, 0.6, 1.0],
+                "rotation": [0.0, 180.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "light2_attached",
+            "type": "spot_light",
+            "transform": {
+                "position": [-0.54, 0.7, 0.8],
+                "rotation": [-90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 0.5
+        },
+        {
+            "name": "truffle_man",
+            "type": "model",
+            "path": "resources/models/truffle_man.glb",
+            "transform": {
+                "position": [1.2, -0.05, -0.3],
+                "rotation": [0.0, 220.0, 0.0],
+                "scale":    [0.7, 0.7, 0.7]
+            }
+        },
+        {
+            "name": "Rumbaman",
+            "type": "model",
+            "path": "resources/models/Rumba Dancing/Rumba Dancing.dae",
+            "transform": {
+                "position": [0.1, 0.25, 0.0],
+                "rotation": [0.0, 140.0, 0.0],
+                "scale":    [0.5, 0.5, 0.5]
+            }
         }
     ]
 }

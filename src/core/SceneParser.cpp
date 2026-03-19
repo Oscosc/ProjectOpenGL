@@ -72,15 +72,15 @@ void SceneParser::parseScene(Scene* scene, const std::string &filePath)
             
             if (!newNode) return;
     
-            if (auto* light = dynamic_cast<PointLight*>(newNode)) {
+            if (auto* light = dynamic_cast<SpotLight*>(newNode)) {
+                scene->addLight(light);
+            }
+
+            else if (auto* light = dynamic_cast<PointLight*>(newNode)) {
                 scene->addLight(light);
             }
 
             else if (auto* light = dynamic_cast<DirectionalLight*>(newNode)) {
-                scene->addLight(light);
-            }
-
-            else if (auto* light = dynamic_cast<SpotLight*>(newNode)) {
                 scene->addLight(light);
             }
 
