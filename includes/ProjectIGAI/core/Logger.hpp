@@ -11,7 +11,7 @@
 #define MAX_LOG_LEVEL 3
 #define DEFAULT_COLOR_ESC "\033["
 
-enum LogType {ERROR, INFO, PERFORMANCE, WARNING};
+enum LogType {ERROR, INFO, PERFORMANCE, WARNING, DEBUG, LOADING};
 
 struct LogInfo {
     std::string toString;
@@ -72,6 +72,22 @@ public:
     static void logWarning(const std::string& message) { Logger::getInstance().log(WARNING, message); }
 
     /**
+     * @brief Log a message as a debug in user console (with adapted color and verbosity level
+     * applied).
+     * 
+     * @param message message to log
+     */
+    static void logDebug(const std::string& message) { Logger::getInstance().log(DEBUG, message); }
+
+    /**
+     * @brief Log a message as loading in user console (with adapted color and verbosity level
+     * applied).
+     * 
+     * @param message message to log
+     */
+    static void logLoading(const std::string& message) { Logger::getInstance().log(LOADING, message); }
+
+    /**
      * @brief Set the Logger global verbosity
      * 
      * @param level new level of verbosity
@@ -107,11 +123,11 @@ private:
 
     /** Map of logging types wih associated colors */
     inline static std::unordered_map<LogType, LogInfo> s_logTypeValues = {
-        {ERROR, {"ERROR", 1, 31}},
-
-        {INFO, {"INFO", 2, 0}},
-        {WARNING, {"WARNING", 2, 33}},
-
+        {ERROR,       {"ERROR",       1, 31}},
+        {LOADING,     {"LOADING",     1, 35}},
+        {INFO,        {"INFO",        2, 0 }},
+        {WARNING,     {"WARNING",     2, 33}},
+        {DEBUG,       {"DEBUG",       2, 32}},
         {PERFORMANCE, {"PERFORMANCE", 3, 36}}
     };
 };

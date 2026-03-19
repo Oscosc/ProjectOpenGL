@@ -1,0 +1,73 @@
+{
+    "nodes": [
+        {
+            "name": "main_camera",
+            "type": "camera",
+            "transform": {
+                "position": [0.0, 2.5, 9.5],
+                "rotation": [0.0, 0.0, -90.0],
+                "scale":    [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "name": "sun_light",
+            "type": "directional_light",
+            "transform": {
+                "position": [0.0, 20.0, 0.0],
+                "rotation": [270.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 8.0
+        },
+        {
+            "name": "floor",
+            "type": "model",
+            "path": "resources/objects/1x1_tile.obj",
+            "transform": {
+                "position": [-5.0, 0.0, -5.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [10.0, 10.0, 10.0]
+            }
+        },
+        {
+            "name": "BoxingRobot",
+            "type": "model",
+            "path": "resources/models/reap_the_whirlwind.glb",
+            "transform": {
+                "position": [0.0, 0.0, -1.0],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale":    [0.005, 0.005, 0.005]
+            }
+        },
+        {
+            "name": "sphere_testA",
+            "type": "object",
+            "transform": {
+                "position": [2.1, 5.0, 0.0],
+                "rotation": [90.0, 0.0, 0.0],
+                "scale":    [1.0, 1.0, 1.0]
+            },
+            "geometry": {
+                "type": "sphere",
+                "radius": 1.0,
+                "segments": 32
+            },
+            "material": {
+                "name": "rough_sphere",
+                "type": "PBR",
+                "albedo": [1.0, 1.0, 1.0], 
+                "roughness": 1.0,
+                "metallic": 1.0,
+                "textures": {
+                    "albedo":    "resources/textures/rusty-metal/albedo.png",
+                    "roughness": "resources/textures/rusty-metal/roughness.png",
+                    "metallic":  "resources/textures/rusty-metal/metallic.png",
+                    "normal":    "resources/textures/rusty-metal/normal.png",
+                    "ao":        "resources/textures/rusty-metal/ao.png",
+                    "height":    "resources/textures/rusty-metal/height.png"
+                }
+            }
+        }
+    ]
+}

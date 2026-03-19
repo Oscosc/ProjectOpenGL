@@ -5,26 +5,15 @@
 #include <ProjectIGAI/graphics/Callbacks.hpp>
 #include <ProjectIGAI/graphics/ShaderManager.hpp>
 #include <ProjectIGAI/graphics/TextureManager.hpp>
-#include <ProjectIGAI/graphics/Mesh.hpp>
-#include <ProjectIGAI/graphics/Sphere.hpp>
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
 #include <ProjectIGAI/graphics/PointLight.hpp>
-#include <ProjectIGAI/geometry/BezierCurve.hpp>
-#include <ProjectIGAI/geometry/BezierSurface.hpp>
-#include <ProjectIGAI/geometry/Grid.hpp>
 #include <ProjectIGAI/core/RasterWindow.hpp>
-#include <ProjectIGAI/core/RaytracingWindow.hpp>
-
-#include <extern/imgui/imgui.h>
-#include <extern/imgui/imgui_impl_glfw.h>
-#include <extern/imgui/imgui_impl_opengl3.h>
-
-#include <chrono>
-#define timer std::chrono::high_resolution_clock
-#define duration std::chrono::duration_cast<std::chrono::nanoseconds>
+#include <ProjectIGAI/core/utils.hpp>
 
 Application::Application(const unsigned int screenWidth, const unsigned int screenWeight) :
     m_screenWidth(screenWidth), m_screenHeight(screenWeight), m_activeWindowsCount(0)
 {
+    this->m_scene = new Scene();
 }
 
 void Application::initGLContext()
@@ -75,45 +64,41 @@ void Application::initGLComponents()
     }, nullptr);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // For cubemaps
     glViewport(0, 0, this->m_screenWidth, this->m_screenHeight);
 }
 
 void Application::initShaders(const std::string& sceneFile)
 {
-    auto sceneCount = SceneParser::retrieveSceneCounts(sceneFile);
+    std::ifstream stream(sceneFile);
+    const json scene = json::parse(stream);
+
+    auto sceneCount = SceneParser::retrieveSceneCounts(scene);
     unsigned int pointLights = sceneCount[SceneParser::POINT_LIGHT];
     unsigned int dirLights = sceneCount[SceneParser::DIR_LIGHT];
     unsigned int spotLights = sceneCount[SceneParser::SPOT_LIGHT];
 
-    ShaderManager::getInstance().loadShader("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights);
-    ShaderManager::getInstance().loadShader("monochrome", "shaders/monochrome.vs", "shaders/monochrome.fs");
-    ShaderManager::getInstance().loadShader("quad", "shaders/quad.vs", "shaders/quad.fs");
-    ShaderManager::getInstance().loadShader("uv", "shaders/uv.vs", "shaders/uv.fs");
-    ShaderManager::getInstance().loadShader("grid", "shaders/grid.vs", "shaders/grid.fs");
+    ShaderManager::getInstance().loadResource(ShaderParam("lighted", "shaders/lighted.vs", "shaders/lighted.fs", pointLights, dirLights, spotLights));
+    ShaderManager::getInstance().loadResource(ShaderParam("quad", "shaders/quad.vs", "shaders/quad.fs"));
+    ShaderManager::getInstance().loadResource(ShaderParam("cubemap", "shaders/cubemap.vs", "shaders/cubemap.fs"));
 
-    ShaderManager::getInstance().loadShader("ray-tracing-compute", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_compute.fs");
-    ShaderManager::getInstance().loadShader("ray-tracing-display", "shaders/ray-tracing_base.vs", "shaders/ray-tracing_display.fs");
-
-#ifdef LOAD_TEXTURES_ON
-    TextureManager::getInstance().loadTexture("earth", "resources/8k_earth.jpg");
-    TextureManager::getInstance().loadTexture("ceres", "resources/4k_ceres.jpg");
-    TextureManager::getInstance().loadTexture("metal", "resources/4k_metal.jpg");
-#endif
+    CubemapManager::getInstance().loadResource(CubemapParam("Sunset pure sky",
+        "resources/cubemaps/kloppenheim_06_puresky_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Rogland clear night",
+        "resources/cubemaps/rogland_clear_night_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Studio", "resources/cubemaps/ferndale_studio_12_8k.hdr"), 512);
+    CubemapManager::getInstance().loadResource(CubemapParam("Park", "resources/cubemaps/suburban_soccer_park_8k.hdr"), 512);
 }
 
-void Application::initScene(const std::string& file)
+void Application::initScene(const std::string& sceneFile)
 {
     // Loading scene
-    this->m_scene = new Scene(SceneParser::parseScene(file));
+    SceneParser::parseScene(this->m_scene, sceneFile);
 
     // Associating scene to main window
     this->getMainWindow()->setSceneRef(m_scene);
 
     this->getActiveCamera()->Ratio = (float)getScreenWidth() / (float)getScreenHeight();
-
-    // this->m_scene->addObject(new Grid());
-
-    Logger::logInfo("Scene builded with " + std::to_string(m_scene->objectsCount()) + " visible objects in it");
 }
 
 void Application::postInitComponents()
@@ -134,7 +119,7 @@ void Application::loop()
         for(unsigned int i = 0; i < m_activeWindowsCount; i++) {
             m_windows[i]->render();
         }
-
+        
         // Poolling callbacks events
         glfwPollEvents();
     }
@@ -142,24 +127,46 @@ void Application::loop()
 
 void Application::run(const std::string& sceneFile)
 {
+    auto timerStart = Timer::getCurrentTime();
+    float execTime;
+
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initGLContext();
-    Logger::logInfo("OpenGL correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tOpenGL correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initMainWindow();
-    Logger::logInfo("Main window correctly created");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tMain window correctly created");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initGLComponents();
-    Logger::logInfo("OpenGL/GLAD components correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\t\tOpenGL/GLAD components correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initShaders(sceneFile);
-    Logger::logInfo("Shaders correctly loaded and computed");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tShaders correctly loaded and computed");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     initScene(sceneFile);
-    Logger::logInfo("Scene correctly loaded");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\tScene correctly loaded");
 
+    // --------------------------------------------------------------------------------------------
+    timerStart = Timer::getCurrentTime();
     postInitComponents();
-    Logger::logInfo("Components are all fully initialized");
+    execTime = (Timer::getCurrentTime() - timerStart).count() * 1000.0;
+    Logger::logLoading("(" + std::to_string(execTime) + " ms)\t\tAll components fully initialized");
     
+    // --------------------------------------------------------------------------------------------
     Logger::logInfo("Starting application loop");
     loop();
     Logger::logInfo("Application closed");
@@ -190,37 +197,6 @@ BaseWindow* Application::getExternalWindow(unsigned int windowID) const
     return m_windows[windowID];
 }
 
-unsigned int Application::createExternalRTWindow(const unsigned int width, const unsigned int height, const std::string& windowTitle)
-{
-    // Check if it's possible to create window
-    if(m_activeWindowsCount >= MAX_WINDOWS) {
-        Logger::logWarning("Could not create a new external window, no space left");
-        return -1;
-    }
-    else if(m_activeWindowsCount == 0) {
-        Logger::logWarning("Could not create a new external window, a main window is needed first");
-        return -1;
-    }
-
-    // Create window
-    unsigned int windowID = m_activeWindowsCount;
-    m_activeWindowsCount++;
-    this->m_windows[windowID] = new RaytracingWindow(
-        m_scene, width, height, windowTitle.c_str(), getMainWindow()->getGLFWwindow()
-    );
-
-    if (getExternalWindow(windowID) == NULL)
-    {
-        Logger::logError("Failed to create GLFW external window");
-        glfwTerminate();
-        exit(-2);
-    }
-
-    // Update values and inform user
-    Logger::logInfo("New external window correctly created. Current windows count is " + std::to_string(m_activeWindowsCount));
-    return windowID;
-}
-
 void Application::cleanRemoveExternalWindow(unsigned int windowID)
 {
     glfwDestroyWindow(getExternalWindow(windowID)->getGLFWwindow());
@@ -231,7 +207,7 @@ void Application::cleanRemoveExternalWindow(unsigned int windowID)
     m_windows[m_activeWindowsCount] = nullptr;
 }
 
-Application *Application::getApplicationFromWindow(GLFWwindow *window)
+Application* Application::getApplicationFromWindow(GLFWwindow *window)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
     if(!app) {

@@ -3,229 +3,260 @@
 #include <fstream>
 #include <iostream>
 
-#include <ProjectIGAI/graphics/Mesh.hpp>
-#include <ProjectIGAI/graphics/Sphere.hpp>
 #include <ProjectIGAI/graphics/Object.hpp>
 #include <ProjectIGAI/graphics/Light.hpp>
+#include <ProjectIGAI/graphics/GeometryManager.hpp>
+#include <ProjectIGAI/graphics/TextureManager.hpp>
+#include <ProjectIGAI/graphics/MaterialManager.hpp>
+#include <ProjectIGAI/graphics/StandardPBRMaterial.hpp>
+#include <ProjectIGAI/graphics/AssimpLoader.hpp>
 #include <ProjectIGAI/core/Logger.hpp>
-#include <ProjectIGAI/geometry/BezierCurve.hpp>
-#include <ProjectIGAI/geometry/BezierSurface.hpp>
+#include <ProjectIGAI/core/utils.hpp>
 
-std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const std::string &file)
+std::unordered_map<SceneParser::ElementType, unsigned int> SceneParser::retrieveSceneCounts(const json& data)
 {
-    std::ifstream stream(file);
-    json data = json::parse(stream);
-
     std::unordered_map<ElementType, unsigned int> sceneCounts;
 
-    for(auto& item : data) {
-        if(item["type"] == nullptr) {
+    const json& dataToIterate = data.contains("nodes") ? data["nodes"] : data;
+
+    for(auto& item : dataToIterate) {
+        if (!item.is_object()) continue;
+
+        if(!item.contains("type")) {
             Logger::logError("Scene object must have a 'type' defined");
-            exit(1);
+            continue;
         }
 
-        auto it = s_TypeAliases.find(item["type"]);
+        std::string typeStr = item["type"];
+        auto it = s_TypeAliases.find(typeStr);
+        
         if(it == s_TypeAliases.end()) {
-            Logger::logError("Type " + (std::string)item["type"] + " does not exist");
-            exit(1);
+            Logger::logWarning("Type " + typeStr + " not found in aliases, skipping count.");
+            continue;
         }
 
         ElementType type = it->second;
-        (sceneCounts.find(type) == sceneCounts.end()) ? sceneCounts[type] = 1 : sceneCounts[type]++;
+        sceneCounts[type]++;
     }
 
-    // for(auto item : sceneCounts) std::cout << item.second << " occurences of " << item.first << std::endl;
     return sceneCounts;
 }
 
-Scene SceneParser::parseScene(const std::string &file)
+void SceneParser::parseScene(Scene* scene, const std::string &filePath)
 {
-    std::ifstream stream(file);
-    json data = json::parse(stream);
+    std::ifstream stream(filePath);
+    const json jFile = json::parse(stream);
 
-    Scene newScene;
+    for (auto& node : jFile["nodes"]) {
+        try {
+            std::string type = node.value("type", "object");
 
-    for(auto& item : data) {
-        addObjectToScene(&newScene, item);
+            Node* newNode = nullptr;
+
+            if(type == "model")
+                newNode = AssimpLoader::loadModel(node.value("path", ""));
+            else if (type == "object")
+                newNode = parseObject(node);
+            else if (type == "directional_light")
+                newNode = parseDirectionalLight(node);
+            else if (type == "point_light")
+                newNode = parsePointLight(node);
+            else if (type == "spot_light")
+                newNode = parseSpotLight(node);
+            else if (type == "camera")
+                newNode = parseCamera(node);
+            
+            if(newNode && node.contains("transform"))
+                newNode->setTransform(jsonToTransform(node["transform"]));
+
+            
+            if (!newNode) return;
+    
+            if (auto* light = dynamic_cast<SpotLight*>(newNode)) {
+                scene->addLight(light);
+            }
+
+            else if (auto* light = dynamic_cast<PointLight*>(newNode)) {
+                scene->addLight(light);
+            }
+
+            else if (auto* light = dynamic_cast<DirectionalLight*>(newNode)) {
+                scene->addLight(light);
+            }
+
+            else if (auto* cam = dynamic_cast<Camera*>(newNode)) {
+                scene->addCamera(cam);
+            }
+
+            else {
+                scene->addNode(newNode);
+            }
+            
+            //if(newNode) scene->addNode(newNode);
+
+        } catch (const json::exception& e) {
+            Logger::logError("JSON Logic Error (ID " + std::to_string(e.id) + "): " + e.what());
+            Logger::logError("On node: " + node.dump());
+        }
     }
 
-    if(newScene.camerasCount() == 0)
-        Logger::logWarning("Scene without camera will not display anything");
+    if(!jFile.contains("camera")) return;
 
-    return newScene;
+    for (auto& camera : jFile["camera"]) {
+        scene->addCamera(parseCamera(camera));
+    }
 }
 
-void SceneParser::addObjectToScene(Scene *scene, json item)
-{
-    if(item["type"] == nullptr) {
-        Logger::logError("Scene object must have a 'type' defined");
-        exit(1);
-    }
-
-    auto it = s_TypeAliases.find(item["type"]);
-    if(it == s_TypeAliases.end()) {
-        Logger::logError("Type " + (std::string)item["type"] + " does not exist");
-        exit(1);
-    }
-    
-    ElementType type = it->second;
-    switch(type) {
-    case CAMERA:
-        parseObjectAs_Camera(scene, item);
-        break;
-
-    case POINT_LIGHT:
-        parseObjectAs_PointLight(scene, item);
-        break;
-
-    case SPOT_LIGHT:
-        parseObjectAs_SpotLight(scene, item);
-        break;
-
-    case DIR_LIGHT:
-        parseObjectAs_DirectionalLight(scene, item);
-        break;
-        
-    case SPHERE:
-        parseObjectAs_Sphere(scene, item);
-        break;
-
-    case MESH:
-        parseObjectAs_Mesh(scene, item);
-        break;
-
-    case BEZIER_CURVE:
-        parseObjectAs_BezierCurve(scene, item);
-        break;
-    
-    case BEZIER_SURFACE:
-        parseObjectAs_BezierSurface(scene, item);
-        break;
-    }
-}
-
-void SceneParser::parseObjectAs_Camera(Scene *scene, json item)
+Camera* SceneParser::parseCamera(const json& node)
 {
     /* Roll(x), Pitch(y), Yaw(z)
      * Roll is fixed (no camera roll), up vector is (0, 1, 0)
      */
-    Transform transform = jsonToTransform(item["transform"]);
-    scene->addCamera(new Camera(
+    Transform transform = jsonToTransform(node.at("transform"));
+    return new Camera(
         transform.position,
         glm::vec3(0.f, 1.f, 0.f),
         transform.rotation.z,
         transform.rotation.y
-    ));
+    );
 }
 
-void SceneParser::parseObjectAs_Mesh(Scene *scene, json item)
+Object* SceneParser::parseObject(const json& node)
 {
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new Mesh(item["file"], jsonToTransform(item["transform"])));
+    Object* obj = new Object(node.value("name", "Object"));
+
+    if(node.contains("geometry"))
+    {
+        json data = node["geometry"];
+        std::string type = data.value("type", "");
+
+        Geometry* geometry = nullptr;
+
+        if (type == "sphere") {
+            float r = data.value("radius", 1.0f);
+            int seg = data.value("segments", 32);
+
+            geometry = GeometryManager::getInstance().getSphere(r, seg);
         }
-    } else {
-        scene->addObject(new Mesh(item["file"]));
-    }
-}
+        else if (type == "mesh") {
+            std::string path = data.value("path", "");
 
-void SceneParser::parseObjectAs_Sphere(Scene *scene, json item)
-{
-    float size = jsonToFloat(item, "size");
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
-            if(item["ray-tracing.type"] != nullptr) {
-                Sphere* last = dynamic_cast<Sphere*>(scene->getObject(scene->objectsCount() - 1));
-                last->Type = Hittable::HitTypeCatalog.at(item["ray-tracing.type"]);
+            geometry = GeometryManager::getInstance().getMesh(path);
+        }
+        else if (type == "cube") {
+            // TODO
+        }
+        else if (type == "bezier curve") {
+            // TODO
+        }
+        else if (type == "bezier surface") {
+            // TODO
+        }
+
+        obj->setGeometry(geometry);
+    }
+
+    if(node.contains("material"))
+    {
+        bool created;
+        json data = node["material"];
+        StandardPBRMaterial* mat = MaterialManager::getInstance().create<StandardPBRMaterial>(node["name"], created);
+        
+        if(!created) {
+            obj->setMaterial(mat);
+            return obj;
+        }
+
+        if(data.contains("albedo")) {
+            auto a = data["albedo"];
+            mat->albedo = glm::vec3(a[0], a[1], a[2]);
+        }
+        mat->roughness = data.value("roughness", 0.5f);
+        mat->metallic  = data.value("metallic", 0.0f);
+
+        if(data.contains("textures")) {
+            json texData = data["textures"];
+
+            if(texData.contains("albedo")) {
+                std::string path = texData["albedo"];
+                mat->albedoMap = TextureManager::getInstance().loadTexture(path);
             }
-        } else {
-            scene->addObject(new Sphere(size, jsonToTransform(item["transform"])));
+
+            if(texData.contains("roughness")) {
+                std::string path = texData["roughness"];
+                mat->roughnessMap = TextureManager::getInstance().loadTexture(path);
+            }
+
+            if(texData.contains("metallic")) {
+                std::string path = texData["metallic"];
+                mat->metallicMap = TextureManager::getInstance().loadTexture(path);
+            }
+
+            if(texData.contains("normal")) {
+                std::string path = texData["normal"];
+                mat->normalMap = TextureManager::getInstance().loadTexture(path);
+            }
+
+            if(texData.contains("ao")) {
+                std::string path = texData["ao"];
+                mat->aoMap = TextureManager::getInstance().loadTexture(path);
+            }
+
+            if(texData.contains("height")) {
+                std::string path = texData["height"];
+                mat->heightMap = TextureManager::getInstance().loadTexture(path);
+            }
         }
-    } else {
-        scene->addObject(new Sphere(size));
+
+        obj->setMaterial(mat);
     }
+
+    return obj;
 }
 
-void SceneParser::parseObjectAs_PointLight(Scene *scene, json item)
+PointLight* SceneParser::parsePointLight(const json &node)
 {
-    glm::vec3 position = jsonToVec3(item, "position");
-    if(item["material"] != nullptr) {
-        scene->addLight(new PointLight(position, jsonToLightMaterial(item["material"])));
-    } else {
-        scene->addLight(new PointLight(position));
-    }
+    PointLight* light = new PointLight();
+
+    light->setName(node.value("name", "Point light"));
+    light->setLightMaterial(jsonToLightProperties(node));
+    light->setRadius(node.value("radius", 1.0f));
+
+    return light;
 }
 
-void SceneParser::parseObjectAs_DirectionalLight(Scene *scene, json item)
+DirectionalLight* SceneParser::parseDirectionalLight(const json &node)
 {
-    glm::vec3 direction = jsonToVec3(item, "direction");
-    if(item["material"] != nullptr) {
-        scene->addLight(new DirectionalLight(direction, jsonToLightMaterial(item["material"])));
-    } else {
-        scene->addLight(new DirectionalLight(direction));
-    }
+    DirectionalLight* light = new DirectionalLight();
+    light->setName(node.value("name", "Point light"));
+    light->setLightMaterial(jsonToLightProperties(node));
+
+    return light;
 }
 
-void SceneParser::parseObjectAs_SpotLight(Scene *scene, json item)
+SpotLight* SceneParser::parseSpotLight(const json &node)
 {
-    glm::vec3 direction = jsonToVec3(item, "direction");
-    glm::vec3 position = jsonToVec3(item, "position");
-    float cutOff = glm::cos(glm::radians(jsonToFloat(item, "cutOff")));
-    float outerCutOff = glm::cos(glm::radians(jsonToFloat(item, "outerCutOff")));
+    SpotLight* light = new SpotLight();
 
-    if(item["material"] != nullptr) {
-        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff, jsonToLightMaterial(item["material"])));
-    } else {
-        scene->addLight(new SpotLight(direction, position, cutOff, outerCutOff));
-    }
+    light->setName(node.value("name", "Point light"));
+    light->setLightMaterial(jsonToLightProperties(node));
+    light->setRadius(node.value("radius", 1.0f));
+    light->setCutOff(node.value("cutOff", 0.0f));
+    light->setOuterCutOff(node.value("outerCutOff", 1.0f));
+
+    return light;
 }
 
-void SceneParser::parseObjectAs_BezierCurve(Scene *scene, json item)
+glm::vec3 SceneParser::jsonToVec3(const json& json, const std::string &attribute)
 {
-    vec3Array controlPoints = jsonToVec3Array(item, "control points");
-
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new BezierCurve(controlPoints, jsonToTransform(item["transform"])));
-        }
-    } else {
-        scene->addObject(new BezierCurve(controlPoints));
-    }
+    return glm::vec3(
+        json[attribute][0].get<float>(),
+        json[attribute][1].get<float>(),
+        json[attribute][2].get<float>()
+    );
 }
 
-void SceneParser::parseObjectAs_BezierSurface(Scene *scene, json item)
-{
-    vec3Grid controlPoints = jsonToVec3Grid(item, "control points");
-
-    if(item["transform"] != nullptr) {
-        if(item["material"] != nullptr) {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"]), jsonToMaterial(item["material"])));
-        } else {
-            scene->addObject(new BezierSurface(controlPoints, jsonToTransform(item["transform"])));
-        }
-    } else {
-        scene->addObject(new BezierSurface(controlPoints));
-    }
-}
-
-glm::vec3 SceneParser::jsonToVec3(json json, const std::string &attribute)
-{
-    std::vector<float> value = static_cast<std::vector<float>>(json[attribute]);
-    return glm::vec3(value[0], value[1], value[2]);
-}
-
-float SceneParser::jsonToFloat(json json, const std::string &attribute)
-{
-    float value = static_cast<float>(json[attribute]);
-    return value;
-}
-
-Transform SceneParser::jsonToTransform(json json)
+Transform SceneParser::jsonToTransform(const json& json)
 {
     return {
         jsonToVec3(json, "position"),
@@ -234,34 +265,15 @@ Transform SceneParser::jsonToTransform(json json)
     };
 }
 
-Material SceneParser::jsonToMaterial(json json)
+LightProperties SceneParser::jsonToLightProperties(const json& json)
 {
     return {
-        ShaderManager::getInstance().getShader(json["shader"]),
-        jsonToShaderMaterial(json["shader material"])
+        jsonToVec3(json, "color"),
+        json["intensity"]
     };
 }
 
-ShaderMaterial SceneParser::jsonToShaderMaterial(json json)
-{
-    return {
-        jsonToVec3(json, "ambient"),
-        jsonToVec3(json, "diffuse"),
-        jsonToVec3(json, "specular"),
-        jsonToFloat(json, "shininess")
-    };
-}
-
-LightMaterial SceneParser::jsonToLightMaterial(json json)
-{
-    return {
-        jsonToVec3(json, "ambient"),
-        jsonToVec3(json, "diffuse"),
-        jsonToVec3(json, "specular")
-    };
-}
-
-vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
+vec3Array SceneParser::jsonToVec3Array(const json& json, const std::string &attribute)
 {
     vec3Array value;
     for(const auto& item : json[attribute]) {
@@ -271,7 +283,7 @@ vec3Array SceneParser::jsonToVec3Array(json json, const std::string &attribute)
     return value;
 }
 
-vec3Grid SceneParser::jsonToVec3Grid(json json, const std::string &attribute)
+vec3Grid SceneParser::jsonToVec3Grid(const json& json, const std::string &attribute)
 {
     vec3Grid value;
     unsigned int i = 0;

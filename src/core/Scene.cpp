@@ -1,13 +1,8 @@
 #include <ProjectIGAI/core/Scene.hpp>
-#include <ProjectIGAI/graphics/Object.hpp>
-#include <ProjectIGAI/graphics/Sphere.hpp>
-#include <ProjectIGAI/core/Logger.hpp>
 
-Scene::Scene(Camera *camera, std::vector<Object *> objects) : m_objects(objects)
-{
-    this->m_cameras.push_back(camera);
-    this->m_activeCamera = 0;
-}
+#include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/graphics/Object.hpp>
+#include <ProjectIGAI/graphics/GeometryManager.hpp>
 
 void Scene::render() {
     if(!camerasCount()) {
@@ -17,7 +12,7 @@ void Scene::render() {
 
     updateActiveCameraPV();
 
-    for(auto object : this->m_objects) {
+    for(auto object : this->m_nodes) {
         object->draw(this);
     }
 }
@@ -35,7 +30,7 @@ void Scene::updateActiveCameraPV()
 
 void Scene::updateLigth(Shader *shader)
 {
-    if(lightsCount() == 0) {
+    if(lightsCount().length == 0) {
         Logger::logWarning("No light source was instanciated, for somes shaders, nothing will be drawn");
         return;
     }
@@ -45,65 +40,54 @@ void Scene::updateLigth(Shader *shader)
     unsigned int i = 0;
     for(PointLight* light : m_lights.pointLights) {
         std::string i_str = std::to_string(i);
-        shader->setVec3("pointLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
-        shader->setVec3("pointLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
-        shader->setVec3("pointLights[" + i_str + "].specular", light->getLightMaterial().specular);
-        shader->setVec3("pointLights[" + i_str + "].position", light->getPosition());
+        shader->setVec3("pointLights[" + i_str + "].color", light->getLightMaterial().color);
+        shader->setFloat("pointLights[" + i_str + "].intensity", light->getLightMaterial().intensity);
+        shader->setFloat("pointLights[" + i_str + "].radius", light->getRadius());
+        shader->setVec3("pointLights[" + i_str + "].position", light->getTransform().position);
         ++i;
     }
 
     i = 0;
     for(DirectionalLight* light : m_lights.dirLights) {
         std::string i_str = std::to_string(i);
-        shader->setVec3("dirLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
-        shader->setVec3("dirLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
-        shader->setVec3("dirLights[" + i_str + "].specular", light->getLightMaterial().specular);
-        shader->setVec3("dirLights[" + i_str + "].direction", light->getDirection());
+        shader->setVec3("dirLights[" + i_str + "].color", light->getLightMaterial().color);
+        shader->setFloat("dirLights[" + i_str + "].intensity", light->getLightMaterial().intensity);
+        shader->setVec3("dirLights[" + i_str + "].direction", light->getForwardVector());
         ++i;
     }
 
     i = 0;
     for(SpotLight* light : m_lights.spotLights) {
         std::string i_str = std::to_string(i);
-        shader->setVec3("spotLights[" + i_str + "].ambient", light->getLightMaterial().ambient);
-        shader->setVec3("spotLights[" + i_str + "].diffuse", light->getLightMaterial().diffuse);
-        shader->setVec3("spotLights[" + i_str + "].specular", light->getLightMaterial().specular);
-        shader->setVec3("spotLights[" + i_str + "].position", light->getPosition());
-        shader->setVec3("spotLights[" + i_str + "].direction", light->getDirection());
-        shader->setFloat("spotLights[" + i_str + "].cutOff", light->getCutOff());
-        shader->setFloat("spotLights[" + i_str + "].outerCutOff", light->getOuterCutOff());
+        shader->setVec3("spotLights[" + i_str + "].color", light->getLightMaterial().color);
+        shader->setFloat("spotLights[" + i_str + "].intensity", light->getLightMaterial().intensity);
+        shader->setVec3("spotLights[" + i_str + "].position", light->getTransform().position);
+        shader->setFloat("spotLights[" + i_str + "].radius", light->getRadius());
+        shader->setVec3("spotLights[" + i_str + "].direction", light->getForwardVector());
+        shader->setFloat("spotLights[" + i_str + "].innerCos", light->getCutOff());
+        shader->setFloat("spotLights[" + i_str + "].outerCos", light->getOuterCutOff());
         ++i;
     }
 
     shader->setVec3("viewPos", this->getActiveCamera()->Position);
 }
 
-void Scene::addCamera(Camera *camera)
-{
-    this->m_cameras.push_back(camera);
-    if(camerasCount() == 1) { this->m_activeCamera = 0; }
+const glm::vec3 Scene::lightsCount() const {
+    return glm::vec3(m_lights.pointLights.size(), m_lights.dirLights.size(), m_lights.spotLights.size());
 }
 
-void Scene::addObject(Object *object)
+Light* Scene::getLight(unsigned int index, unsigned int type) const
 {
-    this->m_objects.push_back(object);
-}
-
-const unsigned int Scene::lightsCount() const {
-    return m_lights.dirLights.size() + m_lights.pointLights.size() + m_lights.spotLights.size();
-}
-
-std::vector<Sphere*> Scene::getSpheresRT() const
-{
-    std::vector<Sphere*> spheres;
-    for(auto obj : m_objects) {
-        Sphere* s = dynamic_cast<Sphere*>(obj);
-        if(s != nullptr) spheres.push_back(s);
+    switch (type)
+    {
+    case POINT_LIGHT_INDEX: return m_lights.pointLights.at(index);
+    case DIR_LIGHT_INDEX:   return m_lights.dirLights.at(index);
+    case SPOT_LIGHT_INDEX:  return m_lights.spotLights.at(index);
+    default: return nullptr;
     }
-    return spheres;
 }
 
-Camera *Scene::getActiveCamera() const
+Camera* Scene::getActiveCamera() const
 {
     return this->m_cameras.at(this->m_activeCamera);
 }
@@ -111,4 +95,12 @@ Camera *Scene::getActiveCamera() const
 ProjViewMatrix Scene::getActiveCameraPV() const
 {
     return this->m_activeCameraPV;
+}
+
+void Scene::update(float dt)
+{
+    for (Node* node : m_nodes)
+    {
+        node->update(dt);
+    }
 }

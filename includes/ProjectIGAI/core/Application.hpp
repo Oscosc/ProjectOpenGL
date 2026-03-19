@@ -6,17 +6,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <extern/json.hpp>
 
 #include <ProjectIGAI/core/Scene.hpp>
 #include <ProjectIGAI/core/BaseWindow.hpp>
 #include <ProjectIGAI/graphics/HUD.hpp>
-#include <ProjectIGAI/raytracing/RayTracer.hpp>
 
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
 
 #define MAX_WINDOWS 2
-// #define LOAD_TEXTURES_ON
 
 class BaseWindow; // For includes error
 
@@ -81,7 +80,7 @@ public:
      * 
      * @param file relative path from executable to the scene file to load
      */
-    void initScene(const std::string& file);
+    void initScene(const std::string& sceneFile);
 
     /**
      * @brief Call post init processes of the main window. This function alow, for example, to
@@ -204,20 +203,6 @@ public:
      * @brief Return the number of currently active windows.
      */
     const unsigned int getActiveWindowCount() { return m_activeWindowsCount; }
-
-    /**
-     * @brief Set a new Ray-tracing external window for this application.
-     * 
-     * @param width width of the window
-     * @param height height of the window
-     * @param windowTitle title of the window
-     * @return ID of the window created
-     */
-    unsigned int createExternalRTWindow(
-        const unsigned int width = DEFAULT_SCREEN_WIDTH,
-        const unsigned int height = DEFAULT_SCREEN_HEIGHT,
-        const std::string& windowTitle = "New window"
-    );
 
     /**
      * @brief Remove properly the specified window.

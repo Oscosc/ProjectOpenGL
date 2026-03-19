@@ -31,7 +31,7 @@ void HUD::initCursor()
 
 void HUD::renderCursor() const
 {
-    Shader* sh = ShaderManager::getInstance().getShader("quad");
+    Shader* sh = ShaderManager::getInstance().getResource("quad");
     sh->use();
     sh->setVec2("screenSize", this->m_screenWidth, this->m_screenHeight);
     glBindVertexArray(this->m_cursorVAO);
@@ -45,4 +45,10 @@ void HUD::renderCursor() const
 void HUD::render() const
 {
     renderCursor();
+}
+
+void HUD::setScreenSize(const unsigned int w, const unsigned int h)
+{
+    m_screenWidth = w;
+    m_screenHeight = h;
 }

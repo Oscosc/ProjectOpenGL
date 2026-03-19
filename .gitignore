@@ -7,8 +7,14 @@ doc/*
 # Répertoire de configuration
 .vscode/*
 
-# Répertoire de ressources
-resources/*
+# Répertoire des objets et des textures
+resources/objects/*
+resources/textures/*
+resources/models/*
+resources/cubemaps/*
 
 # Exécutable
 igai_exe
+
+# ImGui
+imgui.ini

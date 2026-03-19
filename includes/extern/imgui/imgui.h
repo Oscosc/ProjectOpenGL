@@ -64,7 +64,7 @@ Index of this file:
 #ifdef IMGUI_USER_CONFIG
 #include IMGUI_USER_CONFIG
 #endif
-#include <extern/imgui/imconfig.h>
+#include "imconfig.h"
 
 #ifndef IMGUI_DISABLE
 
@@ -4152,7 +4152,7 @@ typedef ImFontAtlasRect ImFontAtlasCustomRect;
 #ifdef IMGUI_USER_H_FILENAME
 #include IMGUI_USER_H_FILENAME
 #else
-#include <extern/imgui/imgui_user.h>
+#include "imgui_user.h"
 #endif
 #endif
 

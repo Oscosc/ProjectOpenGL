@@ -1,5 +1,11 @@
 #include <ProjectIGAI/core/BaseWindow.hpp>
 
+#include <ProjectIGAI/graphics/CubemapManager.hpp>
+
+#include <extern/imgui/imgui.h>
+#include <extern/imgui/backends/imgui_impl_glfw.h>
+#include <extern/imgui/backends/imgui_impl_opengl3.h>
+
 BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned int height,
     const std::string& title, GLFWwindow* rootWindow) :
     m_scene(refScene), m_mouseActive(true), m_firstMouse(true), m_screenWidth(width), m_screenHeight(height)
@@ -22,6 +28,9 @@ BaseWindow::BaseWindow(Scene* refScene, const unsigned int width, const unsigned
 
     // Init callback for this window
     initCallbacks();
+
+    // Init ImGui interface
+    initImGui();
 }
 
 void BaseWindow::initCallbacks()
@@ -57,10 +66,29 @@ void BaseWindow::initCallbacks()
     });
 }
 
+void BaseWindow::initImGui()
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard control
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange; // Disable mouse control by ImGui
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.IndentSpacing = 5.0f;
+
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init();
+}
+
 void BaseWindow::render()
 {
     // Making current window the active one
     glfwMakeContextCurrent(this->getGLFWwindow());
+
+    // ImGui frame creation
+    drawImGuiFrame();
 
     // Updating frame time
     float currentFrame = static_cast<float>(glfwGetTime());
@@ -68,11 +96,19 @@ void BaseWindow::render()
     this->m_lastFrame = currentFrame;
 
     // Clearing buffer before drawing
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 bgColor = glm::vec4(m_scene->getBackgroundColor(), 1.f);
+    glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Animation Process
+    m_scene->update(m_deltaTime);
 
     // Calling window-specific rendering logic
     subClassRendering();
+
+    // ImGui frame rendering
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Swaping buffers to render new frame
     glfwSwapBuffers(this->getGLFWwindow());
@@ -80,6 +116,9 @@ void BaseWindow::render()
 
 void BaseWindow::onResize(int width, int height)
 {
+    m_screenWidth  = width;
+    m_screenHeight = height;
+    m_scene->getActiveCamera()->Ratio = (float)width / (float)height;
     glViewport(0, 0, width, height);
 }
 
@@ -97,9 +136,14 @@ void BaseWindow::onKey(int key, int scancode, int action, int mods)
 
     // Switch mouse status
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        if(isMouseActive()) glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        else glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        switchMouseActive();
+        if(isMouseActive()) {
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else {
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            toggleFirstMouse();
+        }
+        toggleMouseActive();
     }
 }
 
@@ -128,7 +172,7 @@ void BaseWindow::onCursorPos(double xPos, double yPos)
     if (this->isFirstMouse())
     {
         this->setCursor(xpos, ypos);
-        this->firstMouseDone();
+        this->toggleFirstMouse();
     }
 
     float xoffset = xpos - this->getCursor().x;

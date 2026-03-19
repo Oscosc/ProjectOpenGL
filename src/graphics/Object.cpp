@@ -1,65 +1,101 @@
 #include <ProjectIGAI/graphics/Object.hpp>
 
-void Object::debugMaterial() const
+#include <ProjectIGAI/core/Logger.hpp>
+#include <ProjectIGAI/graphics/ProjViewMatrix.hpp>
+#include <ProjectIGAI/core/Scene.hpp>
+
+Object::Object(const std::string& name) : m_geometry(nullptr), m_material(nullptr), Node(DEFAULT_TRANSFORM, name)
 {
-    std::cout << "  |- Ambient   : " << glm::to_string(getMaterial().matShader.ambient) << std::endl;
-    std::cout << "  |- Diffuse   : " << glm::to_string(getMaterial().matShader.diffuse) << std::endl;
-    std::cout << "  |- Specular  : " << glm::to_string(getMaterial().matShader.specular) << std::endl;
-    std::cout << "  |- Shininess : " << getMaterial().matShader.shininess << std::endl;
 }
 
-glm::mat4 Object::getModelMatrix() const
+Object::~Object()
 {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, this->m_transform.position);
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.x), glm::vec3(1.0, 0.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.y), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::rotate(model, glm::radians(this->m_transform.rotation.z), glm::vec3(0.0, 0.0, 1.0));
-    model = glm::scale(model, this->m_transform.scale);
-
-    return model;
-}
-void Object::initGLObject()
-{
-    glGenVertexArrays(1, &this->m_VAO);
-    glGenBuffers(1, &this->m_VBO);
-    glGenBuffers(1, &this->m_EBO);
-
-    glBindVertexArray(this->m_VAO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        this->m_indexes.size() * sizeof(unsigned int),
-        this->m_indexes.data(),
-        GL_STATIC_DRAW
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        this->m_vertices.size() * sizeof(Vertex),
-        this->m_vertices.data(),
-        GL_STATIC_DRAW
-    );
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
 }
 
-void Object::updateMaterial(Shader *shader) const
+void Object::setGeometry(Geometry *geometry)
 {
-    shader->use();
-    
-    shader->setVec3("material.ambient", this->getMaterial().matShader.ambient);
-    shader->setVec3("material.diffuse", this->getMaterial().matShader.diffuse);
-    shader->setVec3("material.specular", this->getMaterial().matShader.specular);
-    shader->setFloat("material.shininess", this->getMaterial().matShader.shininess);
+    if(!geometry)
+        Logger::logWarning("Trying to attach an empty geometry to an object");
+    else
+        m_geometry = geometry;
+}
+
+Geometry *Object::getGeometry() const
+{
+    return m_geometry;
+}
+
+void Object::setMaterial(Material *material)
+{
+    if(!material)
+        Logger::logWarning("Trying to attach an empty material to an object");
+    else
+        m_material = material;
+}
+
+Material *Object::getMaterial() const
+{
+    return m_material;
+}
+
+void Object::draw(Scene *scene, Shader* overrideShader, glm::mat4 parentTransform)
+{
+    glm::mat4 globalTransform = parentTransform * getLocalModelMatrix();
+
+    // Animation retrieving ---------------------
+    Animator* animator = nullptr;
+    Node* currentNode = this;
+    Node* animatorNode = nullptr;
+
+    while (currentNode != nullptr) {
+        if (currentNode->getAnimator() != nullptr) {
+            animator = currentNode->getAnimator();
+            animatorNode = currentNode;
+            break;
+        }
+        currentNode = const_cast<Node*>(currentNode->getParent());
+    }
+    // ------------------------------------------
+
+    Shader* activeShader = overrideShader ? overrideShader : (m_material ? m_material->getShader() : nullptr);
+
+    if (activeShader && m_geometry)
+    {
+        activeShader->use();
+
+        if (animator) {
+            auto transforms = animator->GetFinalBoneMatrices();
+            for (int i = 0; i < transforms.size(); ++i) {
+                activeShader->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+            }
+        }
+
+        glm::mat4 modelMatrix = globalTransform;
+        if (animator && animatorNode) {
+            modelMatrix = glm::mat4(1.0f);
+            Node* tempNode = animatorNode;
+            while (tempNode != nullptr) {
+                modelMatrix = tempNode->getLocalModelMatrix() * modelMatrix;
+                tempNode = const_cast<Node*>(tempNode->getParent());
+            }
+        }
+        activeShader->setMat4("model", modelMatrix);
+
+        if (overrideShader == nullptr && m_material)
+        {
+            m_material->bind(scene);
+
+            ProjViewMatrix pv = scene->getActiveCameraPV();
+            activeShader->setMat4("view", pv.view);
+            activeShader->setMat4("projection", pv.projection);
+        }
+
+        m_geometry->draw();
+    }
+
+    // Propagation aux enfants
+    for (Node* child : m_childrens)
+    {
+        child->draw(scene, overrideShader, globalTransform);
+    }
 }

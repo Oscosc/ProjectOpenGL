@@ -4,6 +4,9 @@
 #include <string>
 #include <iostream>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <ProjectIGAI/core/Singleton.hpp>
 
 class TextureManager : public Singleton<TextureManager>
@@ -13,21 +16,9 @@ class TextureManager : public Singleton<TextureManager>
 
 public:
 
-    /**
-     * @brief Load a texture as an OpenGL object
-     * 
-     * @param name name of the texture in the program
-     * @param textureFile file where the texture is stored
-     */
-    void loadTexture(const std::string& name, const std::string textureFile);
+    GLuint loadTexture(const std::string& path, const int mode = GL_REPEAT);
 
-    /**
-     * @brief Retrieve a texture by it's name stored in the TextureManager
-     * 
-     * @param name name of the texture
-     * @return pointer to the texture object
-     */
-    const unsigned int* getTexture(const std::string& name) const;
+    GLuint loadTextureFromMemory(const unsigned char* dataBuffer, int length, const std::string& cacheKey, const int mode = GL_REPEAT);
 
 private:
 
@@ -35,5 +26,5 @@ private:
     TextureManager() = default;
 
     /** textures map */
-    std::unordered_map<std::string, unsigned int> m_textures;
+    std::unordered_map<std::string, GLuint> m_textures;
 };

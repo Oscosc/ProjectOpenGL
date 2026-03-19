@@ -4,12 +4,36 @@
 #include <unordered_map>
 
 #include <ProjectIGAI/core/Singleton.hpp>
+#include <ProjectIGAI/graphics/IResourceManager.hpp>
 #include <extern/shader.hpp>
+
+struct ShaderParam : public ResourceParam {
+    std::string vertexFile;
+    std::string fragmentFile;
+
+    unsigned int pointLights;
+    unsigned int dirLights;
+    unsigned int spotLights;
+
+    ShaderParam(const std::string& name,
+        const std::string& vertexFile,
+        const std::string& fragmentFile,
+        const unsigned int pointLights = 0,
+        const unsigned int dirLights = 0,
+        const unsigned int spotLights = 0) {
+            this->name = name;
+            this->vertexFile = vertexFile;
+            this->fragmentFile = fragmentFile;
+            this->pointLights = pointLights;
+            this->dirLights = dirLights;
+            this->spotLights = spotLights;
+        }
+};
 
 /**
  * @brief Singleton class for shaders management in an application.
  */
-class ShaderManager : public Singleton<ShaderManager>
+class ShaderManager : public IResourceManager<Shader>, public Singleton<ShaderManager>
 {
     // INFO : friend permet d'accéder aux valeurs protected de la classe Singleton
     friend class Singleton<ShaderManager>;
@@ -19,26 +43,11 @@ public:
     /**
      * @brief Compile and load a shader in the manager.
      * 
-     * @param name name of the shader (to retrieve it later)
-     * @param vertexPath path of the .vs or .vert associated file
-     * @param fragmentPath path of the .fs or .frag associated file
      */
-    void loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath,
-        const unsigned int pointLight = 0, const unsigned int dirLight = 0, const unsigned int spotLight = 0);
-
-    /**
-     * @brief Gives a reference to the shader by it's name (null if not found)
-     * 
-     * @param name name of the shader defined when loaded
-     */
-    Shader* getShader(const std::string& name);
+    void loadResource(const ResourceParam& params) override;
 
 private:
 
-    /**
-     * @brief Default constructor (private because of singleton)
-     */
+    /** Default constructor (private because of singleton) */
     ShaderManager() = default;
-    
-    std::unordered_map<std::string, Shader> m_shaders;
 };

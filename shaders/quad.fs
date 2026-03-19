@@ -6,14 +6,14 @@ uniform vec2 screenSize;
 
 void main()
 {
-    // Épaisseur du crosshair (ajuste si nécessaire)
-    float thickness = 0.002;
     float xRatio = screenSize.y / screenSize.x;
-    float size = 0.02;
+
+    vec2 thickness = vec2(0.002 * xRatio, 0.002);
+    vec2 size = vec2(0.02 * xRatio, 0.02);
     
     // Vérifie si le fragment est sur la ligne horizontale ou verticale du crosshair
-    if ((abs(TexCoords.x) < thickness || abs(TexCoords.y) < thickness)
-        && abs(TexCoords.x) < (size * xRatio) && abs(TexCoords.y) < size) {
+    if ((abs(TexCoords.x) < thickness.x || abs(TexCoords.y) < thickness.y)
+        && abs(TexCoords.x) < (size.x) && abs(TexCoords.y) < size.y) {
             FragColor = vec4(0.0, 1.0, 0.0, 1.0);
         }
     else
